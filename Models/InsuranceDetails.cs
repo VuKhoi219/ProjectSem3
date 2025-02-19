@@ -10,7 +10,8 @@ public abstract class InsuranceDetails
 
     [Required]
     public int PlanId { get; set; }
-
+    [Required]
+    public decimal AnnualPaymentAmount { get; set;}
     [Required]
     public decimal Premium { get; set; }
 

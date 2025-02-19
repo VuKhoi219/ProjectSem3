@@ -12,7 +12,7 @@ using Project_Sem3.Data;
 namespace Project_Sem3.Migrations
 {
     [DbContext(typeof(MyDbContext))]
-    [Migration("20250218063210_Initial")]
+    [Migration("20250219135735_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -177,6 +177,9 @@ namespace Project_Sem3.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
+                    b.Property<decimal>("AnnualPaymentAmount")
+                        .HasColumnType("decimal(18,2)");
+
                     b.Property<decimal>("CoverageAmount")
                         .HasColumnType("decimal(18,2)");
 
@@ -251,6 +254,9 @@ namespace Project_Sem3.Migrations
                         .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
+
+                    b.Property<decimal>("AnnualPaymentAmount")
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("Beneficiaries")
                         .IsRequired()
@@ -389,6 +395,9 @@ namespace Project_Sem3.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<decimal>("AnnualPaymentAmount")
+                        .HasColumnType("decimal(18,2)");
+
                     b.Property<decimal>("CoverageAmount")
                         .HasColumnType("decimal(18,2)");
 
@@ -460,6 +469,9 @@ namespace Project_Sem3.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<decimal>("AnnualPaymentAmount")
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<decimal>("CoverageAmount")
                         .HasColumnType("decimal(18,2)");

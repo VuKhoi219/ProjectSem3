@@ -174,6 +174,9 @@ namespace Project_Sem3.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
+                    b.Property<decimal>("AnnualPaymentAmount")
+                        .HasColumnType("decimal(18,2)");
+
                     b.Property<decimal>("CoverageAmount")
                         .HasColumnType("decimal(18,2)");
 
@@ -248,6 +251,9 @@ namespace Project_Sem3.Migrations
                         .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
+
+                    b.Property<decimal>("AnnualPaymentAmount")
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("Beneficiaries")
                         .IsRequired()
@@ -386,6 +392,9 @@ namespace Project_Sem3.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<decimal>("AnnualPaymentAmount")
+                        .HasColumnType("decimal(18,2)");
+
                     b.Property<decimal>("CoverageAmount")
                         .HasColumnType("decimal(18,2)");
 
@@ -457,6 +466,9 @@ namespace Project_Sem3.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<decimal>("AnnualPaymentAmount")
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<decimal>("CoverageAmount")
                         .HasColumnType("decimal(18,2)");
