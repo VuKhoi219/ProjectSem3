@@ -3,6 +3,8 @@ using DotNetEnv;
 using Microsoft.EntityFrameworkCore;
 using Project_Sem3.Data;
 using Project_Sem3.Helper;
+using Project_Sem3.Helper.BaseRate;
+using Project_Sem3.Helper.RiskFactor;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<MyDbContext>(options => // Program.cs
@@ -11,6 +13,8 @@ builder.Services.AddDbContext<MyDbContext>(options => // Program.cs
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+builder.Services.AddScoped<BaseRate>();
+builder.Services.AddScoped<RiskFactor>();
 builder.Services.AddScoped<CalculateCoefficient>(); 
 builder.Services.AddScoped<CalculateInsuranceServices>();
 
