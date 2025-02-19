@@ -12,32 +12,28 @@ public class CalculateInsuranceServices
         _baseRate = baseRate;
     }
     
-    public (decimal,decimal,decimal,decimal) LifeInsurance(int age, string healthStatus, string career ,decimal coverageAmount , int contractDuration)
+    public (decimal,decimal,decimal,decimal,decimal) LifeInsurance(int age, string healthStatus, string career ,decimal coverageAmount , int contractDuration)
     {
         if (age <=  0 || healthStatus.Length <=0 || career.Length <= 0 || coverageAmount <=0 || contractDuration <=0 )
         {
-            return (0m , 0m,0m , 0m);
+            return (0m , 0m,0m , 0m,0m);
         }
         decimal ageCoefficient = _calculateCoefficient.ageCoefficient(age);
         decimal healthCoefficient = _calculateCoefficient.healthCoefficient(healthStatus);
         decimal careerCoefficient = _calculateCoefficient.careerCoefficient(career);
-
         decimal riskFactor  =
             _riskFactor.CalculateLifeInsuranceRiskFactor(ageCoefficient, healthCoefficient, careerCoefficient);
         decimal baseRateLife = _baseRate.BaseRateLife(age);
-
-        decimal premium = baseRateLife + (riskFactor  * coverageAmount);
-        decimal total = premium * contractDuration;
-        decimal deductible = premium * 0.01m;
-        return (total , deductible , coverageAmount * contractDuration ,riskFactor);        
-
-    }
+        decimal annualPaymentAmount = baseRateLife + (riskFactor  * coverageAmount);
+        decimal deductible = annualPaymentAmount * 0.01m;
+        decimal premium = annualPaymentAmount * contractDuration;
+        return (annualPaymentAmount ,premium,deductible , coverageAmount * contractDuration ,riskFactor);       }
     
-    public (decimal,decimal,decimal,decimal)HealthInsurance(int age, string healthStatus, string career,string lifestyle ,decimal coverageAmount , int contractDuration)
+    public (decimal,decimal,decimal,decimal,decimal)HealthInsurance(int age, string healthStatus, string career,string lifestyle ,decimal coverageAmount , int contractDuration)
     {
         if (age <=  0 || healthStatus.Length <=0 || career.Length <= 0 || lifestyle.Length <= 0 || coverageAmount <=0 || contractDuration <=0 )
         {
-            return (0m , 0m,0m , 0m);
+            return (0m , 0m,0m , 0m,0m);
         }
         decimal baseRateHealth = _baseRate.BaseRateHealth();
         decimal ageCoefficient = _calculateCoefficient.ageCoefficient(age);
@@ -46,13 +42,13 @@ public class CalculateInsuranceServices
         decimal lifestyleCoefficient = _calculateCoefficient.lifestyleCoefficient(lifestyle);
         decimal riskFactor = _riskFactor.CalculateHealthInsuranceRiskFactor(ageCoefficient,healthCoefficient,careerCoefficient,lifestyleCoefficient);
 
-        decimal premium = baseRateHealth + ((riskFactor + healthCoefficient) * coverageAmount);
-        decimal total = premium * contractDuration;
-        decimal deductible = premium * 0.01m;
-        return (total , deductible , coverageAmount * contractDuration ,riskFactor);        
+        decimal annualPaymentAmount = baseRateHealth + ((riskFactor + healthCoefficient) * coverageAmount);
+        decimal deductible = annualPaymentAmount * 0.01m;
+        decimal premium = annualPaymentAmount * contractDuration;
+        return (annualPaymentAmount ,premium,deductible , coverageAmount * contractDuration ,riskFactor);      
     }
     
-    public (decimal, decimal, decimal, decimal) VehicleInsurance(int age ,string vehicleType ,
+    public (decimal, decimal, decimal, decimal,decimal) VehicleInsurance(int age ,string vehicleType ,
         string vehicleBrand ,string city ,
         int numberOfAccidents , int yearsWithoutAccident,
         decimal coverageAmount , int contractDuration)
@@ -60,7 +56,7 @@ public class CalculateInsuranceServices
         if (age <= 0 || vehicleType.Length <= 0 || vehicleBrand.Length <= 0 || city.Length <= 0
             || numberOfAccidents <= 0 || yearsWithoutAccident <= 0 || coverageAmount <= 0 || contractDuration <= 0)
         {
-            return (0m, 0m, 0m, 0m);
+            return (0m , 0m,0m , 0m,0m);
         }
         decimal baseRateVehicle = _baseRate.BaseRateVehicle();
         decimal ageCoefficient = _calculateCoefficient.ageCoefficient(age);
@@ -72,15 +68,16 @@ public class CalculateInsuranceServices
             _riskFactor.CalculateVehicleInsuranceRiskFactor(ageCoefficient , vehicleCoefficient, accidentCoefficient
                 ,locationCoefficient);
         // premium làm tròn đến số lớn hơn
-        decimal premium = decimal.Round(baseRateVehicle + (coverageAmount * riskFactor) * 0.9m , 1 ); 
-        decimal deductible =decimal.Round((premium / 0.9m),1) * 0.1m;
-        decimal total = premium * contractDuration;
-        return (total , deductible , coverageAmount * contractDuration ,riskFactor);        
+        decimal annualPaymentAmount
+            = decimal.Round(baseRateVehicle + (coverageAmount * riskFactor) * 0.9m , 1 ); 
+        decimal deductible =decimal.Round((annualPaymentAmount / 0.9m),1) * 0.1m;
+        decimal premium = annualPaymentAmount * contractDuration;
+        return (annualPaymentAmount ,premium,deductible , coverageAmount * contractDuration ,riskFactor);        
     }
     
     // decimal homeInsuranceCost = HomeInsurance(2000000000, 0.005m, 1.2m, 1.5m);
     // Console.WriteLine($"Phí bảo hiểm nhà ở: {homeInsuranceCost:N0} VND");
-    public (decimal, decimal, decimal, decimal) PropertyCoefficient(string houseType ,string city ,
+    public (decimal, decimal, decimal, decimal , decimal) PropertyCoefficient(string houseType ,string city ,
         int assetAge , string material ,decimal coverageAmount , int contractDuration)
     {
         decimal baseRateProperty = _baseRate.BaseRateProperty();
@@ -105,9 +102,9 @@ public class CalculateInsuranceServices
             deductiblePercentage = 0.01m;
         }
 
-        decimal premium = decimal.Round((baseRateProperty + (coverageAmount * riskFactor)) * (1 - deductiblePercentage));
-        decimal deductible =decimal.Round((premium /(1 - deductiblePercentage)),1) * 0.1m;
-        decimal total = premium * contractDuration;
-        return (total , deductible , coverageAmount * contractDuration ,riskFactor);        
+        decimal annualPaymentAmount = decimal.Round((baseRateProperty + (coverageAmount * riskFactor)) * (1 - deductiblePercentage));
+        decimal deductible =decimal.Round((annualPaymentAmount /(1 - deductiblePercentage)),1) * 0.1m;
+        decimal premium = annualPaymentAmount * contractDuration;
+        return (annualPaymentAmount ,premium,deductible , coverageAmount * contractDuration ,riskFactor);       
     }
 }
