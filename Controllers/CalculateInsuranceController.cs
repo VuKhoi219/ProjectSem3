@@ -20,8 +20,8 @@ public class CalculateInsuranceController : Controller
         {
             try
             {
-                var result = _calculateInsuranceServices.LifeInsurance(request.InsuranceAmount, 0.05m, request.Age, request.HealthStatus , request.ContractDuration);
-                return Ok(new { TotalCost = result });
+                var result = _calculateInsuranceServices.LifeInsurance(request.Age,request.HealthStatus,request.Career,request.CoverageAmount,request.ContractDuration);
+                return Ok(new { TotalCost = result.Item1 , deductible = result.Item2 ,  coverageAmount = result.Item3 , riskFactor = result.Item4  });
             }
             catch (Exception ex)
             {
@@ -34,40 +34,44 @@ public class CalculateInsuranceController : Controller
         {
             try
             {
-                var result = _calculateInsuranceServices.HealthInsurance(request.InsuranceAmount, 0.05m, request.Age, request.HealthStatus, request.ContractDuration);
-                return Ok(new { TotalCost = result });
+                var result = _calculateInsuranceServices.HealthInsurance(request.Age, request.HealthStatus,
+                    request.Career, request.Lifestyle, request.CoverageAmount, request.ContractDuration);
+                return Ok(new { TotalCost = result.Item1 , deductible = result.Item2 ,  coverageAmount = result.Item3 , riskFactor = result.Item4  });
             }
             catch (Exception ex)
             {
                 return BadRequest(new { message = ex.Message });
             }
         }
-
-        [HttpPost("auto")]
-        public IActionResult CalculateAutoInsurance([FromBody] AutoInsuranceRequest request)
+        [HttpPost("vehicle")]
+        public IActionResult CalculateVehicleInsurance([FromBody] VehicleInsuranceRequest request)
         {
             try
             {
-                var result = _calculateInsuranceServices.AutoInsurance(request.CarValue,0.05m, request.CarBrand, request.NumberOfAccidents, request.YearsWithoutAccident, request.ContractDuration);
-                return Ok(new { TotalCost = result });
+                var result = _calculateInsuranceServices.VehicleInsurance(request.Age, request.VehicleType,
+                    request.VehicleBrand, request.City, request.NumberOfAccidents, request.YearsWithoutAccident,
+                    request.CoverageAmount, request.ContractDuration);
+                return Ok(new { TotalCost = result.Item1 , deductible = result.Item2 ,  coverageAmount = result.Item3 , riskFactor = result.Item4  });
             }
-            catch (Exception ex)
+            catch (Exception e)
             {
-                return BadRequest(new { message = ex.Message });
+                return BadRequest(new { message = e.Message });
+
             }
         }
 
         [HttpPost("home")]
-        public IActionResult CalculateHomeInsurance([FromBody] HomeInsuranceRequest request)
+        public IActionResult CalculatePropertyInsurance([FromBody] HomeInsuranceRequest request)
         {
             try
             {
-                var result = _calculateInsuranceServices.HomeInsurance(request.HomeValue, 0.05m, request.City , request.ContractDuration);
-                return Ok(new { TotalCost = result });
+                var result = _calculateInsuranceServices.PropertyCoefficient(request.HouseType, request.City,
+                    request.AssetAge, request.Material, request.CoverageAmount, request.ContractDuration);
+                return Ok(new { TotalCost = result.Item1 , deductible = result.Item2 ,  coverageAmount = result.Item3 , riskFactor = result.Item4  });
             }
-            catch (Exception ex)
+            catch (Exception e)
             {
-                return BadRequest(new { message = ex.Message });
+                return BadRequest(new { message = e.Message });
             }
         }
 }

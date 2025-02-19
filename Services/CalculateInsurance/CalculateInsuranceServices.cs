@@ -2,77 +2,112 @@ namespace Project_Sem3.Helper;
 
 public class CalculateInsuranceServices
 {
-    public readonly CalculateCoefficient _CalculateCoefficient;
-
-    public CalculateInsuranceServices(CalculateCoefficient calculateCoefficient)
+    public readonly CalculateCoefficient _calculateCoefficient;
+    public readonly RiskFactor.RiskFactor _riskFactor;
+    public readonly BaseRate.BaseRate _baseRate;
+    public CalculateInsuranceServices(CalculateCoefficient calculateCoefficient , RiskFactor.RiskFactor riskFactor , BaseRate.BaseRate baseRate)
     {
-        _CalculateCoefficient = calculateCoefficient;
-    }
-    // ví dụ  : 
-    // decimal insuranceAmount = 500000000; // 500 triệu VND
-    // decimal basicFee = 0.005m; // 0.5%
-    // decimal ageCoefficient = 1.2m; // 40 tuổi
-    // decimal healthCoefficient = 1.3m; // Tiểu đường
-    // decimal insuranceCost = LifeInsurance(insuranceAmount, basicFee, ageCoefficient, healthCoefficient);
-    public decimal LifeInsurance(decimal insuranceAmount, decimal basicFee,int age,
-        string healthStatus , int contractDuration)
-    {
-        if (insuranceAmount <= 0 || basicFee <= 0 || age <= 0 || healthStatus.Length <= 0)
-        {
-            throw new ArgumentException("Các giá trị đầu vào phải lớn hơn 0.");
-        }
-        decimal ageCoefficient = _CalculateCoefficient.ageCoefficient(age);
-        decimal healthCoefficient = _CalculateCoefficient.healthCoefficient(healthStatus);
-        decimal contractCoefficient = _CalculateCoefficient.contractCoefficient(contractDuration);
-        return insuranceAmount * basicFee * ageCoefficient * healthCoefficient * contractCoefficient;
+        _calculateCoefficient = calculateCoefficient;
+        _riskFactor = riskFactor;
+        _baseRate = baseRate;
     }
     
-    // decimal healthInsuranceCost = HealthInsurance(100000000, 0.002m, 1.1m, 1.2m);
-    // Console.WriteLine($"Phí bảo hiểm y tế: {healthInsuranceCost:N0} VND");
-    public decimal HealthInsurance(decimal insuranceAmount, decimal baseRate,int age,
-        string healthStatus ,int contractDuration)
+    public (decimal,decimal,decimal,decimal) LifeInsurance(int age, string healthStatus, string career ,decimal coverageAmount , int contractDuration)
     {
-        if (insuranceAmount <= 0 || baseRate <= 0 || age <= 0 || healthStatus.Length <= 0)
+        if (age <=  0 || healthStatus.Length <=0 || career.Length <= 0 || coverageAmount <=0 || contractDuration <=0 )
         {
-            throw new ArgumentException("Các giá trị đầu vào phải lớn hơn 0.");
+            return (0m , 0m,0m , 0m);
         }
-        decimal ageCoefficient = _CalculateCoefficient.ageCoefficient(age);
-        decimal healthCoefficient = _CalculateCoefficient.healthCoefficient(healthStatus);
-        decimal contractCoefficient = _CalculateCoefficient.contractCoefficient(contractDuration);
-        return insuranceAmount * baseRate * ageCoefficient * healthCoefficient * contractCoefficient;
+        decimal ageCoefficient = _calculateCoefficient.ageCoefficient(age);
+        decimal healthCoefficient = _calculateCoefficient.healthCoefficient(healthStatus);
+        decimal careerCoefficient = _calculateCoefficient.careerCoefficient(career);
+
+        decimal riskFactor  =
+            _riskFactor.CalculateLifeInsuranceRiskFactor(ageCoefficient, healthCoefficient, careerCoefficient);
+        decimal baseRateLife = _baseRate.BaseRateLife(age);
+
+        decimal premium = baseRateLife + (riskFactor  * coverageAmount);
+        decimal total = premium * contractDuration;
+        decimal deductible = premium * 0.01m;
+        return (total , deductible , coverageAmount * contractDuration ,riskFactor);        
+
     }
     
-    // decimal autoInsuranceCost = AutoInsurance(500000000, 0.01m, 1.05m, 1.2m);
-    // Console.WriteLine($"Phí bảo hiểm xe cơ giới: {autoInsuranceCost:N0} VND");
-    public decimal AutoInsurance(decimal carValue, decimal baseRate , string carBarand, int numberOfAccidents
-        , int yearsWithoutAccident , int contractDuration)
+    public (decimal,decimal,decimal,decimal)HealthInsurance(int age, string healthStatus, string career,string lifestyle ,decimal coverageAmount , int contractDuration)
     {
-        if (carValue <= 0 || baseRate <= 0 || carBarand.Length <= 0 || numberOfAccidents < 0|| yearsWithoutAccident <0)
+        if (age <=  0 || healthStatus.Length <=0 || career.Length <= 0 || lifestyle.Length <= 0 || coverageAmount <=0 || contractDuration <=0 )
         {
-            throw new ArgumentException("Các giá trị đầu vào phải lớn hơn 0.");
+            return (0m , 0m,0m , 0m);
         }
+        decimal baseRateHealth = _baseRate.BaseRateHealth();
+        decimal ageCoefficient = _calculateCoefficient.ageCoefficient(age);
+        decimal healthCoefficient = _calculateCoefficient.healthCoefficient(healthStatus);
+        decimal careerCoefficient = _calculateCoefficient.careerCoefficient(career);
+        decimal lifestyleCoefficient = _calculateCoefficient.lifestyleCoefficient(lifestyle);
+        decimal riskFactor = _riskFactor.CalculateHealthInsuranceRiskFactor(ageCoefficient,healthCoefficient,careerCoefficient,lifestyleCoefficient);
 
-        decimal carTypeCoefficient = _CalculateCoefficient.carTypeCoefficient(carBarand);
+        decimal premium = baseRateHealth + ((riskFactor + healthCoefficient) * coverageAmount);
+        decimal total = premium * contractDuration;
+        decimal deductible = premium * 0.01m;
+        return (total , deductible , coverageAmount * contractDuration ,riskFactor);        
+    }
+    
+    public (decimal, decimal, decimal, decimal) VehicleInsurance(int age ,string vehicleType ,
+        string vehicleBrand ,string city ,
+        int numberOfAccidents , int yearsWithoutAccident,
+        decimal coverageAmount , int contractDuration)
+    {
+        if (age <= 0 || vehicleType.Length <= 0 || vehicleBrand.Length <= 0 || city.Length <= 0
+            || numberOfAccidents <= 0 || yearsWithoutAccident <= 0 || coverageAmount <= 0 || contractDuration <= 0)
+        {
+            return (0m, 0m, 0m, 0m);
+        }
+        decimal baseRateVehicle = _baseRate.BaseRateVehicle();
+        decimal ageCoefficient = _calculateCoefficient.ageCoefficient(age);
+        decimal vehicleCoefficient = _calculateCoefficient.vehicleCoefficient(vehicleType, vehicleBrand);
+        decimal locationCoefficient = _calculateCoefficient.locationCoefficient(city);
         decimal accidentCoefficient =
-            _CalculateCoefficient.accidentCoefficient(numberOfAccidents, yearsWithoutAccident);
-        decimal contractCoefficient = _CalculateCoefficient.contractCoefficient(contractDuration);
-
-        return carValue * baseRate * carTypeCoefficient * accidentCoefficient * contractCoefficient;
+            _calculateCoefficient.accidentCoefficient(numberOfAccidents, yearsWithoutAccident);
+        decimal riskFactor = 
+            _riskFactor.CalculateVehicleInsuranceRiskFactor(ageCoefficient , vehicleCoefficient, accidentCoefficient
+                ,locationCoefficient);
+        // premium làm tròn đến số lớn hơn
+        decimal premium = decimal.Round(baseRateVehicle + (coverageAmount * riskFactor) * 0.9m , 1 ); 
+        decimal deductible =decimal.Round((premium / 0.9m),1) * 0.1m;
+        decimal total = premium * contractDuration;
+        return (total , deductible , coverageAmount * contractDuration ,riskFactor);        
     }
     
     // decimal homeInsuranceCost = HomeInsurance(2000000000, 0.005m, 1.2m, 1.5m);
     // Console.WriteLine($"Phí bảo hiểm nhà ở: {homeInsuranceCost:N0} VND");
-    public decimal HomeInsurance(decimal homeValue, decimal baseRate, string city,int contractDuration)
+    public (decimal, decimal, decimal, decimal) PropertyCoefficient(string houseType ,string city ,
+        int assetAge , string material ,decimal coverageAmount , int contractDuration)
     {
-        if (homeValue <= 0 || baseRate <= 0 || city.Length <= 0)
+        decimal baseRateProperty = _baseRate.BaseRateProperty();
+        decimal disasterRiskCoefficient = _calculateCoefficient.disasterRiskCoefficient(city);
+        decimal assetAgeRiskCoefficient = _calculateCoefficient.assetAgeRiskCoefficient(assetAge);
+        decimal constructionMaterialRiskCoefficient =
+            _calculateCoefficient.constructionMaterialRiskCoefficient(material);
+        decimal crimeRiskCoefficient = _calculateCoefficient.crimeRiskCoefficient(city);
+        decimal riskFactor = _riskFactor.CalculatePropertyInsuranceRiskFactor(0.01m, disasterRiskCoefficient,
+            assetAgeRiskCoefficient, constructionMaterialRiskCoefficient, crimeRiskCoefficient);
+        decimal deductiblePercentage;
+        if (houseType.ToLower().Trim().Equals("Căn hộ"))
         {
-            throw new ArgumentException("Các giá trị đầu vào phải lớn hơn 0.");
+            deductiblePercentage = 0.03m;
+        }
+        else if(houseType.ToLower().Trim().Equals("Thương mại"))
+        {
+            deductiblePercentage = 0.05m;
+        }
+        else
+        {
+            deductiblePercentage = 0.01m;
         }
 
-        decimal locationCoefficient = _CalculateCoefficient.locationCoefficient(city);
-        decimal disasterRiskCoefficient = _CalculateCoefficient.disasterRiskCoefficient(city);
-        decimal contractCoefficient = _CalculateCoefficient.contractCoefficient(contractDuration);
-
-        return homeValue * baseRate * locationCoefficient * disasterRiskCoefficient * contractCoefficient;
+        decimal premium = decimal.Round((baseRateProperty + (coverageAmount * riskFactor)) * (1 - deductiblePercentage));
+        decimal deductible =decimal.Round((premium /(1 - deductiblePercentage)),1) * 0.1m;
+        decimal total = premium * contractDuration;
+        return (total , deductible , coverageAmount * contractDuration ,riskFactor);        
     }
 }
