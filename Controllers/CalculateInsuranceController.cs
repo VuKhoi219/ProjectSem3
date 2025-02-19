@@ -21,7 +21,7 @@ public class CalculateInsuranceController : Controller
             try
             {
                 var result = _calculateInsuranceServices.LifeInsurance(request.Age,request.HealthStatus,request.Career,request.CoverageAmount,request.ContractDuration);
-                return Ok(new { TotalCost = result.Item1 , deductible = result.Item2 ,  coverageAmount = result.Item3 , riskFactor = result.Item4  });
+                return Ok(new { annualPaymentAmount = result.Item1 , premium = result.Item2 ,  deductible = result.Item3 , coverageAmount = result.Item4 ,riskFactor = result.Item5 });
             }
             catch (Exception ex)
             {
@@ -36,7 +36,7 @@ public class CalculateInsuranceController : Controller
             {
                 var result = _calculateInsuranceServices.HealthInsurance(request.Age, request.HealthStatus,
                     request.Career, request.Lifestyle, request.CoverageAmount, request.ContractDuration);
-                return Ok(new { TotalCost = result.Item1 , deductible = result.Item2 ,  coverageAmount = result.Item3 , riskFactor = result.Item4  });
+                return Ok(new { annualPaymentAmount = result.Item1 , premium = result.Item2 ,  deductible = result.Item3 , coverageAmount = result.Item4 ,riskFactor = result.Item5 });
             }
             catch (Exception ex)
             {
@@ -51,12 +51,11 @@ public class CalculateInsuranceController : Controller
                 var result = _calculateInsuranceServices.VehicleInsurance(request.Age, request.VehicleType,
                     request.VehicleBrand, request.City, request.NumberOfAccidents, request.YearsWithoutAccident,
                     request.CoverageAmount, request.ContractDuration);
-                return Ok(new { TotalCost = result.Item1 , deductible = result.Item2 ,  coverageAmount = result.Item3 , riskFactor = result.Item4  });
+                return Ok(new { annualPaymentAmount = result.Item1 , premium = result.Item2 ,  deductible = result.Item3 , coverageAmount = result.Item4 ,riskFactor = result.Item5 });
             }
             catch (Exception e)
             {
                 return BadRequest(new { message = e.Message });
-
             }
         }
 
@@ -67,7 +66,7 @@ public class CalculateInsuranceController : Controller
             {
                 var result = _calculateInsuranceServices.PropertyCoefficient(request.HouseType, request.City,
                     request.AssetAge, request.Material, request.CoverageAmount, request.ContractDuration);
-                return Ok(new { TotalCost = result.Item1 , deductible = result.Item2 ,  coverageAmount = result.Item3 , riskFactor = result.Item4  });
+                return Ok(new { annualPaymentAmount = result.Item1 , premium = result.Item2 ,  deductible = result.Item3 , coverageAmount = result.Item4 ,riskFactor = result.Item5 });
             }
             catch (Exception e)
             {
