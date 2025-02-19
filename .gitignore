@@ -1,0 +1,36 @@
+# Thư mục build tự động //
+bin/
+obj/
+
+# Thư viện NuGet
+packages/
+
+# Cấu hình IDE
+.vs/
+.idea/
+*.user
+*.suo
+*.vscode/
+
+# File tạm thời và cache
+*.log
+*.tmp
+*.cache
+*.pid
+
+# Cấu hình nhạy cảm
+appsettings.Development.json
+appsettings.Production.json
+appsettings.Local.json
+appsettings.json
+# Các file DLL, EXE
+*.dll
+*.exe
+*.pdb
+
+# File chứa thông tin bảo mật
+secrets.json
+.env
+*.key
+*.pfx
+#
