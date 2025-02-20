@@ -26,8 +26,6 @@ namespace Project_Sem3.Migrations
                     RepaymentAmount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     DueDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     PaymentSchedule = table.Column<int>(type: "int", nullable: false),
-                    BankTransactionId = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    BankStatus = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
                     UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
