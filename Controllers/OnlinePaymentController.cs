@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Project_Sem3.Models.MyBank;
 using Project_Sem3.Services;
 
 namespace Project_Sem3.Controllers;
@@ -14,11 +15,11 @@ public class OnlinePaymentController : Controller
     }
 
     [HttpPost("generate-qr-url")]
-    public IActionResult GenerateQrUrl()
+    public IActionResult GenerateQrUrl([FromBody] PaymentContent paymentContent)
     {
-        decimal am = 100000.0m;
-        string value = "test";
-        var result = _onlinePaymentServices.GenerateQrUrl(am, value);
+        // decimal am = 100000.0m;
+        // string value = "test";
+        var result = _onlinePaymentServices.GenerateQrUrl(paymentContent.Amount, paymentContent.Value);
         return Ok(result);
     }
     
