@@ -3,11 +3,11 @@ using Project_Sem3.Models.MyBank;
 
 namespace Project_Sem3.Services;
 
-public class OnlinePayment
+public class OnlinePaymentServices
 {
     private readonly PaymentSetting _paymentSetting;
 
-    public OnlinePayment(IOptions<PaymentSetting> paymentSetting)
+    public OnlinePaymentServices(IOptions<PaymentSetting> paymentSetting)
     {
         _paymentSetting = paymentSetting.Value;
     }
