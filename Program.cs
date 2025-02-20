@@ -14,6 +14,7 @@ builder.Services.AddDbContext<MyDbContext>(options => // Program.cs
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 builder.Services.Configure<MailSettings>(builder.Configuration.GetSection("MailSettings"));
 builder.Services.Configure<PaymentSetting>(builder.Configuration.GetSection("PaymentSetting"));
+builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 // đăng ký sử dụng file
@@ -21,7 +22,7 @@ builder.Services.AddScoped<ISendMailService, SendMailService>();
 builder.Services.AddScoped<BaseRate>();
 builder.Services.AddScoped<RiskFactor>();
 builder.Services.AddScoped<OnlinePaymentServices>();
-builder.Services.AddScoped<CalculateCoefficient>(); 
+builder.Services.AddScoped<CalculateCoefficient>();
 builder.Services.AddScoped<CalculateInsuranceServices>();
 
 var app = builder.Build();
@@ -44,6 +45,11 @@ app.UseAuthorization();
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
+
+app.MapControllerRoute(
+  name: "defaultWithArea",
+  pattern: "{area:exists}/{controller=Home}/{action=Index2}/{id?}"
+);
 
 app.Run();
 
