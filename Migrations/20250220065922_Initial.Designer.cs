@@ -12,7 +12,7 @@ using Project_Sem3.Data;
 namespace Project_Sem3.Migrations
 {
     [DbContext(typeof(MyDbContext))]
-    [Migration("20250219135735_Initial")]
+    [Migration("20250220065922_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
