@@ -8,17 +8,23 @@ namespace Project_Sem3.Controllers;
 [Route("api/send-email/")]
 public class SendEmail : Controller
 {
-    private readonly SendMailService _sendMailService;
+    private readonly ISendMailService _sendMailService;
+
+    public SendEmail(ISendMailService sendMailService)
+    {
+        _sendMailService = sendMailService;
+    }
     
     [HttpPost("send")]
-    public async Task<IActionResult> SendtoEmail()
+    public async Task<IActionResult> SendtoEmail([FromBody] MailContent mailContent)
     {
-        MailContent content = new MailContent {
-            To = "vukhoi353@gmail.com",
-            Subject = "Kiểm tra thử",
-            Body = "<p><strong>Xin chào xuanthulab.net</strong></p>"
-        };
-        await _sendMailService.SendMail(content);
-        return Ok("ok");
+        // vi dụ
+        // MailContent content = new MailContent {
+        //     To = "ellyproe@gmail.com",
+        //     Subject = "Kiểm tra thử",
+        //     Body = "<p><strong>Xin chào xuanthulab.net</strong></p>"
+        // };
+        bool result =   await _sendMailService.SendMail(mailContent);
+        return Ok(result);
     }
 }

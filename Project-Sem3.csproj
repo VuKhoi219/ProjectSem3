@@ -10,6 +10,7 @@
     <ItemGroup>
       <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
       <PackageReference Include="DotNetEnv" Version="3.1.1" />
+      <PackageReference Include="MailKit" Version="4.10.0" />
       <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="8.0.12" />
       <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.0" />
       <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.0">
@@ -23,6 +24,7 @@
       </PackageReference>
       <PackageReference Include="Microsoft.Extensions.Options" Version="9.0.0" />
       <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.13.0" />
+      <PackageReference Include="MimeKit" Version="4.10.0" />
       <PackageReference Include="System.Net.Mail" Version="1.0.0-rtm-00002" />
     </ItemGroup>
 
