@@ -21,7 +21,6 @@ builder.Services.AddScoped<ISendMailService, SendMailService>();
 builder.Services.AddScoped<BaseRate>();
 builder.Services.AddScoped<RiskFactor>();
 builder.Services.AddScoped<OnlinePaymentServices>();
-
 builder.Services.AddScoped<CalculateCoefficient>(); 
 builder.Services.AddScoped<CalculateInsuranceServices>();
 

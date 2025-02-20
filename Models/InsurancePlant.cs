@@ -48,7 +48,7 @@ public enum InsuranceType
 {
     Life,
     Health,
-    Auto,
+    Vehicle,
     Property
 }
 
