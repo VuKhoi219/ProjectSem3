@@ -34,11 +34,6 @@ public class BorrowCapital
     [Required]
     public PaymentSchedule PaymentSchedule { get; set; }
 
-    [MaxLength(100)]
-    public string BankTransactionId { get; set; }
-
-    public string BankStatus { get; set; }
-
     [Required]
     public string Status { get; set; }
 
@@ -47,7 +42,6 @@ public class BorrowCapital
     public DateTime? UpdatedAt { get; set; }
 
     public DateTime? DeleteAt { get; set; }
-
     public int? CreatedBy { get; set; }
     public int? UpdatedBy { get; set; }
     public int? DeleteBy { get; set; }
