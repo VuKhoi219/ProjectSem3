@@ -14,25 +14,25 @@ public class DatabaseSeeder
         {
             var roles = new List<Role>
             {
-                new Role 
-                { 
-                    Name = "Admin", 
-                    CreatedAt = DateTime.Now, 
-                    UpdatedAt = DateTime.Now, 
-                    DeleteAt = null, 
-                    CreatedBy = null, 
-                    UpdatedBy = null, 
-                    DeleteBy = null 
+                new Role
+                {
+                    Name = "Admin",
+                    CreatedAt = DateTime.Now,
+                    UpdatedAt = DateTime.Now,
+                    DeleteAt = null,
+                    CreatedBy = null,
+                    UpdatedBy = null,
+                    DeleteBy = null
                 },
-                new Role 
-                { 
-                    Name = "User", 
-                    CreatedAt = DateTime.Now, 
-                    UpdatedAt = DateTime.Now, 
-                    DeleteAt = null, 
-                    CreatedBy = null, 
-                    UpdatedBy = null, 
-                    DeleteBy = null 
+                new Role
+                {
+                    Name = "User",
+                    CreatedAt = DateTime.Now,
+                    UpdatedAt = DateTime.Now,
+                    DeleteAt = null,
+                    CreatedBy = null,
+                    UpdatedBy = null,
+                    DeleteBy = null
                 }
             };
             context.Roles.AddRange(roles);
@@ -53,7 +53,7 @@ public class DatabaseSeeder
                 .RuleFor(u => u.UpdatedAt, f => f.Date.Past(1))
                 .RuleFor(u => u.DeleteAt, f => f.Random.Bool(0.1f) ? f.Date.Past(1) : null) // 10% bị xóa
                 .RuleFor(u => u.RoleId, f => f.Random.Int(4, 5)); // Admin = 1, User = 2
-        
+
             var users = userFaker.Generate(10); // Sinh 10 user
             context.Users.AddRange(users);
             context.SaveChanges();
@@ -73,7 +73,7 @@ public class DatabaseSeeder
         .RuleFor(i => i.CreatedBy, f => f.Random.Int(2, 11)) // Người tạo từ 1-10
         .RuleFor(i => i.UpdatedBy, f => f.Random.Int(2, 11))
         .RuleFor(i => i.DeleteBy, f => f.Random.Bool(0.1f) ? f.Random.Int(2, 11) : null);
-        
+
             var insurances = insuranceFaker.Generate(20); // Tạo 20 bản ghi
             context.InsurancePlans.AddRange(insurances);
             context.SaveChanges();
@@ -97,9 +97,9 @@ public class DatabaseSeeder
             context.InsuranceContracts.AddRange(insuranceContracts);
             context.SaveChanges();
         }
-        
+
         if (!context.Payments.Any())
-        { 
+        {
             var paymentFaker = new Faker<Payment>()
                 .RuleFor(p => p.UserId, f =>f.Random.Int(2, 11)) // Người dùng ngẫu nhiên
                 .RuleFor(p => p.ContractId, f => f.Random.Int(4, 103)) // Hợp đồng ngẫu nhiên
@@ -118,7 +118,7 @@ public class DatabaseSeeder
             context.Payments.AddRange(payments);
             context.SaveChanges();
         }
-        
+
 
         if (!context.BorrowCapitals.Any())
         {
@@ -213,6 +213,34 @@ public class DatabaseSeeder
             var insuranceHealthDetails = insuranceHealthFaker.Generate(100); // Tạo 100 bản ghi
             context.InsuranceHealthDetails.AddRange(insuranceHealthDetails);
             context.SaveChanges();
+        }
+        if (!context.LoanPayments.Any())
+        {
+          var loanPaymentFaker = new Faker<LoanPayment>()
+            .RuleFor(lp => lp.BorrowId, f => f.Random.Int(1, 10))
+            .RuleFor(lp => lp.PaymentAmount, f => f.Random.Decimal(100, 5000))
+            .RuleFor(lp => lp.PaymentDate, f => f.Date.Past())
+            .RuleFor(lp => lp.PaymentImage, f => f.Internet.Avatar())
+            .RuleFor(lp => lp.OverdueDays, f => f.Random.Int(0, 30))
+            .RuleFor(lp => lp.PenaltyInterest, f => f.Random.Decimal(0, 100))
+            .RuleFor(lp => lp.Status, f => f.Random.Bool())
+            .RuleFor(lp => lp.CreatedAt, f => f.Date.Past())
+            .RuleFor(lp => lp.CreatedBy, f => f.Random.Int(1, 5));
+
+          var loanPayments = loanPaymentFaker.Generate(10);
+          context.LoanPayments.AddRange(loanPayments);
+        }
+
+        // Kiểm tra nếu dữ liệu đã tồn tại để tránh trùng lặp
+        if (!context.InsuranceDetails.Any())
+        {
+          var insuranceDetailsFaker = new Faker<InsuranceDetails>()
+            .RuleFor(d => d.PlanId, f => f.Random.Int(1, 10))
+            .RuleFor(d => d.CoverageAmount, f => f.Random.Decimal(1000, 100000))
+            .RuleFor(d => d.CreatedAt, f => f.Date.Past());
+
+          var insuranceDetails = insuranceDetailsFaker.Generate(10);
+          context.InsuranceDetails.AddRange(insuranceDetails);
         }
         if (!context.InsurancePropertyDetails.Any())
         {
