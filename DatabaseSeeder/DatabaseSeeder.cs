@@ -247,7 +247,6 @@ public class DatabaseSeeder
                 .RuleFor(n => n.CreatedBy, f => f.Random.Int(1,10))
                 .RuleFor(n => n.UpdatedBy, f => f.Random.Bool() ? f.Random.Int(1,10): null)
                 .RuleFor(n => n.DeleteBy, f => f.Random.Bool(0.1f) ? f.Random.Int(1,10) : null);
-                ; // 10% bị xóa
 
             var insurancePropertyDetails = insurancePropertyFaker.Generate(100); // Tạo 100 bản ghi
             context.InsurancePropertyDetails.AddRange(insurancePropertyDetails);
