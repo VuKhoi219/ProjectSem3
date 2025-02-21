@@ -18,6 +18,7 @@ public class MyDbContext : DbContext
     public DbSet<BorrowCapital> BorrowCapitals { get; set; }
     public DbSet<LoanPayment> LoanPayments { get; set; }
     public DbSet<Notification> Notifications { get; set; }
+    public DbSet<InsuranceDetails> InsuranceDetails { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
