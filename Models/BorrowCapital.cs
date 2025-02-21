@@ -32,10 +32,7 @@ public class BorrowCapital
     public DateTime DueDate { get; set; }
 
     [Required]
-    public PaymentSchedule PaymentSchedule { get; set; }
-
-    [Required]
-    public string Status { get; set; }
+    public StatusBorrowCapital Status { get; set; }
 
     public DateTime? CreatedAt { get; set; }
 
@@ -45,17 +42,21 @@ public class BorrowCapital
     public int? CreatedBy { get; set; }
     public int? UpdatedBy { get; set; }
     public int? DeleteBy { get; set; }
-    
+
     public virtual User User { get; set; }
     public virtual User Creator { get; set; }
     public virtual User Updater { get; set; }
     public virtual User Deleter { get; set; }
 
+    public ICollection<LoanPayment> LoanPayments { get; set; }
+
 }
 
-public enum PaymentSchedule
+
+public enum StatusBorrowCapital
 {
-    Monthly,
-    Quarterly,
-    Yearly
+  Pending,
+  Active,
+  Overdue,
+  Closed
 }

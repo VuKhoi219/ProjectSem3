@@ -16,6 +16,7 @@ public class MyDbContext : DbContext
     public DbSet<InsuranceHealthDetail> InsuranceHealthDetails { get; set; }    public DbSet<InsuranceContract> InsuranceContracts { get; set; }
     public DbSet<Payment> Payments { get; set; }
     public DbSet<BorrowCapital> BorrowCapitals { get; set; }
+    public DbSet<LoanPayment> LoanPayments { get; set; }
     public DbSet<Notification> Notifications { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -79,7 +80,7 @@ public class MyDbContext : DbContext
             .HasOne(h => h.Plan)
             .WithMany(p => p.HealthDetails)  // Tên phải khác nhau
             .HasForeignKey(h => h.PlanId);
-        
+
                 modelBuilder.Entity<InsurancePlan>()
             .HasOne(p => p.Creator)
             .WithMany()
@@ -271,6 +272,17 @@ public class MyDbContext : DbContext
             .WithMany()
             .HasForeignKey(r => r.DeleteBy)
             .OnDelete(DeleteBehavior.Restrict);
+        modelBuilder.Entity<LoanPayment>()
+          .HasOne(l => l.BorrowCapital)
+          .WithMany(b => b.LoanPayments)
+          .HasForeignKey(l => l.BorrowId)
+          .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<LoanPayment>()
+          .HasOne(l => l.Creator)
+          .WithMany()
+          .HasForeignKey(l => l.CreatedBy)
+          .OnDelete(DeleteBehavior.Restrict);
 
     }
 }
