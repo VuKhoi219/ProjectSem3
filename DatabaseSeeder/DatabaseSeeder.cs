@@ -230,18 +230,6 @@ public class DatabaseSeeder
           var loanPayments = loanPaymentFaker.Generate(10);
           context.LoanPayments.AddRange(loanPayments);
         }
-
-        // Kiểm tra nếu dữ liệu đã tồn tại để tránh trùng lặp
-        if (!context.InsuranceDetails.Any())
-        {
-          var insuranceDetailsFaker = new Faker<InsuranceDetails>()
-            .RuleFor(d => d.PlanId, f => f.Random.Int(1, 10))
-            .RuleFor(d => d.CoverageAmount, f => f.Random.Decimal(1000, 100000))
-            .RuleFor(d => d.CreatedAt, f => f.Date.Past());
-
-          var insuranceDetails = insuranceDetailsFaker.Generate(10);
-          context.InsuranceDetails.AddRange(insuranceDetails);
-        }
         if (!context.InsurancePropertyDetails.Any())
         {
             var insurancePropertyFaker = new Faker<InsurancePropertyDetail>()
