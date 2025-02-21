@@ -12,7 +12,7 @@ using Project_Sem3.Data;
 namespace Project_Sem3.Migrations
 {
     [DbContext(typeof(MyDbContext))]
-    [Migration("20250220073907_Initial")]
+    [Migration("20250221030701_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -67,15 +67,11 @@ namespace Project_Sem3.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
-                    b.Property<int>("PaymentSchedule")
-                        .HasColumnType("int");
-
                     b.Property<decimal>("RepaymentAmount")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
@@ -529,6 +525,51 @@ namespace Project_Sem3.Migrations
                     b.HasIndex("UpdatedBy");
 
                     b.ToTable("InsuranceVehicleDetails");
+                });
+
+            modelBuilder.Entity("Project_Sem3.Models.LoanPayment", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("BorrowId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("CreatedBy")
+                        .HasColumnType("int");
+
+                    b.Property<int>("OverdueDays")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("PaymentAmount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime>("PaymentDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("PaymentImage")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal>("PenaltyInterest")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<bool>("Status")
+                        .HasColumnType("bit");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BorrowId");
+
+                    b.HasIndex("CreatedBy");
+
+                    b.ToTable("LoanPayments");
                 });
 
             modelBuilder.Entity("Project_Sem3.Models.Notification", b =>
@@ -990,6 +1031,25 @@ namespace Project_Sem3.Migrations
                     b.Navigation("Updater");
                 });
 
+            modelBuilder.Entity("Project_Sem3.Models.LoanPayment", b =>
+                {
+                    b.HasOne("Project_Sem3.Models.BorrowCapital", "BorrowCapital")
+                        .WithMany("LoanPayments")
+                        .HasForeignKey("BorrowId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Project_Sem3.Models.User", "Creator")
+                        .WithMany()
+                        .HasForeignKey("CreatedBy")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("BorrowCapital");
+
+                    b.Navigation("Creator");
+                });
+
             modelBuilder.Entity("Project_Sem3.Models.Notification", b =>
                 {
                     b.HasOne("Project_Sem3.Models.User", "Creator")
@@ -1103,6 +1163,11 @@ namespace Project_Sem3.Migrations
                         .IsRequired();
 
                     b.Navigation("Role");
+                });
+
+            modelBuilder.Entity("Project_Sem3.Models.BorrowCapital", b =>
+                {
+                    b.Navigation("LoanPayments");
                 });
 
             modelBuilder.Entity("Project_Sem3.Models.InsuranceContract", b =>

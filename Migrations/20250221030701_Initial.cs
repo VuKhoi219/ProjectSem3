@@ -25,8 +25,7 @@ namespace Project_Sem3.Migrations
                     LoanDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     RepaymentAmount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     DueDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    PaymentSchedule = table.Column<int>(type: "int", nullable: false),
-                    Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Status = table.Column<int>(type: "int", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
                     UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
                     DeleteAt = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -210,6 +209,33 @@ namespace Project_Sem3.Migrations
                         name: "FK_InsuranceVehicleDetails_InsurancePlans_PlanId",
                         column: x => x.PlanId,
                         principalTable: "InsurancePlans",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "LoanPayments",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    BorrowId = table.Column<int>(type: "int", nullable: false),
+                    PaymentAmount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    PaymentDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    PaymentImage = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    OverdueDays = table.Column<int>(type: "int", nullable: false),
+                    PenaltyInterest = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Status = table.Column<bool>(type: "bit", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    CreatedBy = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_LoanPayments", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_LoanPayments_BorrowCapitals_BorrowId",
+                        column: x => x.BorrowId,
+                        principalTable: "BorrowCapitals",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -470,6 +496,16 @@ namespace Project_Sem3.Migrations
                 name: "IX_InsuranceVehicleDetails_UpdatedBy",
                 table: "InsuranceVehicleDetails",
                 column: "UpdatedBy");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_LoanPayments_BorrowId",
+                table: "LoanPayments",
+                column: "BorrowId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_LoanPayments_CreatedBy",
+                table: "LoanPayments",
+                column: "CreatedBy");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Notifications_CreatedBy",
@@ -776,6 +812,14 @@ namespace Project_Sem3.Migrations
                 onDelete: ReferentialAction.Restrict);
 
             migrationBuilder.AddForeignKey(
+                name: "FK_LoanPayments_Users_CreatedBy",
+                table: "LoanPayments",
+                column: "CreatedBy",
+                principalTable: "Users",
+                principalColumn: "Id",
+                onDelete: ReferentialAction.Restrict);
+
+            migrationBuilder.AddForeignKey(
                 name: "FK_Notifications_Users_CreatedBy",
                 table: "Notifications",
                 column: "CreatedBy",
@@ -898,9 +942,6 @@ namespace Project_Sem3.Migrations
                 table: "Roles");
 
             migrationBuilder.DropTable(
-                name: "BorrowCapitals");
-
-            migrationBuilder.DropTable(
                 name: "InsuranceHealthDetails");
 
             migrationBuilder.DropTable(
@@ -913,10 +954,16 @@ namespace Project_Sem3.Migrations
                 name: "InsuranceVehicleDetails");
 
             migrationBuilder.DropTable(
+                name: "LoanPayments");
+
+            migrationBuilder.DropTable(
                 name: "Notifications");
 
             migrationBuilder.DropTable(
                 name: "Payments");
+
+            migrationBuilder.DropTable(
+                name: "BorrowCapitals");
 
             migrationBuilder.DropTable(
                 name: "InsuranceContracts");
