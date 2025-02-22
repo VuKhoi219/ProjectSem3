@@ -10,8 +10,7 @@ using Project_Sem3.Models;
 
 namespace Project_Sem3.Areas.Admin.Controllers
 {
-    [Area("Admin")]
-    public class RoleController : Controller
+    public class RoleController : AdminBaseController
     {
         private readonly MyDbContext _context;
 
@@ -62,7 +61,7 @@ namespace Project_Sem3.Areas.Admin.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name,CreatedAt,UpdatedAt,DeleteAt,CreatedBy,UpdatedBy,DeleteBy")] Role role)
+        public async Task<IActionResult> Create([Bind("Id,Name")] Role role)
         {
             if (ModelState.IsValid)
             {
@@ -100,7 +99,7 @@ namespace Project_Sem3.Areas.Admin.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,CreatedAt,UpdatedAt,DeleteAt,CreatedBy,UpdatedBy,DeleteBy")] Role role)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Name")] Role role)
         {
             if (id != role.Id)
             {
