@@ -20,10 +20,11 @@ public class BorrowCapital
     [Required]
     public decimal InterestRate { get; set; }
 
+    [Required]
     [MaxLength(255)]
     public string LoanPurpose { get; set; }
 
-    public DateTime LoanDate { get; set; }
+    public DateTime LoanDate { get; set; } = DateTime.Now;
 
     [Required]
     public decimal RepaymentAmount { get; set; }
@@ -34,7 +35,7 @@ public class BorrowCapital
     [Required]
     public StatusBorrowCapital Status { get; set; }
 
-    public DateTime? CreatedAt { get; set; }
+    public DateTime? CreatedAt { get; set; } = DateTime.Now;
 
     public DateTime? UpdatedAt { get; set; }
 
@@ -43,12 +44,12 @@ public class BorrowCapital
     public int? UpdatedBy { get; set; }
     public int? DeleteBy { get; set; }
 
-    public virtual User User { get; set; }
-    public virtual User Creator { get; set; }
-    public virtual User Updater { get; set; }
-    public virtual User Deleter { get; set; }
+    public virtual User? User { get; set; }
+    public virtual User? Creator { get; set; }
+    public virtual User? Updater { get; set; }
+    public virtual User? Deleter { get; set; }
 
-    public ICollection<LoanPayment> LoanPayments { get; set; }
+    public ICollection<LoanPayment>? LoanPayments { get; set; }
 
 }
 

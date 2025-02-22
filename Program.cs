@@ -4,9 +4,12 @@ using Project_Sem3.Data;
 using Project_Sem3.Helper;
 using Project_Sem3.Helper.BaseRate;
 using Project_Sem3.Helper.RiskFactor;
+using Project_Sem3.Models.InterestRate;
 using Project_Sem3.Models.MailContent;
 using Project_Sem3.Models.MyBank;
 using Project_Sem3.Services;
+using Project_Sem3.Services.CalculateBorrowCapital;
+using Project_Sem3.Services.CalculateBorrowCapital.MonthlyPaymentAmount;
 using Project_Sem3.Services.SendMail;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -14,16 +17,20 @@ builder.Services.AddDbContext<MyDbContext>(options => // Program.cs
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 builder.Services.Configure<MailSettings>(builder.Configuration.GetSection("MailSettings"));
 builder.Services.Configure<PaymentSetting>(builder.Configuration.GetSection("PaymentSetting"));
+builder.Services.Configure<InterestRateSetting>(builder.Configuration.GetSection("FixeInterestSetting"));
 builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 // đăng ký sử dụng file
+builder.Services.AddScoped<MonthlyPaymentAmount>();
+builder.Services.AddScoped<CalculateBorrowCapitalServices>();
 builder.Services.AddScoped<ISendMailService, SendMailService>();
 builder.Services.AddScoped<BaseRate>();
 builder.Services.AddScoped<RiskFactor>();
 builder.Services.AddScoped<OnlinePaymentServices>();
 builder.Services.AddScoped<CalculateCoefficient>();
 builder.Services.AddScoped<CalculateInsuranceServices>();
+
 
 var app = builder.Build();
 
