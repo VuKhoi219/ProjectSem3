@@ -31,9 +31,9 @@ public class LoanPayment
   public DateTime? CreatedAt { get; set; }
 
   [Required]
-  public int CreatedBy { get; set; }
+  public int? CreatedBy { get; set; }
 
   // Navigation properties
   public BorrowCapital BorrowCapital { get; set; }
-  public User Creator { get; set; }
+  public User? Creator { get; set; }
 }
