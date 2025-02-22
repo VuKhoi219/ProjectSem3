@@ -54,6 +54,24 @@
         </li>
       </ul>
     </li>
+    <li class='menu-item@(currentPage.StartsWith("/Admin/Role") ? " open" : "")'>
+      <a asp-controller="User" asp-action="Index" class="menu-link menu-toggle">
+        <i class="menu-icon tf-icons fa fas fa-user"></i>
+        <div>Roles</div>
+      </a>
+      <ul class="menu-sub">
+        <li class='menu-item@(currentPage == "/Admin/Role/Create" ? " active" : "")'>
+          <a asp-controller="Role" asp-action="Create" class="menu-link">
+            <div>Add New</div>
+          </a>
+        </li>
+        <li class='menu-item@(currentPage == "/Admin/Role" ? " active" : "")'>
+          <a asp-controller="Role" asp-action="Index" class="menu-link">
+            <div>View All</div>
+          </a>
+        </li>
+      </ul>
+    </li>
   </ul>
 </aside>
 <!-- / Menu -->
