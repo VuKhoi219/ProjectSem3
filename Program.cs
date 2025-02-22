@@ -52,13 +52,12 @@ app.UseRouting();
 app.UseAuthorization();
 
 app.MapControllerRoute(
-    name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
-
-app.MapControllerRoute(
-  name: "defaultWithArea",
+  name: "default",
   pattern: "{area:exists}/{controller=Home}/{action=Index2}/{id?}"
 );
 
+app.MapControllerRoute(
+    name: "default",
+    pattern: "{controller=Home}/{action=Index}/{id?}");
 app.Run();
 
