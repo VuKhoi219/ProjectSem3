@@ -23,5 +23,5 @@ ENTRYPOINT ["dotnet", "AspnetCoreMvcStarter.dll"]
 
 # Display a message in the terminal during build
 RUN echo  -----------------------------------------------
-RUN echo  Application is running at http://localhost:5065
+RUN echo  Application is running at http://localhost:5075
 RUN echo  -----------------------------------------------
