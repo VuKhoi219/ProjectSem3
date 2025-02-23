@@ -12,12 +12,12 @@ namespace Project_Sem3.Controllers;
 public class BorrowCapitalController : Controller
 {
   public readonly MyDbContext _context;
-  public readonly CalculateBorrowCapitalServices CalculateBorrowCapitalServices;
+  public readonly CalculateBorrowCapitalServices _calculateBorrowCapitalServices;
 
   public BorrowCapitalController(MyDbContext context , CalculateBorrowCapitalServices calculateBorrowCapitalServices)
   {
     _context = context;
-    CalculateBorrowCapitalServices = calculateBorrowCapitalServices;
+    _calculateBorrowCapitalServices = calculateBorrowCapitalServices;
   }
 // crud vay vốn
   [HttpGet]
@@ -70,7 +70,7 @@ public class BorrowCapitalController : Controller
   }
 
   [HttpPost]
-  public async Task<IActionResult> createBorrowCapital([FromBody] BorrowCapital rq)
+  public async Task<IActionResult> CreateBorrowCapital([FromBody] BorrowCapital rq)
   {
     try
     {
@@ -87,7 +87,7 @@ public class BorrowCapitalController : Controller
   }
 
   [HttpPut("{id}/{newStatusBorrowCapital}")]
-  public async Task<IActionResult> editStatusBorrowCapital(int id , string newStatusBorrowCapital)
+  public async Task<IActionResult> EditStatusBorrowCapital(int id , string newStatusBorrowCapital)
   {
     try
     {
@@ -124,12 +124,12 @@ public class BorrowCapitalController : Controller
   }
 
   [HttpPost("calculate")]
-  public IActionResult calculateBorrowCapital([FromBody] BorrowCapitalRequest request)
+  public IActionResult CalculateBorrowCapital([FromBody] BorrowCapitalRequest request)
   {
     try
     {
-      var totalPaymentAmount = CalculateBorrowCapitalServices.totalPaymentAmount(request.LoanAmount);
-      var monthlyPaymentAmount = CalculateBorrowCapitalServices.MonthlyPaymentAmount(request.Salaly, request.PercentageSalary,
+      var totalPaymentAmount = _calculateBorrowCapitalServices.totalPaymentAmount(request.LoanAmount);
+      var monthlyPaymentAmount = _calculateBorrowCapitalServices.MonthlyPaymentAmount(request.Salaly, request.PercentageSalary,
         totalPaymentAmount.Item1, request.NumberOfMonthly);
 
       return Ok(new
