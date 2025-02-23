@@ -24,10 +24,10 @@ public class CalculateBorrowCapitalServices
     return (loanAmount * (1m + _interestRateSetting.InterestRate / 100),_interestRateSetting.InterestRate);
   }
   public (decimal, bool) MonthlyPaymentAmount(decimal salaly, decimal percentageOfSalary, decimal totalPaymentAmount,
-    int numberOfMonthly)
+    int NumberOfPayments)
   {
     decimal fixedPaymentAmount =
-      _monthlyPaymentAmount.CalculateMonthlyPaymentAmount(totalPaymentAmount, numberOfMonthly);
+      _monthlyPaymentAmount.CalculateMonthlyPaymentAmount(totalPaymentAmount, NumberOfPayments);
     decimal userProposedAmount = salaly * (percentageOfSalary / 100);
     if (fixedPaymentAmount > userProposedAmount)
     {

@@ -15,7 +15,7 @@ public class LoanPayment
   public decimal PaymentAmount { get; set; }
 
   [Required]
-  public DateTime PaymentDate { get; set; }
+  public DateTime PaymentDate { get; set; } = DateTime.Now;
   [Required]
   public string PaymentImage { get; set; }
 
@@ -25,15 +25,14 @@ public class LoanPayment
   [Required]
   public decimal PenaltyInterest { get; set; }
 
-  [Required]
-  public bool Status { get; set; }
+  [Required] public bool Status { get; set; } = false;
 
-  public DateTime? CreatedAt { get; set; }
+  public DateTime? CreatedAt { get; set; } = DateTime.Now;
 
   [Required]
   public int? CreatedBy { get; set; }
 
   // Navigation properties
-  public BorrowCapital BorrowCapital { get; set; }
+  public BorrowCapital? BorrowCapital { get; set; }
   public User? Creator { get; set; }
 }
