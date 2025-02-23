@@ -10,6 +10,9 @@ using Project_Sem3.Models.MyBank;
 using Project_Sem3.Services;
 using Project_Sem3.Services.CalculateBorrowCapital;
 using Project_Sem3.Services.CalculateBorrowCapital.MonthlyPaymentAmount;
+using Project_Sem3.Services.LoanPaymentServices;
+using Project_Sem3.Services.LoanPaymentServices.CheckIfOverdue;
+using Project_Sem3.Services.LoanPaymentServices.PenaltyPercentage;
 using Project_Sem3.Services.SendMail;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -30,7 +33,9 @@ builder.Services.AddScoped<RiskFactor>();
 builder.Services.AddScoped<OnlinePaymentServices>();
 builder.Services.AddScoped<CalculateCoefficient>();
 builder.Services.AddScoped<CalculateInsuranceServices>();
-
+builder.Services.AddScoped<LoanPaymentServices>();
+builder.Services.AddScoped<CalculatePenaltyPercentage>();
+builder.Services.AddScoped<CalculateCheckIfOverdue>();
 
 var app = builder.Build();
 

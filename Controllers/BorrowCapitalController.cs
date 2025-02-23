@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.VisualBasic;
 using Project_Sem3.Data;
 using Project_Sem3.Models;
 using Project_Sem3.Models.Request;
@@ -130,14 +131,15 @@ public class BorrowCapitalController : Controller
     {
       var totalPaymentAmount = _calculateBorrowCapitalServices.totalPaymentAmount(request.LoanAmount);
       var monthlyPaymentAmount = _calculateBorrowCapitalServices.MonthlyPaymentAmount(request.Salaly, request.PercentageSalary,
-        totalPaymentAmount.Item1, request.NumberOfMonthly);
-
+        totalPaymentAmount.Item1, request.NumberOfPayments);
+      var dueDate = request.LoanDate.AddMonths(request.NumberOfPayments);
       return Ok(new
       {
         TotalAmount = totalPaymentAmount.Item1,
         TotalInterest = totalPaymentAmount.Item2,
         MonthlyAmount = monthlyPaymentAmount.Item1,
-        BoolMonthlyAmount = monthlyPaymentAmount.Item2
+        BoolMonthlyAmount = monthlyPaymentAmount.Item2,
+        DueDate = dueDate
       });
 
     }
@@ -145,6 +147,51 @@ public class BorrowCapitalController : Controller
     {
       Console.WriteLine(e);
       throw;
+    }
+  }
+
+  [HttpPost("by-date")]
+  public async Task<IActionResult> GetBorrowCapitalsByDateRange([FromBody] BorrowCapitalDateRangeRequest request)
+  {
+    try
+    {
+      if (request == null)
+      {
+        return BadRequest(new { Message = "Request body is null" });
+      }
+
+      var query = _context.BorrowCapitals.AsQueryable();
+
+      if (request.StartDate.HasValue)
+        query = query.Where(b => b.LoanDate >= request.StartDate.Value);
+      if (request.EndDate.HasValue)
+        query = query.Where(b => b.LoanDate <= request.EndDate.Value);
+      if (request.UserId.HasValue)
+        query = query.Where(b => b.UserId == request.UserId.Value);
+      if (request.Status.HasValue)
+        query = query.Where(b => b.Status == request.Status.Value);
+
+      var result = await query.Select(b => new
+      {
+        b.Id,
+        b.UserId,
+        b.LoanAmount,
+        b.LoanDate,
+        b.DueDate,
+        b.Status,
+        b.CreatedAt
+      }).ToListAsync();
+
+      if (!result.Any())
+      {
+        return Ok(new { Message = "No borrow capitals found for the specified criteria", Data = result });
+      }
+
+      return Ok(result);
+    }
+    catch (Exception e)
+    {
+      return StatusCode(500, new { Message = "An error occurred", Error = e.Message });
     }
   }
 }
