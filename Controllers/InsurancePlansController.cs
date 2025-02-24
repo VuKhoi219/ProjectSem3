@@ -26,11 +26,7 @@ public class InsurancePlansController : ControllerBase
     [HttpGet("{id}")]
     public async Task<IActionResult> GetPlanById(int id)
     {
-        var plan = await _context.InsurancePlans.Include(p => p.VehicleDetails)
-                                               .Include(p => p.LifeDetails)
-                                               .Include(p => p.PropertyDetails)
-                                               .Include(p => p.HealthDetails)
-                                               .FirstOrDefaultAsync(p => p.Id == id);
+        var plan = await _context.InsurancePlans.FirstOrDefaultAsync(p => p.Id == id);
         if (plan == null) return NotFound();
         return Ok(plan);
     }
@@ -41,7 +37,7 @@ public class InsurancePlansController : ControllerBase
     {
         if (!ModelState.IsValid) return BadRequest(ModelState);
         plan.CreatedAt = DateTime.UtcNow;
-        
+
         _context.InsurancePlans.Add(plan);
         await _context.SaveChangesAsync();
 
@@ -52,7 +48,7 @@ public class InsurancePlansController : ControllerBase
     [HttpPut("{id}")]
     public async Task<IActionResult> UpdatePlan(int id, [FromBody] InsurancePlan updatedPlan)
     {
-        
+
         var plan = await _context.InsurancePlans.FindAsync(id);
         if (plan == null) return NotFound();
 
