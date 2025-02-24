@@ -41,7 +41,7 @@ public class InsurancePlansController : ControllerBase
     {
         if (!ModelState.IsValid) return BadRequest(ModelState);
         plan.CreatedAt = DateTime.UtcNow;
-        
+
         _context.InsurancePlans.Add(plan);
         await _context.SaveChangesAsync();
 
@@ -52,12 +52,12 @@ public class InsurancePlansController : ControllerBase
     [HttpPut("{id}")]
     public async Task<IActionResult> UpdatePlan(int id, [FromBody] InsurancePlan updatedPlan)
     {
-        
+
         var plan = await _context.InsurancePlans.FindAsync(id);
         if (plan == null) return NotFound();
 
         plan.Name = updatedPlan.Name;
-        plan.Destination = updatedPlan.Destination;
+        plan.Description = updatedPlan.Description;
         plan.Type = updatedPlan.Type;
         plan.Status = updatedPlan.Status;
         plan.UpdatedAt = DateTime.UtcNow;

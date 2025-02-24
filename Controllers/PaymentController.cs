@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Project_Sem3.Areas.Admin.Controllers;
 using Project_Sem3.Data; // Giả sử đây là namespace chứa DbContext
 using Project_Sem3.Models; // Giả sử đây là namespace chứa Payment và PaymentStatus
 
