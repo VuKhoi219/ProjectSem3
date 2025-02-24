@@ -155,7 +155,6 @@ public class DatabaseSeeder
             .RuleFor(lp => lp.Status, f => f.Random.Bool())
             .RuleFor(lp => lp.CreatedAt, f => f.Date.Past())
             .RuleFor(lp => lp.CreatedBy, f => f.Random.Int(1, 5));
-
           var loanPayments = loanPaymentFaker.Generate(10);
           context.LoanPayments.AddRange(loanPayments);
         }

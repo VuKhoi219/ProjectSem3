@@ -51,9 +51,7 @@ public class Helpers
     {
         return JsonConvert.SerializeObject(obj);
     }
-    
-    
-    
+
     //  bcrypt password
     public string HashPassword(string p)
     {

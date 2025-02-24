@@ -22,5 +22,4 @@ public class OnlinePaymentController : Controller
         var result = _onlinePaymentServices.GenerateQrUrl(paymentContent.Amount, paymentContent.Value);
         return Ok(result);
     }
-    
 }

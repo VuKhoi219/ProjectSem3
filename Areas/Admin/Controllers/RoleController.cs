@@ -63,16 +63,24 @@ namespace Project_Sem3.Areas.Admin.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,Name")] Role role)
         {
+          try
+          {
             if (ModelState.IsValid)
             {
-                _context.Add(role);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+              _context.Add(role);
+              await _context.SaveChangesAsync();
+              return RedirectToAction(nameof(Index));
             }
             ViewData["CreatedBy"] = new SelectList(_context.Users, "Id", "CitizenIdentificationCard", role.CreatedBy);
             ViewData["DeleteBy"] = new SelectList(_context.Users, "Id", "CitizenIdentificationCard", role.DeleteBy);
             ViewData["UpdatedBy"] = new SelectList(_context.Users, "Id", "CitizenIdentificationCard", role.UpdatedBy);
             return View(role);
+          }
+          catch (Exception e)
+          {
+            Console.WriteLine(e);
+            throw;
+          }
         }
 
         // GET: Admin/Role/Edit/5
