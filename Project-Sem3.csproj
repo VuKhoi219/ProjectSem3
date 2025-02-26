@@ -118,6 +118,11 @@
       <UpToDateCheckInput Remove="Areas\Admin\Views\Role\Details.cshtml" />
       <UpToDateCheckInput Remove="Areas\Admin\Views\Role\Edit.cshtml" />
       <UpToDateCheckInput Remove="Areas\Admin\Views\Role\Index.cshtml" />
+      <UpToDateCheckInput Remove="Areas\Admin\Views\Role\Create.cshtml" />
+      <UpToDateCheckInput Remove="Areas\Admin\Views\Role\Delete.cshtml" />
+      <UpToDateCheckInput Remove="Areas\Admin\Views\Role\Details.cshtml" />
+      <UpToDateCheckInput Remove="Areas\Admin\Views\Role\Edit.cshtml" />
+      <UpToDateCheckInput Remove="Areas\Admin\Views\Role\Index.cshtml" />
     </ItemGroup>
 
 </Project>

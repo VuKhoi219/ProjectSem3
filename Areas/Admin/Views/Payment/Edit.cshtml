@@ -1,0 +1,167 @@
+@model Project_Sem3.Models.Payment
+
+@{
+    ViewData["Title"] = "Edit";
+}
+
+@section VendorStyles{
+<link rel="stylesheet" href="~/vendor/libs/bootstrap-select/bootstrap-select.css" />
+<link rel="stylesheet" href="~/vendor/libs/select2/select2.css" />
+<link rel="stylesheet" href="~/vendor/libs/flatpickr/flatpickr.css" />
+<link rel="stylesheet" href="~/vendor/libs/typeahead-js/typeahead.css" />
+<link rel="stylesheet" href="~/vendor/libs/tagify/tagify.css" />
+<link rel="stylesheet" href="~/vendor/libs/&#64;form-validation/form-validation.css" />
+}
+
+@section VendorScripts{
+<script src="~/vendor/libs/select2/select2.js"></script>
+<script src="~/vendor/libs/bootstrap-select/bootstrap-select.js"></script>
+<script src="~/vendor/libs/moment/moment.js"></script>
+<script src="~/vendor/libs/flatpickr/flatpickr.js"></script>
+<script src="~/vendor/libs/typeahead-js/typeahead.js"></script>
+<script src="~/vendor/libs/tagify/tagify.js"></script>
+<script src="~/vendor/libs/&#64;form-validation/popular.js"></script>
+<script src="~/vendor/libs/&#64;form-validation/bootstrap5.js"></script>
+<script src="~/vendor/libs/&#64;form-validation/auto-focus.js"></script>
+}
+
+@section PageScripts {
+<script src="~/js/form-validation.js"></script>
+}
+
+<h1>Edit</h1>
+
+<h4>Payment</h4>
+<div class="row">
+  <!-- FormValidation -->
+  <div class="col-12">
+    <div class="card">
+      <div class="card-body">
+
+        <div id="successAlert" class="alert alert-success">
+          <strong>Success!</strong> Payment created successfully.
+        </div>
+        <div id="errorAlert" class="alert alert-danger">
+          <strong>Error!</strong> Something went wrong, please try again.
+        </div>
+
+        <form id="formValidationExamples" class="row g-6" asp-action="UpdatePayment" method="post">
+          <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+          <input type="hidden" asp-for="Id"/>
+          <div class="form-group col-md-6">
+            <label asp-for="UserId" class="control-label"></label>
+            <select asp-for="UserId" class="form-control" asp-items="ViewBag.UserId"></select>
+            <span asp-validation-for="UserId" class="text-danger"></span>
+          </div>
+          <div class="form-group col-md-6">
+            <label asp-for="ContractId" class="control-label"></label>
+            <select asp-for="ContractId" class="form-control" asp-items="ViewBag.ContractId"></select>
+            <span asp-validation-for="ContractId" class="text-danger"></span>
+          </div>
+          <div class="form-group col-md-6">
+            <label asp-for="Amount" class="control-label"></label>
+            <input asp-for="Amount" class="form-control"/>
+            <span asp-validation-for="Amount" class="text-danger"></span>
+          </div>
+          <div class="form-group col-md-6">
+            <label asp-for="PaymentDate" class="control-label"></label>
+            <input asp-for="PaymentDate" class="form-control"/>
+            <span asp-validation-for="PaymentDate" class="text-danger"></span>
+          </div>
+          <div class="form-group col-md-6">
+            <label asp-for="Status" class="control-label"></label>
+            <select asp-for="Status" class="form-control"></select>
+            <span asp-validation-for="Status" class="text-danger"></span>
+          </div>
+          <div class="form-group col-md-6">
+            <label asp-for="ImageUrl" class="control-label"></label>
+            <input asp-for="ImageUrl" class="form-control"/>
+            <span asp-validation-for="ImageUrl" class="text-danger"></span>
+          </div>
+          <div class="form-group col-md-6">
+            <label asp-for="CreatedAt" class="control-label"></label>
+            <input asp-for="CreatedAt" class="form-control"/>
+            <span asp-validation-for="CreatedAt" class="text-danger"></span>
+          </div>
+          <div class="form-group col-md-6">
+            <label asp-for="UpdatedAt" class="control-label"></label>
+            <input asp-for="UpdatedAt" class="form-control"/>
+            <span asp-validation-for="UpdatedAt" class="text-danger"></span>
+          </div>
+          <div class="form-group col-md-6">
+            <label asp-for="DeleteAt" class="control-label"></label>
+            <input asp-for="DeleteAt" class="form-control"/>
+            <span asp-validation-for="DeleteAt" class="text-danger"></span>
+          </div>
+          <div class="form-group col-md-6">
+            <label asp-for="CreatedBy" class="control-label"></label>
+            <select asp-for="CreatedBy" class="form-control" asp-items="ViewBag.CreatedBy"></select>
+            <span asp-validation-for="CreatedBy" class="text-danger"></span>
+          </div>
+          <div class="form-group col-md-6">
+            <label asp-for="UpdatedBy" class="control-label"></label>
+            <select asp-for="UpdatedBy" class="form-control" asp-items="ViewBag.UpdatedBy"></select>
+            <span asp-validation-for="UpdatedBy" class="text-danger"></span>
+          </div>
+          <div class="form-group col-md-6">
+            <label asp-for="DeleteBy" class="control-label"></label>
+            <select asp-for="DeleteBy" class="form-control" asp-items="ViewBag.DeleteBy"></select>
+            <span asp-validation-for="DeleteBy" class="text-danger"></span>
+          </div>
+          <div class="form-group">
+            <input type="submit" value="Save" class="btn btn-primary"/>
+          </div>
+          <div class="col-12">
+            <div class="form-check">
+              <input type="checkbox" class="form-check-input" id="formValidationCheckbox" name="formValidationCheckbox"/>
+              <label class="form-check-label" for="formValidationCheckbox">Agree to our terms and conditions</label>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  <!-- /FormValidation -->
+</div>
+<div>
+  <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script>
+  $(document).ready(function() {
+    $('#formValidationExamples').on('submit', function(e) {
+      e.preventDefault(); // Ngừng form submit mặc định
+
+      // Lấy dữ liệu từ form
+      const paymentData = {
+        userId: $('#userId').val(),
+        contractId: $('#contractId').val(),
+        amount: $('#amount').val(),
+        imageUrl: $('#imageUrl').val()
+      };
+
+      const paymentId = $('#paymentId').val(); // Lấy paymentId từ input ẩn hoặc URL
+
+      // Gọi API để sửa Payment (PUT request)
+      $.ajax({
+        url: '/api/payments/' + paymentId,  // Sử dụng paymentId để xác định payment cần sửa
+        method: 'PUT',
+        contentType: 'application/json',
+        data: JSON.stringify(paymentData),
+        success: function(response) {
+          $('#successAlert').show();
+          $('#errorAlert').hide();
+          $('#formValidationExamples')[0].reset(); // Reset form sau khi cập nhật thành công
+        },
+        error: function(xhr, status, error) {
+          $('#errorAlert').show();
+          $('#successAlert').hide();
+        }
+      });
+    });
+  });
+</script>
+}
