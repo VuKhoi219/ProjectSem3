@@ -25,10 +25,10 @@ public class Notification
     public int? CreatedBy { get; set; }
     public int? UpdatedBy { get; set; }
     public int? DeleteBy { get; set; }
-    
-    public virtual User User { get; set; }
-    public virtual User Creator { get; set; }
-    public virtual User Updater { get; set; }
-    public virtual User Deleter { get; set; }
+
+    public virtual User? User { get; set; }
+    public virtual User? Creator { get; set; }
+    public virtual User? Updater { get; set; }
+    public virtual User? Deleter { get; set; }
 
 }
