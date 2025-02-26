@@ -37,11 +37,11 @@ public class InsurancePlan
 
 
     // Relationships
-    public virtual ICollection<InsuranceContract> InsuranceContracts { get; set; }
-    public virtual ICollection<InsuranceVehicleDetail> VehicleDetails { get; set; }
-    public virtual ICollection<InsuranceLifeDetail> LifeDetails { get; set; }
-    public virtual ICollection<InsurancePropertyDetail> PropertyDetails { get; set; }
-    public virtual ICollection<InsuranceHealthDetail> HealthDetails { get; set; }
+    public virtual ICollection<InsuranceContract>? InsuranceContracts { get; set; }
+    public virtual ICollection<InsuranceVehicleDetail>? VehicleDetails { get; set; }
+    public virtual ICollection<InsuranceLifeDetail>? LifeDetails { get; set; }
+    public virtual ICollection<InsurancePropertyDetail>? PropertyDetails { get; set; }
+    public virtual ICollection<InsuranceHealthDetail>? HealthDetails { get; set; }
 }
 
 public enum InsuranceType

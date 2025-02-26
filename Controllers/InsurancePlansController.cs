@@ -26,11 +26,7 @@ public class InsurancePlansController : ControllerBase
     [HttpGet("{id}")]
     public async Task<IActionResult> GetPlanById(int id)
     {
-        var plan = await _context.InsurancePlans.Include(p => p.VehicleDetails)
-                                               .Include(p => p.LifeDetails)
-                                               .Include(p => p.PropertyDetails)
-                                               .Include(p => p.HealthDetails)
-                                               .FirstOrDefaultAsync(p => p.Id == id);
+        var plan = await _context.InsurancePlans.FirstOrDefaultAsync(p => p.Id == id);
         if (plan == null) return NotFound();
         return Ok(plan);
     }
