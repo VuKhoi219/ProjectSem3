@@ -1,0 +1,58 @@
+@section VendorScripts {
+<!-- Add any scripts you need for this page -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script>
+  $(document).ready(function() {
+    // When the "View Details" button is clicked
+    $('#viewDetailsButton').on('click', function(e) {
+      e.preventDefault(); // Prevent default action
+
+      const notificationId = $(this).data('notification-id'); // Get the ID of the notification
+
+      // Send an AJAX request to fetch the notification details
+      $.ajax({
+        url: '/api/notifications/' + notificationId,  // API route to fetch notification details
+        method: 'GET',
+        success: function(response) {
+          // Insert the notification details into the HTML
+          $('#notificationDetails').html(`
+              <h4>Notification Details</h4>
+              <hr />
+              <dl class="row">
+                  <dt class="col-sm-2">Message</dt>
+                  <dd class="col-sm-10">${response.message}</dd>
+                  <dt class="col-sm-2">Status</dt>
+                  <dd class="col-sm-10">${response.isRead ? 'Read' : 'Unread'}</dd>
+                  <dt class="col-sm-2">Date Created</dt>
+                  <dd class="col-sm-10">${response.createdDate}</dd>
+                  <dt class="col-sm-2">User</dt>
+                  <dd class="col-sm-10">${response.userId}</dd>
+              </dl>
+            `);
+        },
+        error: function(xhr, status, error) {
+          // Show an error message if something goes wrong
+          alert("Error fetching notification details: " + error);
+        }
+      });
+    });
+  });
+</script>
+}
+
+<h1>Details</h1>
+
+<div>
+  <button id="viewDetailsButton" data-notification-id="@Model?.Id" class="btn btn-primary">View Notification Details</button>
+</div>
+
+<!-- Div to display the details dynamically -->
+<div id="notificationDetails">
+  <!-- Payment details will be loaded here dynamically -->
+</div>
+
+<div>
+  <a asp-action="Edit" class="col-md-6" asp-route-id="@Model?.Id">Edit</a> |
+  <a asp-action="Index" class="col-md-6">Back to List</a>
+</div>
