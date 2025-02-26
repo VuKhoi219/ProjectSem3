@@ -1,0 +1,51 @@
+@using Microsoft.AspNetCore.Mvc
+@{
+var currentController = ViewContext.RouteData.Values["controller"]?.ToString() ?? "Home";
+var currentAction = ViewContext.RouteData.Values["action"]?.ToString() ?? "Index";
+var navItems = new List<Project_Sem3.Models.ViewModel.NavItem>
+{
+new Project_Sem3.Models.ViewModel.NavItem { Text = "Home", Controller = "Home", Action = "Index" },
+new Project_Sem3.Models.ViewModel.NavItem { Text = "About Us", Controller = "Home", Action = "AboutUs" },
+new Project_Sem3.Models.ViewModel.NavItem { Text = "Insurance Services", Controller = "Home", Action = "Service" },
+// new Project_Sem3.Models.ViewModel.NavItem { Text = "Customer Support", Controller = "Home", Action = "Support" },
+new Project_Sem3.Models.ViewModel.NavItem { Text = "Contact Us", Controller = "Home", Action = "Contact" } // Thêm Contact Us
+};
+var pageItems = new List<Project_Sem3.Models.ViewModel.NavItem>
+{
+new Project_Sem3.Models.ViewModel.NavItem { Text = "Borrow capital", Controller = "BorrowCapital", Action = "BorrowCapital" },
+new Project_Sem3.Models.ViewModel.NavItem { Text = "Transaction history", Controller = "Payment", Action = "TransactionHistory" },
+new Project_Sem3.Models.ViewModel.NavItem { Text = "List of contracts", Controller = "Contract", Action = "ListOfContracts" },
+new Project_Sem3.Models.ViewModel.NavItem { Text = "Loan Payment History", Controller = "LoanPayment", Action = "Testimonial" },
+};
+}
+
+<nav class="navbar navbar-expand-lg bg-white navbar-light sticky-top px-4 px-lg-5">
+  <a href="@Url.Action("Index", "Home")" class="navbar-brand d-flex align-items-center">
+    <h1 class="m-0"><img class="img-fluid me-3" src="~/user/img/icon/icon-02-primary.png" alt="">Insure</h1>
+  </a>
+  <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+  <div class="collapse navbar-collapse" id="navbarCollapse">
+    <div class="navbar-nav mx-auto bg-light rounded pe-4 py-3 py-lg-0">
+      @foreach (var item in navItems)
+      {
+      var isActive = currentController == item.Controller && currentAction == item.Action;
+      <a href="@Url.Action(item.Action, item.Controller)" class="nav-item nav-link @(isActive ? "active" : "")">@item.Text</a>
+      }
+
+      <!-- Dropdown Pages -->
+      <div class="nav-item dropdown">
+        <a href="#" class="nav-link dropdown-toggle @(pageItems.Any(p => currentController == p.Controller && currentAction == p.Action) ? "active" : "")" data-bs-toggle="dropdown">Customer Support</a>
+        <div class="dropdown-menu bg-light border-0 m-0">
+          @* @foreach (var page in pageItems) *@
+          @* { *@
+          @* var isPageActive = currentController == page.Controller && currentAction == page.Action; *@
+          @* <a href="@Url.Action(page.Action, page.Controller)" class="dropdown-item @(isPageActive ? "active" : "")">@page.Text</a> *@
+          @* } *@
+        </div>
+      </div>
+    </div>
+  </div>
+  <a href="" class="btn btn-primary px-3 d-none d-lg-block">Get A Quote</a>
+</nav>
