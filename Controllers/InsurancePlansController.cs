@@ -53,7 +53,7 @@ public class InsurancePlansController : ControllerBase
         if (plan == null) return NotFound();
 
         plan.Name = updatedPlan.Name;
-        plan.Destination = updatedPlan.Destination;
+        plan.Description = updatedPlan.Description;
         plan.Type = updatedPlan.Type;
         plan.Status = updatedPlan.Status;
         plan.UpdatedAt = DateTime.UtcNow;

@@ -1,0 +1,77 @@
+@model Project_Sem3.Models.Notification
+
+@{
+    ViewData["Title"] = "Delete";
+}
+
+@section VendorStyles {
+<!-- Add any vendor stylesheets you might still need -->
+<link rel="stylesheet" href="~/vendor/libs/datatables-bs5/datatables.bootstrap5.css">
+<link rel="stylesheet" href="~/vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.css">
+}
+
+@section VendorScripts {
+<!-- Add any scripts you need for this page -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+}
+
+<h1>Delete</h1>
+
+<h3>Are you sure you want to delete this?</h3>
+<div>
+  <h4>Notification</h4>
+  <hr />
+  <dl class="row">
+    <dt class = "col-sm-2">
+      @Html.DisplayNameFor(model => model.Message)
+    </dt>
+    <dd class = "col-sm-10">
+      @Html.DisplayFor(model => model.Message)
+    </dd>
+    <dt class = "col-sm-2">
+      @Html.DisplayNameFor(model => model.IsRead)
+    </dt>
+    <dd class = "col-sm-10">
+      @Html.DisplayFor(model => model.IsRead)
+    </dd>
+  </dl>
+
+  <form asp-action="Delete">
+    <input type="hidden" asp-for="Id" />
+    <input type="submit" value="Delete" class="btn btn-danger" /> |
+    <a asp-action="Index">Back to List</a>
+  </form>
+</div>
+
+@section Scripts {
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script>
+  $(document).ready(function() {
+    // Handle delete action when delete button is clicked
+    $('#deleteButton').on('click', function(e) {
+      e.preventDefault(); // Prevent the default action
+
+      // Get the ID of the notification (assuming it's stored in a data attribute of the button)
+      const notificationId = $(this).data('notification-id');
+
+      // Send an AJAX request to delete the notification
+      $.ajax({
+        url: '/api/notifications/' + notificationId,  // Assuming the API route for deleting a notification is '/api/notifications/{id}'
+        method: 'DELETE',
+        success: function(response) {
+          $('#successAlert').show();
+          $('#errorAlert').hide();
+          // Optionally, remove the notification row from the DOM
+          $('#notificationRow_' + notificationId).remove();
+        },
+        error: function(xhr, status, error) {
+          $('#errorAlert').show();
+          $('#successAlert').hide();
+        }
+      });
+    });
+  });
+</script>
+}
+

@@ -1,0 +1,72 @@
+@model Project_Sem3.Models.Payment
+
+@{
+ViewData["Title"] = "Details";
+}
+
+@section VendorStyles {
+<!-- Add any vendor stylesheets you might still need -->
+<link rel="stylesheet" href="~/vendor/libs/datatables-bs5/datatables.bootstrap5.css">
+<link rel="stylesheet" href="~/vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.css">
+}
+
+@section VendorScripts {
+<!-- Add any scripts you need for this page -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script>
+  $(document).ready(function() {
+    // Khi nút "View Details" được nhấn
+    $('#viewDetailsButton').on('click', function(e) {
+      e.preventDefault(); // Ngừng hành động mặc định
+
+      const paymentId = $(this).data('payment-id'); // Lấy ID của payment
+
+      // Gửi yêu cầu AJAX để lấy chi tiết payment
+      $.ajax({
+        url: '/api/payments/' + paymentId,  // Đường dẫn API để lấy thông tin payment
+        method: 'GET',
+        success: function(response) {
+          // Chèn thông tin chi tiết payment vào các phần tử HTML trên trang
+          $('#paymentDetails').html(`
+            <h4>Payment</h4>
+            <hr />
+            <dl class="row">
+                <dt class="col-sm-2">Amount</dt>
+                <dd class="col-sm-10">${response.amount}</dd>
+                <dt class="col-sm-2">Payment Date</dt>
+                <dd class="col-sm-10">${response.paymentDate}</dd>
+                <dt class="col-sm-2">Status</dt>
+                <dd class="col-sm-10">${response.status}</dd>
+                <dt class="col-sm-2">Image URL</dt>
+                <dd class="col-sm-10"><a href="${response.imageUrl}" target="_blank">View Image</a></dd>
+                <dt class="col-sm-2">Contract</dt>
+                <dd class="col-sm-10">${response.contractId}</dd>
+            </dl>
+          `);
+        },
+        error: function(xhr, status, error) {
+          // Nếu có lỗi, hiển thị thông báo lỗi
+          alert("Error fetching payment details: " + error);
+        }
+      });
+    });
+  });
+</script>
+}
+
+<h1>Details</h1>
+
+<div>
+  <button id="viewDetailsButton" data-payment-id="@Model?.Id" class="btn btn-primary">View Payment Details</button>
+</div>
+
+<!-- Div to display the details dynamically -->
+<div id="paymentDetails">
+  <!-- Payment details will be loaded here dynamically -->
+</div>
+
+<div>
+  <a asp-action="Edit" class="col-md-6" asp-route-id="@Model?.Id">Edit</a> |
+  <a asp-action="Index" class="col-md-6">Back to List</a>
+</div>

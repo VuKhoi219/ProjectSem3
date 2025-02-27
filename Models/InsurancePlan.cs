@@ -12,7 +12,7 @@ public class InsurancePlan
     public string Name { get; set; }
 
     [MaxLength(225)]
-    public string Destination { get; set; }
+    public string Description { get; set; }
 
     public InsuranceType Type { get; set; }
 

@@ -64,7 +64,7 @@ public class DatabaseSeeder
         {
             var insuranceFaker = new Faker<InsurancePlan>()
                 .RuleFor(i => i.Name, f => f.PickRandom("Life","Health","Vehicle","Property"))
-                .RuleFor(i => i.Destination, f => f.Address.City()) // Thành phố ngẫu nhiên
+                .RuleFor(i => i.Description, f => f.Address.City()) // Thành phố ngẫu nhiên
                 .RuleFor(i => i.Type, f => f.PickRandom<InsuranceType>())
                 .RuleFor(i => i.Status, f => f.PickRandom<InsuranceStatus>())
                 .RuleFor(i => i.CreatedAt, f => f.Date.Past(2)) // Ngẫu nhiên trong 2 năm qua
