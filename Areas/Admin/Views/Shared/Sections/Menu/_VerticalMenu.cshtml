@@ -56,7 +56,7 @@
     </li>
     <li class='menu-item@(currentPage.StartsWith("/Admin/Payment") ? " open" : "")'>
       <a asp-controller="Payment" asp-action="Index" class="menu-link menu-toggle">
-        <i class="menu-icon tf-icons 	fab fa-blogger"></i>
+        <i class="menu-icon tf-icons fab fa-blogger"></i>
         <div>Payments</div>
       </a>
       <ul class="menu-sub">
@@ -67,6 +67,150 @@
         </li>
         <li class='menu-item@(currentPage == "/Admin/Payment" ? " active" : "")'>
           <a asp-controller="Payment" asp-action="Index" class="menu-link">
+            <div>View All</div>
+          </a>
+        </li>
+      </ul>
+    </li>
+    <li class='menu-item@(currentPage.StartsWith("/Admin/Notification") ? " open" : "")'>
+      <a asp-controller="Notification" asp-action="Index" class="menu-link menu-toggle">
+        <i class="menu-icon tf-icons fas fa-bell"></i>
+        <div>Notifications</div>
+      </a>
+      <ul class="menu-sub">
+        <li class='menu-item@(currentPage == "/Admin/Notification/Create" ? " active" : "")'>
+          <a asp-controller="Notification" asp-action="Create" class="menu-link">
+            <div>Add New</div>
+          </a>
+        </li>
+        <li class='menu-item@(currentPage == "/Admin/Notification" ? " active" : "")'>
+          <a asp-controller="Notification" asp-action="Index" class="menu-link">
+            <div>View All</div>
+          </a>
+        </li>
+      </ul>
+    </li>
+    <li class='menu-item@(currentPage.StartsWith("/Admin/LoanPayment") ? " open" : "")'>
+      <a asp-controller="LoanPayment" asp-action="Index" class="menu-link menu-toggle">
+        <i class="menu-icon tf-icons fab fa-blogger"></i>
+        <div>Loan Payments</div>
+      </a>
+      <ul class="menu-sub">
+        <li class='menu-item@(currentPage == "/Admin/LoanPayment/Create" ? " active" : "")'>
+          <a asp-controller="LoanPayment" asp-action="Create" class="menu-link">
+            <div>Add New</div>
+          </a>
+        </li>
+        <li class='menu-item@(currentPage == "/Admin/LoanPayment" ? " active" : "")'>
+          <a asp-controller="LoanPayment" asp-action="Index" class="menu-link">
+            <div>View All</div>
+          </a>
+        </li>
+      </ul>
+    </li>
+    <li class='menu-item@(currentPage.StartsWith("/Admin/Vehicle") ? " open" : "")'>
+      <a asp-controller="/" asp-action="Index" class="menu-link menu-toggle">
+        <i class="menu-icon tf-icons fas fa-car"></i>
+        <div>Vehicle Insurance</div>
+      </a>
+      <ul class="menu-sub">
+        <li class='menu-item@(currentPage == "/Admin/Vehicle/Create" ? " active" : "")'>
+          <a asp-controller="/" asp-action="Create" class="menu-link">
+            <div>Add New</div>
+          </a>
+        </li>
+        <li class='menu-item@(currentPage == "/Admin/Vehicle" ? " active" : "")'>
+          <a asp-controller="/" asp-action="Index" class="menu-link">
+            <div>View All</div>
+          </a>
+        </li>
+      </ul>
+    </li>
+    <li class='menu-item@(currentPage.StartsWith("/Admin/Property") ? " open" : "")'>
+      <a asp-controller="/" asp-action="Index" class="menu-link menu-toggle">
+        <i class="menu-icon tf-icons fas fa-house-user"></i>
+        <div>Property Insurance</div>
+      </a>
+      <ul class="menu-sub">
+        <li class='menu-item@(currentPage == "/Admin/Property/Create" ? " active" : "")'>
+          <a asp-controller="/" asp-action="Create" class="menu-link">
+            <div>Add New</div>
+          </a>
+        </li>
+        <li class='menu-item@(currentPage == "/Admin/Property" ? " active" : "")'>
+          <a asp-controller="/" asp-action="Index" class="menu-link">
+            <div>View All</div>
+          </a>
+        </li>
+      </ul>
+    </li>
+    <li class='menu-item@(currentPage.StartsWith("/Admin/Life") ? " open" : "")'>
+      <a asp-controller="/" asp-action="Index" class="menu-link menu-toggle">
+        <i class="menu-icon tf-icons fas fa-star-of-life"></i>
+        <div>Life Insurance</div>
+      </a>
+      <ul class="menu-sub">
+        <li class='menu-item@(currentPage == "/Admin/Life/Create" ? " active" : "")'>
+          <a asp-controller="/" asp-action="Create" class="menu-link">
+            <div>Add New</div>
+          </a>
+        </li>
+        <li class='menu-item@(currentPage == "/Admin/Life" ? " active" : "")'>
+          <a asp-controller="/" asp-action="Index" class="menu-link">
+            <div>View All</div>
+          </a>
+        </li>
+      </ul>
+    </li>
+    <li class='menu-item@(currentPage.StartsWith("/Admin/Health") ? " open" : "")'>
+      <a asp-controller="/" asp-action="Index" class="menu-link menu-toggle">
+        <i class="menu-icon tf-icons fas fa-hand-holding-heart"></i>
+        <div>Health Insurance</div>
+      </a>
+      <ul class="menu-sub">
+        <li class='menu-item@(currentPage == "/Admin/Health/Create" ? " active" : "")'>
+          <a asp-controller="/" asp-action="Create" class="menu-link">
+            <div>Add New</div>
+          </a>
+        </li>
+        <li class='menu-item@(currentPage == "/Admin/Health" ? " active" : "")'>
+          <a asp-controller="/" asp-action="Index" class="menu-link">
+            <div>View All</div>
+          </a>
+        </li>
+      </ul>
+    </li>
+    <li class='menu-item@(currentPage.StartsWith("/Admin/Contract") ? " open" : "")'>
+      <a asp-controller="/" asp-action="Index" class="menu-link menu-toggle">
+        <i class="menu-icon tf-icons fas fa-file-contract"></i>
+        <div>Contract</div>
+      </a>
+      <ul class="menu-sub">
+        <li class='menu-item@(currentPage == "/Admin/Contract/Create" ? " active" : "")'>
+          <a asp-controller="/" asp-action="Create" class="menu-link">
+            <div>Add New</div>
+          </a>
+        </li>
+        <li class='menu-item@(currentPage == "/Admin/Contract" ? " active" : "")'>
+          <a asp-controller="/" asp-action="Index" class="menu-link">
+            <div>View All</div>
+          </a>
+        </li>
+      </ul>
+    </li>
+    <li class='menu-item@(currentPage.StartsWith("/Admin/Plan") ? " open" : "")'>
+      <a asp-controller="/" asp-action="Index" class="menu-link menu-toggle">
+        <i class="menu-icon tf-icons fas fa-newspaper"></i>
+        <div>Plan</div>
+      </a>
+      <ul class="menu-sub">
+        <li class='menu-item@(currentPage == "/Admin/Plan/Create" ? " active" : "")'>
+          <a asp-controller="/" asp-action="Create" class="menu-link">
+            <div>Add New</div>
+          </a>
+        </li>
+        <li class='menu-item@(currentPage == "/Admin/Plan" ? " active" : "")'>
+          <a asp-controller="/" asp-action="Index" class="menu-link">
             <div>View All</div>
           </a>
         </li>
