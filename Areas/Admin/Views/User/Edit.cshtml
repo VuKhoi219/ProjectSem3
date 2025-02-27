@@ -1,28 +1,28 @@
 @model Project_Sem3.Models.User
 
 @{
-    ViewData["Title"] = "Edit";
+ViewData["Title"] = "Edit";
 }
 
 @section VendorStyles{
-<link rel="stylesheet" href="~/vendor/libs/bootstrap-select/bootstrap-select.css" />
-<link rel="stylesheet" href="~/vendor/libs/select2/select2.css" />
-<link rel="stylesheet" href="~/vendor/libs/flatpickr/flatpickr.css" />
-<link rel="stylesheet" href="~/vendor/libs/typeahead-js/typeahead.css" />
-<link rel="stylesheet" href="~/vendor/libs/tagify/tagify.css" />
-<link rel="stylesheet" href="~/vendor/libs/&#64;form-validation/form-validation.css" />
+  <link rel="stylesheet" href="~/vendor/libs/bootstrap-select/bootstrap-select.css" />
+  <link rel="stylesheet" href="~/vendor/libs/select2/select2.css" />
+  <link rel="stylesheet" href="~/vendor/libs/flatpickr/flatpickr.css" />
+  <link rel="stylesheet" href="~/vendor/libs/typeahead-js/typeahead.css" />
+  <link rel="stylesheet" href="~/vendor/libs/tagify/tagify.css" />
+  <link rel="stylesheet" href="~/vendor/libs/&#64;form-validation/form-validation.css" />
 }
 
 @section VendorScripts{
-<script src="~/vendor/libs/select2/select2.js"></script>
-<script src="~/vendor/libs/bootstrap-select/bootstrap-select.js"></script>
-<script src="~/vendor/libs/moment/moment.js"></script>
-<script src="~/vendor/libs/flatpickr/flatpickr.js"></script>
-<script src="~/vendor/libs/typeahead-js/typeahead.js"></script>
-<script src="~/vendor/libs/tagify/tagify.js"></script>
-<script src="~/vendor/libs/&#64;form-validation/popular.js"></script>
-<script src="~/vendor/libs/&#64;form-validation/bootstrap5.js"></script>
-<script src="~/vendor/libs/&#64;form-validation/auto-focus.js"></script>
+  <script src="~/vendor/libs/select2/select2.js"></script>
+  <script src="~/vendor/libs/bootstrap-select/bootstrap-select.js"></script>
+  <script src="~/vendor/libs/moment/moment.js"></script>
+  <script src="~/vendor/libs/flatpickr/flatpickr.js"></script>
+  <script src="~/vendor/libs/typeahead-js/typeahead.js"></script>
+  <script src="~/vendor/libs/tagify/tagify.js"></script>
+  <script src="~/vendor/libs/&#64;form-validation/popular.js"></script>
+  <script src="~/vendor/libs/&#64;form-validation/bootstrap5.js"></script>
+  <script src="~/vendor/libs/&#64;form-validation/auto-focus.js"></script>
 }
 
 @section PageScripts {
@@ -38,55 +38,45 @@
     <div class="card">
       <div class="card-body">
 
-        @{
-        var successMessage = TempData["SuccessMessage"] as string;
-        }
-
-        @if (!string.IsNullOrEmpty(successMessage))
+        @if (!string.IsNullOrEmpty(TempData["SuccessMessage"] as string))
         {
         <div class="alert alert-success">
-          @successMessage
+          @TempData["SuccessMessage"]
         </div>
         }
 
-
-        <form id="formValidationExamples" class="row g-6" asp-action="Create" method="post">
+        <form id="formValidationExamples" class="row g-6" method="post">
           <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-          <div class="col-12">
-            <h6>Basic Information</h6>
-            <hr class="mt-0"/>
-          </div>
           <div class="col-md-6">
             <label asp-for="FullName" class="form-label">Full Name</label>
-            <input asp-for="FullName" class="form-control"/>
+            <input asp-for="FullName" class="form-control" />
           </div>
           <div class="col-md-6">
             <label asp-for="Email" class="form-label">Email</label>
-            <input asp-for="Email" class="form-control"/>
+            <input asp-for="Email" class="form-control" />
           </div>
           <div class="col-md-6">
             <label asp-for="Password" class="form-label">Password</label>
-            <input asp-for="Password" type="password" class="form-control"/>
+            <input asp-for="Password" type="password" class="form-control" />
           </div>
           <div class="col-md-6">
             <label asp-for="Phone" class="form-label">Phone</label>
-            <input asp-for="Phone" class="form-control"/>
+            <input asp-for="Phone" class="form-control" />
           </div>
-          <div class="form-group col-md-6">
-            <label asp-for="Gender" class="control-label"></label>
-            <select asp-for="Status" class="form-control">
+          <div class="col-md-6">
+            <label asp-for="Gender" class="form-label">Gender</label>
+            <select asp-for="Gender" class="form-control">
               <option value="Male">Male</option>
               <option value="Female">Female</option>
             </select>
-            <span asp-validation-for="Gender" class="text-danger"></span>
           </div>
           <div class="col-md-6">
             <label asp-for="CitizenIdentificationCard" class="form-label">Citizen Identification Card</label>
-            <input asp-for="CitizenIdentificationCard" class="form-control"/>
+            <input asp-for="CitizenIdentificationCard" class="form-control" />
           </div>
           <div class="col-md-6">
             <label asp-for="DateOfBirth" class="form-label">Date Of Birth</label>
-            <input asp-for="DateOfBirth" type="date" class="form-control"/>
+            <input asp-for="DateOfBirth" type="date" class="form-control" />
           </div>
           <div class="col-md-6">
             <label asp-for="Status" class="form-label">Status</label>
@@ -96,18 +86,13 @@
               <option value="Deleted">Rejected</option>
             </select>
           </div>
-          <div class="form-group col-md-6">
-            <label asp-for="RoleId" class="control-label"></label>
-            <select asp-for="RoleId" class ="form-control" asp-items="ViewBag.RoleId"></select>
+          <div class="col-md-6">
+            <label asp-for="RoleId" class="form-label">Role</label>
+            <select asp-for="RoleId" class="form-control" asp-items="ViewBag.RoleId"></select>
           </div>
-          <div class="col-12">
-            <div class="form-check">
-              <input type="checkbox" class="form-check-input" id="formValidationCheckbox" name="formValidationCheckbox"/>
-              <label class="form-check-label" for="formValidationCheckbox">Agree to our terms and conditions</label>
-            </div>
-          </div>
+
           <div class="form-group">
-            <input type="submit" value="Save" class="btn btn-primary" />
+            <button type="submit" class="btn btn-primary">Save</button>
           </div>
         </form>
       </div>
@@ -115,6 +100,38 @@
   </div>
   <!-- /FormValidation -->
 </div>
+
 <div>
   <a asp-action="Index">Back to List</a>
 </div>
+
+@section Scripts {
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script>
+  $(document).ready(function () {
+    $('#formValidationExamples').on('submit', function (e) {
+      e.preventDefault();
+
+      var formData = $(this).serialize();  // Serialize the form data
+
+      $.ajax({
+        url: '/api/users',  // Make sure to include the user ID in the URL
+        type: 'POST',
+        data: formData,
+        success: function (response) {
+          if (response.success) {
+            // Show success message
+            alert(response.message);
+            // Optionally redirect or update UI
+          } else {
+            alert(response.message);  // Show error message
+          }
+        },
+        error: function () {
+          alert('An error occurred while updating the user. Please try again later.');
+        }
+      });
+    });
+  });
+</script>
+}
