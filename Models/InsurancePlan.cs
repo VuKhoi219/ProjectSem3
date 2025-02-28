@@ -13,11 +13,12 @@ public class InsurancePlan
 
     [MaxLength(225)]
     public string Description { get; set; }
-
+    [Required]
     public InsuranceType Type { get; set; }
-
+    [Required]
     public InsuranceStatus Status { get; set; }
-
+    [Required]
+    public decimal CoverageAmount { get; set; } // Thêm trường này
     public DateTime? CreatedAt { get; set; }
     public DateTime? UpdatedAt { get; set; }
     public DateTime? DeleteAt { get; set; }
@@ -28,11 +29,8 @@ public class InsurancePlan
     public int? DeleteBy { get; set; }
 
     // Liên kết với User
-    [ForeignKey("CreatedBy")]
     public virtual User? Creator { get; set; }
-    [ForeignKey("UpdatedBy")]
     public virtual User? Updater { get; set; }
-    [ForeignKey("DeleteBy")]
     public virtual User? Deleter { get; set; }
 
 

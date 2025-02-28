@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using NuGet.Protocol.Core.Types;
 
 namespace Project_Sem3.Models;
 
@@ -16,11 +17,9 @@ public abstract class InsuranceDetails
     public decimal Premium { get; set; }
 
     [Required]
-    public decimal CoverageAmount { get; set; }
-
-    [Required]
     public decimal Deductible { get; set; }
-
+    [Required]
+    public StatusType Status { get; set; }
     public DateTime? CreatedAt { get; set; }
 
     public DateTime? UpdatedAt { get; set; }
@@ -30,9 +29,14 @@ public abstract class InsuranceDetails
     public int? CreatedBy { get; set; }
     public int? UpdatedBy { get; set; }
     public int? DeleteBy { get; set; }
-    
-    public virtual InsurancePlan Plan { get; set; }
-    public virtual User Creator { get; set; }
-    public virtual User Updater { get; set; }
-    public virtual User Deleter { get; set; }
+
+    public virtual InsurancePlan? Plan { get; set; }
+    public virtual User? Creator { get; set; }
+    public virtual User? Updater { get; set; }
+    public virtual User? Deleter { get; set; }
+}
+public enum StatusType{
+  Pending,
+  Active,
+
 }
