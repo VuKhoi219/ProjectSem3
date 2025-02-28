@@ -12,7 +12,7 @@ using Project_Sem3.Data;
 namespace Project_Sem3.Migrations
 {
     [DbContext(typeof(MyDbContext))]
-    [Migration("20250228083309_Initial")]
+    [Migration("20250228125416_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -115,6 +115,9 @@ namespace Project_Sem3.Migrations
                     b.Property<int?>("DeleteBy")
                         .HasColumnType("int");
 
+                    b.Property<int>("DetailId")
+                        .HasColumnType("int");
+
                     b.Property<DateTime>("EndDate")
                         .HasColumnType("datetime2");
 
@@ -187,9 +190,6 @@ namespace Project_Sem3.Migrations
 
                     b.Property<decimal>("Premium")
                         .HasColumnType("decimal(18,2)");
-
-                    b.Property<int>("Status")
-                        .HasColumnType("int");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");

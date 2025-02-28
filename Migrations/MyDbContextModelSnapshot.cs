@@ -112,6 +112,9 @@ namespace Project_Sem3.Migrations
                     b.Property<int?>("DeleteBy")
                         .HasColumnType("int");
 
+                    b.Property<int>("DetailId")
+                        .HasColumnType("int");
+
                     b.Property<DateTime>("EndDate")
                         .HasColumnType("datetime2");
 
@@ -185,12 +188,6 @@ namespace Project_Sem3.Migrations
                     b.Property<decimal>("Premium")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<int>("Status")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Status")
-                        .HasColumnType("int");
-
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
 
@@ -205,76 +202,7 @@ namespace Project_Sem3.Migrations
 
                     b.HasIndex("UpdatedBy");
 
-                    b.ToTable("InsuranceHealthDetails");
-                });
-
-            modelBuilder.Entity("Project_Sem3.Models.InsuranceLifeDetail", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("AgeGroup")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<decimal>("AnnualPaymentAmount")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<string>("Beneficiaries")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int?>("CreatedBy")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("Deductible")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<DateTime?>("DeleteAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int?>("DeleteBy")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Duration")
-                        .HasColumnType("int");
-
-                    b.Property<int>("PlanId")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("Premium")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<string>("Region")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<decimal>("RiskFactor")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<int>("Status")
-                        .HasColumnType("int");
-
-                    b.Property<int>("TermYears")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int?>("UpdatedBy")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CreatedBy");
+                    b.ToTable("InsuranceDetails");
 
                     b.HasDiscriminator().HasValue("InsuranceDetails");
 
@@ -361,13 +289,6 @@ namespace Project_Sem3.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<int>("BorrowId")
-                    b.Property<decimal>("AnnualPaymentAmount")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<DateTime?>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int?>("CreatedBy")
                         .HasColumnType("int");
 
                     b.Property<DateTime?>("CreatedAt")
@@ -395,13 +316,6 @@ namespace Project_Sem3.Migrations
                     b.Property<bool>("Status")
                         .HasColumnType("bit");
 
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int?>("UpdatedBy")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
 
                     b.HasIndex("BorrowId");
@@ -418,9 +332,6 @@ namespace Project_Sem3.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<decimal>("AnnualPaymentAmount")
-                        .HasColumnType("decimal(18,2)");
 
                     b.Property<DateTime?>("CreatedAt")
                         .HasColumnType("datetime2");
@@ -440,9 +351,6 @@ namespace Project_Sem3.Migrations
                     b.Property<string>("Message")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("Status")
-                        .HasColumnType("int");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");

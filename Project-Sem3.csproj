@@ -28,6 +28,7 @@
       <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.13.0" />
       <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="8.0.7" />
       <PackageReference Include="MimeKit" Version="4.10.0" />
+      <PackageReference Include="System.Linq.Dynamic.Core" Version="1.6.0.2" />
       <PackageReference Include="System.Net.Mail" Version="1.0.0-rtm-00002" />
     </ItemGroup>
 

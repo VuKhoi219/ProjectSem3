@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Project_Sem3.Areas.Admin.Controllers;
 using Project_Sem3.Data; // Giả sử đây là namespace chứa DbContext
 using Project_Sem3.Models; // Giả sử đây là namespace chứa Payment và PaymentStatus
+using System.Linq.Dynamic.Core;
 
 
 namespace Project_Sem3.Controllers;
@@ -46,49 +47,75 @@ public class PaymentController : ControllerBase
 
     // 2. Read - Lấy tất cả Payments với phân trang, chỉ lấy record chưa xóa mềm
     [HttpGet]
-    public async Task<IActionResult> GetAllPayments(int page = 1, int pageSize = 10)
+    public async Task<IActionResult> GetAllPayments( [FromQuery] int page = 1,
+      [FromQuery] int pageSize = 10,
+      [FromQuery] string? search = null,
+      [FromQuery] string? orderColumn = null,
+      [FromQuery] string? orderDir = null)
     {
-        try
+      try
+      {
+        // var totalRecords = await _context.Payments
+        //   .Where(p => p.DeleteAt == null)
+        //   .CountAsync();
+        // var totalPages = (int)Math.Ceiling((double)totalRecords / pageSize);
+        //
+        // var payments = await _context.Payments
+        //   .Where(p => p.DeleteAt == null)
+        //   .Select(p => new
+        //   {
+        //     p.Id,
+        //     p.UserId,
+        //     p.ContractId,
+        //     p.Amount,
+        //     PaymentDate = p.PaymentDate.ToString("yyyy-MM-dd HH:mm:ss"),
+        //     p.Status,
+        //     p.ImageUrl,
+        //     CreatedAt = p.CreatedAt.HasValue ? p.CreatedAt.Value.ToString("yyyy-MM-dd HH:mm:ss") : null,
+        //     UpdatedAt = p.UpdatedAt.HasValue ? p.UpdatedAt.Value.ToString("yyyy-MM-dd HH:mm:ss") : null
+        //   })
+        //   .OrderBy(p => p.Id)
+        //   .Skip((page - 1) * pageSize)
+        //   .Take(pageSize)
+        //   .ToListAsync();
+        //
+        // return Ok(new
+        // {
+        //   data = payments, // Chú ý thay đổi từ Data sang data
+        //   recordsTotal = totalRecords, // Tổng số bản ghi
+        //   recordsFiltered = totalRecords, // Số bản ghi sau khi lọc
+        //   draw = Request.Query["draw"].ToString() // Trả về giá trị draw (trường bắt buộc của DataTable)
+        // });
+        var query = _context.Payments.AsQueryable(); // móc từ db.
+        if (!string.IsNullOrEmpty(search))
         {
-            var totalRecords = await _context.Payments
-                .Where(p => p.DeleteAt == null)
-                .CountAsync();
-            var totalPages = (int)Math.Ceiling((double)totalRecords / pageSize);
-
-            var payments = await _context.Payments
-                .Where(p => p.DeleteAt == null)
-                .Select(p => new
-                {
-                    p.Id,
-                    p.UserId,
-                    p.ContractId,
-                    p.Amount,
-                    PaymentDate = p.PaymentDate.ToString("yyyy-MM-dd HH:mm:ss"),
-                    p.Status,
-                    p.ImageUrl,
-                    CreatedAt = p.CreatedAt.HasValue ? p.CreatedAt.Value.ToString("yyyy-MM-dd HH:mm:ss") : null,
-                    UpdatedAt = p.UpdatedAt.HasValue ? p.UpdatedAt.Value.ToString("yyyy-MM-dd HH:mm:ss") : null
-                })
-                .OrderBy(p => p.Id)
-                .Skip((page - 1) * pageSize)
-                .Take(pageSize)
-                .ToListAsync();
-
-            return Ok(new
-            {
-                Data = payments,
-                TotalRecords = totalRecords,
-                TotalPages = totalPages,
-                CurrentPage = page,
-                PageSize = pageSize
-            });
+          // search theo keyword
+          query = query.Where(x => x.User.Email.Contains(search, StringComparison.OrdinalIgnoreCase));
         }
-        catch (Exception e)
+        if (!string.IsNullOrEmpty(orderColumn) && !string.IsNullOrEmpty(orderDir))
         {
-            Console.WriteLine(e);
-            return StatusCode(500, new { Message = "An error occurred", Error = e.Message });
+          // sort by field
+          query = query.OrderBy($"{orderColumn} {orderDir}");
         }
+        var totalCount = query.Count();
+        var pagedProducts = query.Skip((page - 1) * pageSize).Take(pageSize).ToList();
+        var result = new
+        {
+          data = pagedProducts.ToArray(),
+          recordsTotal = _context.Payments.Count(),
+          recordsFiltered = totalCount,
+          page = page,
+          pageSize = pageSize
+        };
+        return Ok(result);
+      }
+      catch (Exception e)
+      {
+        Console.WriteLine(e);
+        return StatusCode(500, new { Message = "An error occurred", Error = e.Message });
+      }
     }
+
 
     // 2.1 Read - Lấy Payment theo Id, chỉ lấy record chưa xóa mềm
     [HttpGet("{id}")]
