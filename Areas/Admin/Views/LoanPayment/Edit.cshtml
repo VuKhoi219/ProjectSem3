@@ -46,35 +46,35 @@
 
         <form id="formValidationExamples" class="row g-6" asp-action="Edit" method="post">
           <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-          <input type="hidden" asp-for="Id" />
+          <input type="hidden" asp-for="Id" id="id" />
           <div class="form-group">
             <label asp-for="BorrowId" class="control-label"></label>
-            <select asp-for="BorrowId" class="form-control" asp-items="ViewBag.BorrowId"></select>
+            <select asp-for="BorrowId" id="borrowId" class="form-control" asp-items="ViewBag.BorrowId"></select>
             <span asp-validation-for="BorrowId" class="text-danger"></span>
           </div>
           <div class="form-group">
             <label asp-for="PaymentAmount" class="control-label"></label>
-            <input asp-for="PaymentAmount" class="form-control" />
+            <input asp-for="PaymentAmount" id="paymentAmount" class="form-control" />
             <span asp-validation-for="PaymentAmount" class="text-danger"></span>
           </div>
           <div class="form-group">
             <label asp-for="PaymentDate" class="control-label"></label>
-            <input asp-for="PaymentDate" class="form-control" />
+            <input asp-for="PaymentDate" id="paymentDate" class="form-control" />
             <span asp-validation-for="PaymentDate" class="text-danger"></span>
           </div>
           <div class="form-group">
             <label asp-for="PaymentImage" class="control-label"></label>
-            <input asp-for="PaymentImage" class="form-control" />
+            <input asp-for="PaymentImage" id="paymentImage" class="form-control" />
             <span asp-validation-for="PaymentImage" class="text-danger"></span>
           </div>
           <div class="form-group">
             <label asp-for="OverdueDays" class="control-label"></label>
-            <input asp-for="OverdueDays" class="form-control" />
+            <input asp-for="OverdueDays" id="overdueDays" class="form-control" />
             <span asp-validation-for="OverdueDays" class="text-danger"></span>
           </div>
           <div class="form-group">
             <label asp-for="PenaltyInterest" class="control-label"></label>
-            <input asp-for="PenaltyInterest" class="form-control" />
+            <input asp-for="PenaltyInterest" id="penaltyInterest" class="form-control" />
             <span asp-validation-for="PenaltyInterest" class="text-danger"></span>
           </div>
           <div class="form-group form-check">
@@ -112,14 +112,14 @@
 
       // Get form data for loan payment
       const loanPaymentData = {
-        id: $('#Id').val(),  // Get the loan payment ID
-        borrowId: $('#BorrowId').val(),  // Get the selected BorrowId
-        paymentAmount: $('#PaymentAmount').val(),  // Get the payment amount
-        paymentDate: $('#PaymentDate').val(),  // Get the payment date
-        paymentImage: $('#PaymentImage').val(),  // Get the payment image
-        overdueDays: $('#OverdueDays').val(),  // Get the overdue days
-        penaltyInterest: $('#PenaltyInterest').val(),  // Get the penalty interest
-        status: $('#Status').prop('checked'),  // Get the status (checkbox value)
+        id: $('#id').val(),  // Get the loan payment ID
+        borrowId: $('#borrowId').val(),  // Get the selected BorrowId
+        paymentAmount: $('#paymentAmount').val(),  // Get the payment amount
+        paymentDate: $('#paymentDate').val(),  // Get the payment date
+        paymentImage: $('#paymentImage').val(),  // Get the payment image
+        overdueDays: $('#overdueDays').val(),  // Get the overdue days
+        penaltyInterest: $('#penaltyInterest').val(),  // Get the penalty interest
+        status: $('#status').prop('checked'),  // Get the status (checkbox value)
         agreeToTerms: $('#formValidationCheckbox').prop('checked') // Terms and conditions checkbox value
       };
 

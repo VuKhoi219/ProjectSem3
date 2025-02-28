@@ -1,0 +1,130 @@
+@model Project_Sem3.Models.InsurancePlan
+
+@{
+ViewData["Title"] = "Edit";
+}
+
+@section VendorStyles{
+<link rel="stylesheet" href="~/vendor/libs/bootstrap-select/bootstrap-select.css" />
+<link rel="stylesheet" href="~/vendor/libs/select2/select2.css" />
+<link rel="stylesheet" href="~/vendor/libs/flatpickr/flatpickr.css" />
+<link rel="stylesheet" href="~/vendor/libs/typeahead-js/typeahead.css" />
+<link rel="stylesheet" href="~/vendor/libs/tagify/tagify.css" />
+<link rel="stylesheet" href="~/vendor/libs/&#64;form-validation/form-validation.css" />
+}
+
+@section VendorScripts{
+<script src="~/vendor/libs/select2/select2.js"></script>
+<script src="~/vendor/libs/bootstrap-select/bootstrap-select.js"></script>
+<script src="~/vendor/libs/moment/moment.js"></script>
+<script src="~/vendor/libs/flatpickr/flatpickr.js"></script>
+<script src="~/vendor/libs/typeahead-js/typeahead.js"></script>
+<script src="~/vendor/libs/tagify/tagify.js"></script>
+<script src="~/vendor/libs/&#64;form-validation/popular.js"></script>
+<script src="~/vendor/libs/&#64;form-validation/bootstrap5.js"></script>
+<script src="~/vendor/libs/&#64;form-validation/auto-focus.js"></script>
+}
+
+@section PageScripts {
+<script src="~/js/form-validation.js"></script>
+}
+
+<h1>Edit</h1>
+
+<div class="row">
+  <!-- FormValidation -->
+  <div class="col-12">
+    <div class="card">
+      <div class="card-body">
+
+        <form id="editInsurancePlanForm" class="row g-6" method="post">
+          <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+          <input type="hidden" asp-for="Id" id="insurancePlanId" />
+          <div class="form-group">
+            <label asp-for="Name" class="control-label"></label>
+            <input asp-for="Name" class="form-control" id="insurancePlanName" />
+            <span asp-validation-for="Name" class="text-danger"></span>
+          </div>
+          <div class="form-group">
+            <label asp-for="Description" class="control-label"></label>
+            <input asp-for="Description" class="form-control" id="insurancePlanDescription" />
+            <span asp-validation-for="Description" class="text-danger"></span>
+          </div>
+          <div class="form-group">
+            <label asp-for="Type" class="control-label"></label>
+            <select asp-for="Type" class="form-control" id="insurancePlanType">
+              <option value="Type1">Type 1</option>
+              <option value="Type2">Type 2</option>
+            </select>
+            <span asp-validation-for="Type" class="text-danger"></span>
+          </div>
+          <div class="form-group">
+            <label asp-for="CoverageAmount" class="control-label"></label>
+            <input asp-for="CoverageAmount" class="form-control" id="insurancePlanCoverageAmount" />
+            <span asp-validation-for="CoverageAmount" class="text-danger"></span>
+          </div>
+          <div class="form-group">
+            <label asp-for="CreatedBy" class="control-label"></label>
+            <select asp-for="CreatedBy" class="form-control" asp-items="ViewBag.CreatedBy" id="insurancePlanCreatedBy"></select>
+            <span asp-validation-for="CreatedBy" class="text-danger"></span>
+          </div>
+          <div class="col-12">
+            <div class="form-check">
+              <input type="checkbox" class="form-check-input" id="insurancePlanTerms" name="insurancePlanTerms"/>
+              <label class="form-check-label" for="insurancePlanTerms">Agree to our terms and conditions</label>
+            </div>
+          </div>
+          <div class="form-group">
+            <input type="submit" value="Save" class="btn btn-primary"/>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  <!-- /FormValidation -->
+</div>
+<div>
+  <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script>
+  $(document).ready(function() {
+    // When the form is submitted
+    $('#editInsurancePlanForm').on('submit', function(e) {
+      e.preventDefault(); // Prevent default form submission
+
+      // Get form data
+      const insurancePlanData = {
+        id: $('#insurancePlanId').val(),  // Get the insurance plan ID
+        name: $('#insurancePlanName').val(),  // Get the insurance plan Name
+        description: $('#insurancePlanDescription').val(),  // Get the description
+        type: $('#insurancePlanType').val(),  // Get the type
+        coverageAmount: $('#insurancePlanCoverageAmount').val(),  // Get the coverage amount
+        createdBy: $('#insurancePlanCreatedBy').val(),  // Get the created by
+        termsAgreed: $('#insurancePlanTerms').prop('checked')  // Check if the terms are agreed
+      };
+
+      // Send AJAX request to update Insurance Plan (PUT request)
+      $.ajax({
+        url: '/api/insurance-plans' + insurancePlanData.id,  // API URL for the update
+        method: 'PUT',
+        contentType: 'application/json',
+        data: JSON.stringify(insurancePlanData),  // Send the data as JSON
+        success: function(response) {
+          // Show a success message or take an action on success
+          alert("Insurance Plan updated successfully!");
+          // Optionally, reset the form after a successful update
+          $('#editInsurancePlanForm')[0].reset();
+        },
+        error: function(xhr, status, error) {
+          // Show an error message if something goes wrong
+          alert("Error updating Insurance Plan: " + error);
+        }
+      });
+    });
+  });
+</script>
+}

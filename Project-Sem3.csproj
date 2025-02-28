@@ -110,6 +110,11 @@
       <_ContentIncludedByDefault Remove="Areas\Admin\Views\Role\Details.cshtml" />
       <_ContentIncludedByDefault Remove="Areas\Admin\Views\Role\Edit.cshtml" />
       <_ContentIncludedByDefault Remove="Areas\Admin\Views\Role\Index.cshtml" />
+      <_ContentIncludedByDefault Remove="Areas\Admin\Views\VehicleDetail\Create.cshtml" />
+      <_ContentIncludedByDefault Remove="Areas\Admin\Views\VehicleDetail\Delete.cshtml" />
+      <_ContentIncludedByDefault Remove="Areas\Admin\Views\VehicleDetail\Details.cshtml" />
+      <_ContentIncludedByDefault Remove="Areas\Admin\Views\VehicleDetail\Edit.cshtml" />
+      <_ContentIncludedByDefault Remove="Areas\Admin\Views\VehicleDetail\Index.cshtml" />
     </ItemGroup>
 
     <ItemGroup>

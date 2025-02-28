@@ -285,4 +285,6 @@ public class MyDbContext : DbContext
           .OnDelete(DeleteBehavior.Restrict);
 
     }
+
+public DbSet<Project_Sem3.Models.InsuranceDetails> InsuranceDetails { get; set; } = default!;
 }

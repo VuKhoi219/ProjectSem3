@@ -1,4 +1,4 @@
-@model Project_Sem3.Models.LoanPayment
+@model Project_Sem3.Models.InsurancePlan
 
 @{
     ViewData["Title"] = "Create";
@@ -31,7 +31,7 @@
 
 <h1>Create</h1>
 
-<h4>Add New Loan Payment</h4>
+<h4>Add New Insurance Plan</h4>
 <div class="row">
   <!-- FormValidation -->
   <div class="col-12">
@@ -48,34 +48,28 @@
         <form id="formValidationExamples" class="row g-6" asp-action="Create" method="post">
           <div asp-validation-summary="ModelOnly" class="text-danger"></div>
           <div class="form-group">
-            <label asp-for="BorrowId" class="control-label"></label>
-            <input asp-for="BorrowId" id="borrowId" class="form-control"/>
-            @* <select asp-for="BorrowId" id="borrowId" class ="form-control" asp-items="ViewBag.BorrowId"></select> *@
+            <label asp-for="Name" class="control-label"></label>
+            <input asp-for="Name" id="name" class="form-control" />
+            <span asp-validation-for="Name" class="text-danger"></span>
           </div>
           <div class="form-group">
-            <label asp-for="PaymentAmount" class="control-label"></label>
-            <input asp-for="PaymentAmount" id="paymentAmount" class="form-control" />
-            <span asp-validation-for="PaymentAmount" class="text-danger"></span>
+            <label asp-for="Description" class="control-label"></label>
+            <input asp-for="Description" id="description" class="form-control" />
+            <span asp-validation-for="Description" class="text-danger"></span>
           </div>
           <div class="form-group">
-            <label asp-for="PaymentImage" class="control-label"></label>
-            <input asp-for="PaymentImage" id="paymentImage" class="form-control" />
-            <span asp-validation-for="PaymentImage" class="text-danger"></span>
+            <label asp-for="Type" class="control-label"></label>
+            <input asp-for="Type" id="type" class="form-control" />
+            <span asp-validation-for="Type" class="text-danger"></span>
           </div>
           <div class="form-group">
-            <label asp-for="OverdueDays" class="control-label"></label>
-            <input asp-for="OverdueDays" id="overdueDays" class="form-control" />
-            <span asp-validation-for="OverdueDays" class="text-danger"></span>
-          </div>
-          <div class="form-group">
-            <label asp-for="PenaltyInterest" class="control-label"></label>
-            <input asp-for="PenaltyInterest" id="penaltyInterest" class="form-control" />
-            <span asp-validation-for="PenaltyInterest" class="text-danger"></span>
+            <label asp-for="CoverageAmount" class="control-label"></label>
+            <input asp-for="CoverageAmount" id="coverageAmount" class="form-control" />
+            <span asp-validation-for="CoverageAmount" class="text-danger"></span>
           </div>
           <div class="form-group">
             <label asp-for="CreatedBy" class="control-label"></label>
-            <input asp-for="CreatedBy" id="createdBy" class="form-control" />
-            <span asp-validation-for="CreatedBy" class="text-danger"></span>
+            <input asp-for="CreatedBy" id="createdBy" class ="form-control"/>
           </div>
           <div class="col-12 col-md-6">
             <div class="form-check">
@@ -102,36 +96,44 @@
 <script>
   $(document).ready(function() {
     $('#formValidationExamples').on('submit', function(e) {
-      e.preventDefault(); // Prevent the default form submit
+      e.preventDefault(); // Prevent the default form submission
 
       // Get the form data
-      const loanPaymentData = {
-        borrowId: $('#borrowId').val(), // Assuming your select has id="BorrowId"
-        paymentAmount: $('#paymentAmount').val(), // Assuming your input for payment amount has id="PaymentAmount"
-        paymentDate: $('#paymentDate').val(), // Assuming your input for payment date has id="PaymentDate"
-        paymentImage: $('#paymentImage').val(), // Assuming your input for payment image has id="PaymentImage"
-        overdueDays: $('#overdueDays').val(), // Assuming your input for overdue days has id="OverdueDays"
-        penaltyInterest: $('#penaltyInterest').val(), // Assuming your input for penalty interest has id="PenaltyInterest"
-        createdBy: $('#createdBy').val(),
+      const insurancePlanData = {
+        Name: $('#name').val(), // Assuming your input has id="Name"
+        Description: $('#description').val(), // Assuming your input has id="Description"
+        Type: $('#type').val(), // Assuming your input has id="Type"
+        CoverageAmount: $('#coverageAmount').val(), // Assuming your input has id="CoverageAmount"
+        CreatedBy: $('#createdBy').val(), // Assuming your input has id="CreatedBy"
       };
 
-      // Call the API to create the loan payment
+      // Check if the user agreed to the terms
+      const isAgreed = $('#formValidationCheckbox').prop('checked');
+      if (!isAgreed) {
+        alert("You must agree to the terms and conditions.");
+        return;
+      }
+
+      // Call the API to create the insurance plan
       $.ajax({
-        url: '/api/loan-payment/', // Use the correct URL for your Create Loan Payment action
+        url: '/api/insurance-plans', // Use the correct URL for your Create action
         method: 'POST',
         contentType: 'application/json',
-        data: JSON.stringify(loanPaymentData), // Send the data as JSON
+        data: JSON.stringify(insurancePlanData), // Send the data as JSON
         success: function(response) {
           // Success action, you can display a success message or redirect
-          alert("Loan Payment created successfully!");
+          alert("Insurance Plan created successfully!");
           $('#formValidationExamples')[0].reset(); // Optionally reset the form
+          // Redirect to the Index page after success
         },
         error: function(xhr, status, error) {
           // Error action, you can display an error message
-          alert("Error creating loan payment. Please try again.");
+          alert("Error creating insurance plan. Please try again.");
         }
       });
     });
   });
 </script>
 }
+
+

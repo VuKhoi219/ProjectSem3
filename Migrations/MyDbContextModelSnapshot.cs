@@ -148,7 +148,7 @@ namespace Project_Sem3.Migrations
                     b.ToTable("InsuranceContracts");
                 });
 
-            modelBuilder.Entity("Project_Sem3.Models.InsuranceHealthDetail", b =>
+            modelBuilder.Entity("Project_Sem3.Models.InsuranceDetails", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -156,15 +156,7 @@ namespace Project_Sem3.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("AgeGroup")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
                     b.Property<decimal>("AnnualPaymentAmount")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<decimal>("CoverageAmount")
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<DateTime?>("CreatedAt")
@@ -182,90 +174,10 @@ namespace Project_Sem3.Migrations
                     b.Property<int?>("DeleteBy")
                         .HasColumnType("int");
 
-                    b.Property<int>("Duration")
-                        .HasColumnType("int");
-
-                    b.Property<string>("HospitalNetwork")
+                    b.Property<string>("Discriminator")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("PlanId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("PreExistingConditions")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<decimal>("Premium")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<string>("Region")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<decimal>("RiskFactor")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int?>("UpdatedBy")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CreatedBy");
-
-                    b.HasIndex("DeleteBy");
-
-                    b.HasIndex("PlanId");
-
-                    b.HasIndex("UpdatedBy");
-
-                    b.ToTable("InsuranceHealthDetails");
-                });
-
-            modelBuilder.Entity("Project_Sem3.Models.InsuranceLifeDetail", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("AgeGroup")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<decimal>("AnnualPaymentAmount")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<string>("Beneficiaries")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<decimal>("CoverageAmount")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<DateTime?>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int?>("CreatedBy")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("Deductible")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<DateTime?>("DeleteAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int?>("DeleteBy")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Duration")
-                        .HasColumnType("int");
+                        .HasMaxLength(34)
+                        .HasColumnType("nvarchar(34)");
 
                     b.Property<int>("PlanId")
                         .HasColumnType("int");
@@ -273,15 +185,7 @@ namespace Project_Sem3.Migrations
                     b.Property<decimal>("Premium")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<string>("Region")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<decimal>("RiskFactor")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<int>("TermYears")
+                    b.Property<int>("Status")
                         .HasColumnType("int");
 
                     b.Property<DateTime?>("UpdatedAt")
@@ -296,11 +200,13 @@ namespace Project_Sem3.Migrations
 
                     b.HasIndex("DeleteBy");
 
-                    b.HasIndex("PlanId");
-
                     b.HasIndex("UpdatedBy");
 
-                    b.ToTable("InsuranceLifeDetails");
+                    b.ToTable("InsuranceDetails");
+
+                    b.HasDiscriminator().HasValue("InsuranceDetails");
+
+                    b.UseTphMappingStrategy();
                 });
 
             modelBuilder.Entity("Project_Sem3.Models.InsurancePlan", b =>
@@ -311,6 +217,9 @@ namespace Project_Sem3.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<decimal>("CoverageAmount")
+                        .HasColumnType("decimal(18,2)");
+
                     b.Property<DateTime?>("CreatedAt")
                         .HasColumnType("datetime2");
 
@@ -323,7 +232,7 @@ namespace Project_Sem3.Migrations
                     b.Property<int?>("DeleteBy")
                         .HasColumnType("int");
 
-                    b.Property<string>("Destination")
+                    b.Property<string>("Description")
                         .IsRequired()
                         .HasMaxLength(225)
                         .HasColumnType("nvarchar(225)");
@@ -369,159 +278,6 @@ namespace Project_Sem3.Migrations
                     b.HasIndex("UserId2");
 
                     b.ToTable("InsurancePlans");
-                });
-
-            modelBuilder.Entity("Project_Sem3.Models.InsurancePropertyDetail", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<decimal>("AnnualPaymentAmount")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<decimal>("CoverageAmount")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<DateTime?>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int?>("CreatedBy")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("Deductible")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<DateTime?>("DeleteAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int?>("DeleteBy")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Duration")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Location")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
-
-                    b.Property<int>("PlanId")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("Premium")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<string>("PropertyType")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
-
-                    b.Property<string>("Region")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<decimal>("RiskFactor")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int?>("UpdatedBy")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CreatedBy");
-
-                    b.HasIndex("DeleteBy");
-
-                    b.HasIndex("PlanId");
-
-                    b.HasIndex("UpdatedBy");
-
-                    b.ToTable("InsurancePropertyDetails");
-                });
-
-            modelBuilder.Entity("Project_Sem3.Models.InsuranceVehicleDetail", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<decimal>("AnnualPaymentAmount")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<decimal>("CoverageAmount")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<DateTime?>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int?>("CreatedBy")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("Deductible")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<DateTime?>("DeleteAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int?>("DeleteBy")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Duration")
-                        .HasColumnType("int");
-
-                    b.Property<int>("PlanId")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("Premium")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<string>("Region")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<decimal>("RiskFactor")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int?>("UpdatedBy")
-                        .HasColumnType("int");
-
-                    b.Property<string>("VehicleModel")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
-
-                    b.Property<string>("VehicleType")
-                        .IsRequired()
-                        .HasMaxLength(225)
-                        .HasColumnType("nvarchar(225)");
-
-                    b.Property<int>("VehicleYear")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CreatedBy");
-
-                    b.HasIndex("DeleteBy");
-
-                    b.HasIndex("PlanId");
-
-                    b.HasIndex("UpdatedBy");
-
-                    b.ToTable("InsuranceVehicleDetails");
                 });
 
             modelBuilder.Entity("Project_Sem3.Models.LoanPayment", b =>
@@ -792,6 +548,173 @@ namespace Project_Sem3.Migrations
                     b.ToTable("Users");
                 });
 
+            modelBuilder.Entity("Project_Sem3.Models.InsuranceHealthDetail", b =>
+                {
+                    b.HasBaseType("Project_Sem3.Models.InsuranceDetails");
+
+                    b.Property<string>("AgeGroup")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<int>("Duration")
+                        .HasColumnType("int");
+
+                    b.Property<string>("HospitalNetwork")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PreExistingConditions")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Region")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<decimal>("RiskFactor")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.HasIndex("PlanId");
+
+                    b.HasDiscriminator().HasValue("InsuranceHealthDetail");
+                });
+
+            modelBuilder.Entity("Project_Sem3.Models.InsuranceLifeDetail", b =>
+                {
+                    b.HasBaseType("Project_Sem3.Models.InsuranceDetails");
+
+                    b.Property<string>("AgeGroup")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("Beneficiaries")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Duration")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Region")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<decimal>("RiskFactor")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("TermYears")
+                        .HasColumnType("int");
+
+                    b.HasIndex("PlanId");
+
+                    b.ToTable("InsuranceDetails", t =>
+                        {
+                            t.Property("AgeGroup")
+                                .HasColumnName("InsuranceLifeDetail_AgeGroup");
+
+                            t.Property("Duration")
+                                .HasColumnName("InsuranceLifeDetail_Duration");
+
+                            t.Property("Region")
+                                .HasColumnName("InsuranceLifeDetail_Region");
+
+                            t.Property("RiskFactor")
+                                .HasColumnName("InsuranceLifeDetail_RiskFactor");
+                        });
+
+                    b.HasDiscriminator().HasValue("InsuranceLifeDetail");
+                });
+
+            modelBuilder.Entity("Project_Sem3.Models.InsurancePropertyDetail", b =>
+                {
+                    b.HasBaseType("Project_Sem3.Models.InsuranceDetails");
+
+                    b.Property<int>("Duration")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Location")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<string>("PropertyType")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<string>("Region")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<decimal>("RiskFactor")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.HasIndex("PlanId");
+
+                    b.ToTable("InsuranceDetails", t =>
+                        {
+                            t.Property("Duration")
+                                .HasColumnName("InsurancePropertyDetail_Duration");
+
+                            t.Property("Region")
+                                .HasColumnName("InsurancePropertyDetail_Region");
+
+                            t.Property("RiskFactor")
+                                .HasColumnName("InsurancePropertyDetail_RiskFactor");
+                        });
+
+                    b.HasDiscriminator().HasValue("InsurancePropertyDetail");
+                });
+
+            modelBuilder.Entity("Project_Sem3.Models.InsuranceVehicleDetail", b =>
+                {
+                    b.HasBaseType("Project_Sem3.Models.InsuranceDetails");
+
+                    b.Property<int>("Duration")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Region")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<decimal>("RiskFactor")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("VehicleModel")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<string>("VehicleType")
+                        .IsRequired()
+                        .HasMaxLength(225)
+                        .HasColumnType("nvarchar(225)");
+
+                    b.Property<int>("VehicleYear")
+                        .HasColumnType("int");
+
+                    b.HasIndex("PlanId");
+
+                    b.ToTable("InsuranceDetails", t =>
+                        {
+                            t.Property("Duration")
+                                .HasColumnName("InsuranceVehicleDetail_Duration");
+
+                            t.Property("Region")
+                                .HasColumnName("InsuranceVehicleDetail_Region");
+
+                            t.Property("RiskFactor")
+                                .HasColumnName("InsuranceVehicleDetail_RiskFactor");
+                        });
+
+                    b.HasDiscriminator().HasValue("InsuranceVehicleDetail");
+                });
+
             modelBuilder.Entity("Project_Sem3.Models.BorrowCapital", b =>
                 {
                     b.HasOne("Project_Sem3.Models.User", "Creator")
@@ -864,7 +787,7 @@ namespace Project_Sem3.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("Project_Sem3.Models.InsuranceHealthDetail", b =>
+            modelBuilder.Entity("Project_Sem3.Models.InsuranceDetails", b =>
                 {
                     b.HasOne("Project_Sem3.Models.User", "Creator")
                         .WithMany()
@@ -876,12 +799,6 @@ namespace Project_Sem3.Migrations
                         .HasForeignKey("DeleteBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Project_Sem3.Models.InsurancePlan", "Plan")
-                        .WithMany("HealthDetails")
-                        .HasForeignKey("PlanId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("Project_Sem3.Models.User", "Updater")
                         .WithMany()
                         .HasForeignKey("UpdatedBy")
@@ -890,40 +807,6 @@ namespace Project_Sem3.Migrations
                     b.Navigation("Creator");
 
                     b.Navigation("Deleter");
-
-                    b.Navigation("Plan");
-
-                    b.Navigation("Updater");
-                });
-
-            modelBuilder.Entity("Project_Sem3.Models.InsuranceLifeDetail", b =>
-                {
-                    b.HasOne("Project_Sem3.Models.User", "Creator")
-                        .WithMany()
-                        .HasForeignKey("CreatedBy")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.HasOne("Project_Sem3.Models.User", "Deleter")
-                        .WithMany()
-                        .HasForeignKey("DeleteBy")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.HasOne("Project_Sem3.Models.InsurancePlan", "Plan")
-                        .WithMany("LifeDetails")
-                        .HasForeignKey("PlanId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Project_Sem3.Models.User", "Updater")
-                        .WithMany()
-                        .HasForeignKey("UpdatedBy")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.Navigation("Creator");
-
-                    b.Navigation("Deleter");
-
-                    b.Navigation("Plan");
 
                     b.Navigation("Updater");
                 });
@@ -960,70 +843,6 @@ namespace Project_Sem3.Migrations
                     b.Navigation("Creator");
 
                     b.Navigation("Deleter");
-
-                    b.Navigation("Updater");
-                });
-
-            modelBuilder.Entity("Project_Sem3.Models.InsurancePropertyDetail", b =>
-                {
-                    b.HasOne("Project_Sem3.Models.User", "Creator")
-                        .WithMany()
-                        .HasForeignKey("CreatedBy")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.HasOne("Project_Sem3.Models.User", "Deleter")
-                        .WithMany()
-                        .HasForeignKey("DeleteBy")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.HasOne("Project_Sem3.Models.InsurancePlan", "Plan")
-                        .WithMany("PropertyDetails")
-                        .HasForeignKey("PlanId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Project_Sem3.Models.User", "Updater")
-                        .WithMany()
-                        .HasForeignKey("UpdatedBy")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.Navigation("Creator");
-
-                    b.Navigation("Deleter");
-
-                    b.Navigation("Plan");
-
-                    b.Navigation("Updater");
-                });
-
-            modelBuilder.Entity("Project_Sem3.Models.InsuranceVehicleDetail", b =>
-                {
-                    b.HasOne("Project_Sem3.Models.User", "Creator")
-                        .WithMany()
-                        .HasForeignKey("CreatedBy")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.HasOne("Project_Sem3.Models.User", "Deleter")
-                        .WithMany()
-                        .HasForeignKey("DeleteBy")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.HasOne("Project_Sem3.Models.InsurancePlan", "Plan")
-                        .WithMany("VehicleDetails")
-                        .HasForeignKey("PlanId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Project_Sem3.Models.User", "Updater")
-                        .WithMany()
-                        .HasForeignKey("UpdatedBy")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.Navigation("Creator");
-
-                    b.Navigation("Deleter");
-
-                    b.Navigation("Plan");
 
                     b.Navigation("Updater");
                 });
@@ -1160,6 +979,50 @@ namespace Project_Sem3.Migrations
                         .IsRequired();
 
                     b.Navigation("Role");
+                });
+
+            modelBuilder.Entity("Project_Sem3.Models.InsuranceHealthDetail", b =>
+                {
+                    b.HasOne("Project_Sem3.Models.InsurancePlan", "Plan")
+                        .WithMany("HealthDetails")
+                        .HasForeignKey("PlanId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Plan");
+                });
+
+            modelBuilder.Entity("Project_Sem3.Models.InsuranceLifeDetail", b =>
+                {
+                    b.HasOne("Project_Sem3.Models.InsurancePlan", "Plan")
+                        .WithMany("LifeDetails")
+                        .HasForeignKey("PlanId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Plan");
+                });
+
+            modelBuilder.Entity("Project_Sem3.Models.InsurancePropertyDetail", b =>
+                {
+                    b.HasOne("Project_Sem3.Models.InsurancePlan", "Plan")
+                        .WithMany("PropertyDetails")
+                        .HasForeignKey("PlanId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Plan");
+                });
+
+            modelBuilder.Entity("Project_Sem3.Models.InsuranceVehicleDetail", b =>
+                {
+                    b.HasOne("Project_Sem3.Models.InsurancePlan", "Plan")
+                        .WithMany("VehicleDetails")
+                        .HasForeignKey("PlanId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Plan");
                 });
 
             modelBuilder.Entity("Project_Sem3.Models.BorrowCapital", b =>
