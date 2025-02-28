@@ -23,7 +23,7 @@ public class NotificationsController : ControllerBase
         try
         {
             // Kiểm tra dữ liệu đầu vào
-            if (notification == null || notification.UserId <= 0 || string.IsNullOrEmpty(notification.Message))
+            if (notification.UserId <= 0 || string.IsNullOrEmpty(notification.Message))
             {
                 return BadRequest(new { Message = "Invalid notification data" });
             }

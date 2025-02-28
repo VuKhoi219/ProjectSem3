@@ -6,7 +6,7 @@ using Project_Sem3.Models;
 namespace Project_Sem3.Controllers;
 
 [ApiController]
-[Route("api/insurancecontracts")]
+[Route("api/insurance-contracts")]
 public class InsuranceContractsController : ControllerBase
 {
     private readonly MyDbContext _context;

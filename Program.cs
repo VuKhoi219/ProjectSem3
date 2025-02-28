@@ -23,7 +23,12 @@ builder.Services.Configure<PaymentSetting>(builder.Configuration.GetSection("Pay
 builder.Services.Configure<InterestRateSetting>(builder.Configuration.GetSection("FixeInterestSetting"));
 builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 // Add services to the container.
-builder.Services.AddControllersWithViews();
+builder.Services.AddControllersWithViews()
+  .AddJsonOptions(options =>
+  {
+    options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.Preserve;
+    options.JsonSerializerOptions.WriteIndented = true;
+  });
 // đăng ký sử dụng file
 builder.Services.AddScoped<MonthlyPaymentAmount>();
 builder.Services.AddScoped<CalculateBorrowCapitalServices>();
