@@ -113,27 +113,7 @@ ViewData["Title"] = "Index";
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 }
 
-<!-- Advanced Search -->
-<div class="card">
-  <h5 class="card-header d-flex justify-content-between">Payment List
-    <a href="@Url.Action("Create", "Payment")" class="float-right btn btn-primary">Create New Payment</a></h5>
-  <div class="card-datatable table-responsive">
-    <table id="dataTable" class="dt-advanced-search table border-top">
-      <thead>
-      <tr>
-        <th><input type="checkbox" id="select-all" /></th> <!-- Checkbox for selecting all -->
-        <th>Id</th>
-        <th>User</th>
-        <th>Contract</th>
-        <th>Amount</th>
-        <th>Image Url</th>
-        <th>Action</th>
-      </tr>
-      </thead>
-    </table>
-  </div>
-</div>
-<!-- /Advanced Search -->
+
 
 @section Scripts {
 <script>
@@ -141,10 +121,9 @@ ViewData["Title"] = "Index";
     processing: true,
     serverSide: true,
     ajax: {
-      url: '/api/payments', // Update this to your API endpoint for payments
+      url: '/api/payments', // Đảm bảo URL đúng
       type: 'GET',
       data: function (d) {
-        // Sending additional parameters to the server for pagination and sorting
         d.page = (d.start / d.length) + 1;
         d.pageSize = d.length;
         d.search = d.search.value;
@@ -152,66 +131,34 @@ ViewData["Title"] = "Index";
         d.orderDir = d.order[0].dir;
         return d;
       },
-      success: function (response) {
-        if (response && response.data) {
-          // Success: The server returned the data, now populate the DataTable
-          dataTable.clear();
-          dataTable.rows.add(response.data);
-          dataTable.draw();
-        } else {
-          // If no data is available
-          Swal.fire({
-            icon: 'warning',
-            title: 'No Data Available',
-            text: 'No payments found matching the search criteria.',
-          });
-        }
-      },
-      error: function (xhr, status, error) {
-        // Error handling
-        Swal.fire({
-          icon: 'error',
-          title: 'Oops...',
-          text: 'Something went wrong while loading the payments.',
-        });
-      }
+      dataSrc: 'data'
     },
     columns: [
-      {
-        data: null,
-        render: function (data, type, row, meta) {
-          return '<input type="checkbox" class="select-row" />';
-        },
-        orderable: false
-      },
       { data: 'id' },
       { data: 'userId' },
       { data: 'contractId' },
-      {
-        data: 'amount',
-        render: function (data) {
-          return data.toLocaleString();
-        }
-      },
+      { data: 'amount' },
       { data: 'imageUrl' },
       {
         data: null,
-        render: function (data) {
-          return `
-                            <button class="btn btn-warning btn-sm" onclick="editPayment(${data.id})">Edit</button>
-                            <button class="btn btn-danger btn-sm" onclick="deletePayment(${data.id})">Delete</button>
-                        `;
+        orderable: false,
+        searchable: false,
+        render: function (data, type, row) {
+          return '<button class="btn btn-sm btn-primary btn-edit" data-id="' + row.id + '">Sửa</button> ' +
+            '<button class="btn btn-sm btn-danger btn-delete" data-id="' + row.id + '">Xóa</button> ' +
+            '<button class="btn btn-sm btn-info btn-detail" data-id="' + row.id + '">Chi tiết</button>';
         }
       }
     ],
-    initComplete: function () {
+    @*initComplete: function () {
       // Checkbox select-all functionality
       $('#select-all').on('click', function () {
-        var rows = dataTable.rows({ 'search': 'applied' }).nodes(); // Get visible rows after search/filtering
+        var rows = dataTable.rows({'search': 'applied'}).nodes();
         $('input[type="checkbox"]', rows).prop('checked', this.checked);
       });
-    }
-  });
+    },*@
+});
+
 
   function editPayment(paymentId) {
     // Navigate to the edit page or handle the editing logic
@@ -250,3 +197,24 @@ ViewData["Title"] = "Index";
 </script>
 }
 
+<!-- Advanced Search -->
+<div class="card">
+  <h5 class="card-header d-flex justify-content-between">Payment List
+    <a href="@Url.Action("Create", "Payment")" class="float-right btn btn-primary">Create New Payment</a></h5>
+  <div class="card-datatable table-responsive">
+    <table id="dataTable" class="dt-advanced-search table border-top">
+      <thead>
+      <tr>
+        <th><input type="checkbox" id="select-all" /></th> <!-- Checkbox for selecting all -->
+        <th>Id</th>
+        <th>User</th>
+        <th>Contract</th>
+        <th>Amount</th>
+        <th>Image Url</th>
+        <th>Action</th>
+      </tr>
+      </thead>
+    </table>
+  </div>
+</div>
+<!-- /Advanced Search -->

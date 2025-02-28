@@ -1,0 +1,76 @@
+@model Project_Sem3.Models.InsuranceDetails
+
+@{
+    ViewData["Title"] = "Edit";
+}
+
+<h1>Edit</h1>
+
+<h4>InsuranceDetails</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Edit">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="Id" />
+            <div class="form-group">
+                <label asp-for="PlanId" class="control-label"></label>
+                <select asp-for="PlanId" class="form-control" asp-items="ViewBag.PlanId"></select>
+                <span asp-validation-for="PlanId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="AnnualPaymentAmount" class="control-label"></label>
+                <input asp-for="AnnualPaymentAmount" class="form-control" />
+                <span asp-validation-for="AnnualPaymentAmount" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Premium" class="control-label"></label>
+                <input asp-for="Premium" class="form-control" />
+                <span asp-validation-for="Premium" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Deductible" class="control-label"></label>
+                <input asp-for="Deductible" class="form-control" />
+                <span asp-validation-for="Deductible" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="CreatedAt" class="control-label"></label>
+                <input asp-for="CreatedAt" class="form-control" />
+                <span asp-validation-for="CreatedAt" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="UpdatedAt" class="control-label"></label>
+                <input asp-for="UpdatedAt" class="form-control" />
+                <span asp-validation-for="UpdatedAt" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="DeleteAt" class="control-label"></label>
+                <input asp-for="DeleteAt" class="form-control" />
+                <span asp-validation-for="DeleteAt" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="CreatedBy" class="control-label"></label>
+                <select asp-for="CreatedBy" class="form-control" asp-items="ViewBag.CreatedBy"></select>
+                <span asp-validation-for="CreatedBy" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="UpdatedBy" class="control-label"></label>
+                <select asp-for="UpdatedBy" class="form-control" asp-items="ViewBag.UpdatedBy"></select>
+                <span asp-validation-for="UpdatedBy" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="DeleteBy" class="control-label"></label>
+                <select asp-for="DeleteBy" class="form-control" asp-items="ViewBag.DeleteBy"></select>
+                <span asp-validation-for="DeleteBy" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
