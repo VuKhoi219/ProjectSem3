@@ -97,36 +97,60 @@ public class InsuranceContractsController : ControllerBase
         }
     }
 
-    // 3. Get By UserId - Lấy InsuranceContracts theo UserId, chỉ lấy record chưa xóa mềm
-    [HttpGet("user/{userId}")]
-    public async Task<IActionResult> GetInsuranceContractsByUserId(int userId)
+// 3. Get By UserId - Lấy InsuranceContracts theo UserId, chỉ lấy record chưa xóa mềm, có phân trang
+[HttpGet("user/{userId}")]
+public async Task<IActionResult> GetInsuranceContractsByUserId(int userId, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
+{
+    try
     {
-        try
-        {
-            var contracts = await _context.InsuranceContracts
-                .Where(c => c.UserId == userId && c.DeleteAt == null)
-                .Select(c => new
-                {
-                    c.Id,
-                    c.UserId,
-                    c.PlanId,
-                    c.StartDate,
-                    c.EndDate,
-                    c.Status,
-                    CreatedAt = c.CreatedAt.HasValue ? c.CreatedAt.Value.ToString("yyyy-MM-dd HH:mm:ss") : null,
-                    UpdatedAt = c.UpdatedAt.HasValue ? c.UpdatedAt.Value.ToString("yyyy-MM-dd HH:mm:ss") : null
-                })
-                .ToListAsync();
+        // Đảm bảo pageNumber và pageSize hợp lệ
+        if (pageNumber < 1) pageNumber = 1;
+        if (pageSize < 1) pageSize = 10;
 
-            return Ok(contracts);
-        }
-        catch (Exception e)
+        // Lấy tổng số bản ghi thỏa mãn điều kiện
+        var totalRecords = await _context.InsuranceContracts
+            .CountAsync(c => c.UserId == userId && c.DeleteAt == null);
+
+        // Tính tổng số trang
+        var totalPages = (int)Math.Ceiling(totalRecords / (double)pageSize);
+
+        // Lấy dữ liệu với phân trang
+        var contracts = await _context.InsuranceContracts
+            .Where(c => c.UserId == userId && c.DeleteAt == null)
+            .OrderBy(c => c.CreatedAt) // Sắp xếp theo CreatedAt (tùy chọn, bạn có thể thay đổi tiêu chí sắp xếp)
+            .Skip((pageNumber - 1) * pageSize) // Bỏ qua các bản ghi của các trang trước
+            .Take(pageSize) // Lấy số bản ghi theo pageSize
+            .Select(c => new
+            {
+                c.Id,
+                c.UserId,
+                c.PlanId,
+                c.StartDate,
+                c.EndDate,
+                c.Status,
+                CreatedAt = c.CreatedAt.HasValue ? c.CreatedAt.Value.ToString("yyyy-MM-dd HH:mm:ss") : null,
+                UpdatedAt = c.UpdatedAt.HasValue ? c.UpdatedAt.Value.ToString("yyyy-MM-dd HH:mm:ss") : null
+            })
+            .ToListAsync();
+
+        // Trả về dữ liệu kèm thông tin phân trang
+        var result = new
         {
-            Console.WriteLine(e);
-            return StatusCode(500, new { Message = "An error occurred", Error = e.Message });
-        }
+            TotalRecords = totalRecords,
+            TotalPages = totalPages,
+            CurrentPage = pageNumber,
+            PageSize = pageSize,
+            Data = contracts
+        };
+
+        return Ok(result);
     }
-
+    catch (Exception e)
+    {
+        Console.WriteLine(e);
+        return StatusCode(500, new { Message = "An error occurred", Error = e.Message });
+    }
+}
     // 4. Create - Tạo một InsuranceContract mới
     [HttpPost]
     public async Task<IActionResult> CreateInsuranceContract([FromBody] InsuranceContract contract)

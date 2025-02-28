@@ -18,8 +18,7 @@ public abstract class InsuranceDetails
 
     [Required]
     public decimal Deductible { get; set; }
-    [Required]
-    public StatusType Status { get; set; }
+
     public DateTime? CreatedAt { get; set; }
 
     public DateTime? UpdatedAt { get; set; }
@@ -34,9 +33,4 @@ public abstract class InsuranceDetails
     public virtual User? Creator { get; set; }
     public virtual User? Updater { get; set; }
     public virtual User? Deleter { get; set; }
-}
-public enum StatusType{
-  Pending,
-  Active,
-
 }

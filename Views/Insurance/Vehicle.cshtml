@@ -1,0 +1,103 @@
+@using Microsoft.AspNetCore.Mvc.Rendering
+@using Microsoft.AspNetCore.Mvc.TagHelpers
+@{
+ViewData["Title"] = "Motor Vehicle Insurance";
+Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container mt-5">
+  <div class="card shadow-lg p-4">
+    <h2 class="text-danger">Motor Vehicle Insurance</h2>
+    <p>Motor vehicle insurance protects you from risks related to accidents, damage, and legal liabilities.</p>
+    <h4>Benefits</h4>
+    <ul>
+      <li>Covers vehicle repair costs</li>
+      <li>Supports accident compensation</li>
+      <li>Protects against legal liability</li>
+      <li>Covers third-party damages</li>
+      <li>Emergency roadside assistance</li>
+    </ul>
+    <h4>Eligible Participants</h4>
+    <p>Owners of legally registered cars or motorcycles.</p>
+    <h4 class="mt-4">Available Motor Vehicle Insurance Plans</h4>
+    <div id="insuranceCards" class="owl-carousel owl-theme"></div>
+  </div>
+</div>
+
+@section Scripts {
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/owl.carousel.min.js"></script>
+<script>
+  $(document).ready(function () {
+    loadInsurancePlans();
+  });
+
+  function loadInsurancePlans() {
+    showLoading();
+
+    $.ajax({
+      url: "/api/insurance-plans/type/Vehicle", // Thay đổi type thành "Vehicle"
+      method: "GET",
+      success: function (response) {
+        hideLoading();
+        console.log(response.data);
+        if (response.data && response.data.$values && response.data.$values.length > 0) {
+          displayInsuranceCards(response.data.$values);
+        } else {
+          $("#insuranceCards").html("<p class='text-muted'>No active Motor Vehicle insurance plans found.</p>");
+        }
+      },
+      error: function (xhr, status, error) {
+        hideLoading();
+        $("#insuranceCards").html("<p class='text-danger'>Error loading insurance plans: " + (xhr.responseText || "Unknown error") + "</p>");
+      }
+    });
+  }
+
+  function displayInsuranceCards(plans) {
+    let cardsHtml = "";
+    plans.forEach(plan => {
+      cardsHtml += `
+          <div class="item">
+            <div class="card border-danger"> <!-- Thay border-primary bằng border-danger -->
+              <div class="card-body">
+                <h5 class="card-title text-danger">${plan.name}</h5> <!-- Thay text-primary bằng text-danger -->
+                <p class="card-text">${plan.description}</p>
+                <p class="card-text"><strong>Coverage Amount:</strong> ${formatVND(plan.coverageAmount)}</p>
+                <button class="btn btn-danger" onclick="selectPlan(${plan.id}, '${plan.name}', ${plan.coverageAmount})">Select Plan</button> <!-- Thay btn-primary bằng btn-danger -->
+              </div>
+            </div>
+          </div>
+        `;
+    });
+    $("#insuranceCards").html(cardsHtml);
+
+    // Khởi tạo Owl Carousel
+    $("#insuranceCards").owlCarousel({
+      loop: true,
+      margin: 10,
+      nav: true,
+      responsive: {
+        0: { items: 1 },
+        600: { items: 2 },
+        1000: { items: 3 }
+      }
+    });
+  }
+
+  function formatVND(number) {
+    return number.toLocaleString("vi-VN", { style: "currency", currency: "VND" }).replace("₫", "").trim();
+  }
+
+  function selectPlan(planId, planName, coverageAmount) {
+    localStorage.setItem("selectedPlan", JSON.stringify({
+      id: planId,
+      name: planName,
+      coverageAmount: coverageAmount
+    }));
+    window.location.href = "/request/vehicle"; // Chuyển hướng đến trang yêu cầu Motor Vehicle Insurance
+  }
+
+  // Placeholder functions
+</script>
+}

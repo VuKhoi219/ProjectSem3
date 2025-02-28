@@ -40,14 +40,10 @@ public class HomeController : Controller
         });
     }
 
-    // Các action cho Pages
-    // public IActionResult Features()
-    // {
-    //     return View(new Project_Sem3.Models.ViewModel.PageHeaderViewModel
-    //     {
-    //         Title = "Features",
-    //         BreadcrumbItems = new List<string> { "Home", "Pages", "Features" }
-    //     });
-    // }
+    public IActionResult PageSuccess()
+    {
+      return View();
+    }
+
 
 }

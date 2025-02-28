@@ -1,0 +1,101 @@
+@using Microsoft.AspNetCore.Mvc.Rendering
+@using Microsoft.AspNetCore.Mvc.TagHelpers
+@{
+    ViewData["Title"] = "Health Insurance";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container mt-5">
+  <div class="card shadow-lg p-4">
+    <h2 class="text-success">Health Insurance</h2>
+    <p>Health insurance helps reduce the financial burden of medical treatments and ensures your well-being.</p>
+    <h4>Benefits</h4>
+    <ul>
+      <li>Covers medical treatment costs</li>
+      <li>Supports medication expenses</li>
+      <li>Reduces family financial burden</li>
+      <li>Assists in treating critical illnesses</li>
+      <li>Covers hospital and surgery fees</li>
+    </ul>
+    <h4>Eligible Participants</h4>
+    <p>All citizens, regardless of age, can participate.</p>
+    <h4 class="mt-4">Available Health Insurance Plans</h4>
+    <div id="insuranceCards" class="owl-carousel owl-theme"></div>
+  </div>
+</div>
+
+@section Scripts {
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/owl.carousel.min.js"></script>
+  <script>
+    $(document).ready(function () {
+      loadInsurancePlans();
+    });
+
+    function loadInsurancePlans() {
+      showLoading();
+
+      $.ajax({
+        url: "/api/insurance-plans/type/Health", // Thay "Life" bằng "Health"
+        method: "GET",
+        success: function (response) {
+          hideLoading();
+          console.log(response.data);
+          if (response.data && response.data.$values && response.data.$values.length > 0) {
+            displayInsuranceCards(response.data.$values);
+          } else {
+            $("#insuranceCards").html("<p class='text-muted'>No active Health insurance plans found.</p>");
+          }
+        },
+        error: function (xhr, status, error) {
+          hideLoading();
+          $("#insuranceCards").html("<p class='text-danger'>Error loading insurance plans: " + (xhr.responseText || "Unknown error") + "</p>");
+        }
+      });
+    }
+
+    function displayInsuranceCards(plans) {
+      let cardsHtml = "";
+      plans.forEach(plan => {
+        cardsHtml += `
+          <div class="item">
+            <div class="card border-success"> <!-- Thay border-primary bằng border-success -->
+              <div class="card-body">
+                <h5 class="card-title text-success">${plan.name}</h5> <!-- Thay text-primary bằng text-success -->
+                <p class="card-text">${plan.description}</p>
+                <p class="card-text"><strong>Coverage Amount:</strong> ${formatVND(plan.coverageAmount)}</p>
+                <button class="btn btn-success" onclick="selectPlan(${plan.id}, '${plan.name}', ${plan.coverageAmount})">Select Plan</button> <!-- Thay btn-primary bằng btn-success -->
+              </div>
+            </div>
+          </div>
+        `;
+      });
+      $("#insuranceCards").html(cardsHtml);
+
+      // Khởi tạo Owl Carousel
+      $("#insuranceCards").owlCarousel({
+        loop: true,
+        margin: 10,
+        nav: true,
+        responsive: {
+          0: { items: 1 },
+          600: { items: 2 },
+          1000: { items: 3 }
+        }
+      });
+    }
+
+    function formatVND(number) {
+      return number.toLocaleString("vi-VN", { style: "currency", currency: "VND" }).replace("₫", "").trim();
+    }
+
+    function selectPlan(planId, planName, coverageAmount) {
+      localStorage.setItem("selectedPlan", JSON.stringify({
+        id: planId,
+        name: planName,
+        coverageAmount: coverageAmount
+      }));
+      window.location.href = "/request/health"; // Thay "/request/life" bằng "/request/health"
+    }
+  </script>
+}

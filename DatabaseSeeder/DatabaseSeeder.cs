@@ -84,6 +84,7 @@ public class DatabaseSeeder
             var insuranceContractFaker = new Faker<InsuranceContract>()
                 .RuleFor(d => d.UserId, f => f.Random.Int(1,10)) // Giả sử có 50 người dùng
                 .RuleFor(d => d.PlanId, f => f.Random.Int(1,10)) // Giả sử có 4 gói bảo hiểm
+                .RuleFor(d=> d.DetailId,f=> f.Random.Int(1,10))
                 .RuleFor(d => d.StartDate, f => f.Date.Past(2)) // Ngày bắt đầu trong vòng 2 năm qua
                 .RuleFor(d => d.EndDate, (f, d) => d.StartDate.AddYears(f.Random.Int(1, 10))) // Kết thúc từ 1 đến 10 năm sau
                 .RuleFor(d => d.Status, f => f.PickRandom<ContractStatus>()) // Trạng thái hợp đồng
@@ -185,7 +186,6 @@ public class DatabaseSeeder
                 .RuleFor(d => d.Premium, f => f.Random.Decimal(100000, 1000000)) // Phí bảo hiểm
                 .RuleFor(d => d.Deductible, f => f.Random.Decimal(500000, 5000000)) // Khoản khấu trừ
                 .RuleFor(d => d.TermYears, f => f.Random.Int(1, 30)) // Thời hạn bảo hiểm
-                .RuleFor(d=> d.Status,f=>f.PickRandom<StatusType>())
                 .RuleFor(d => d.AgeGroup, f => f.PickRandom(new[] { "18-25", "26-35", "36-45", "46-60", "60+" })) // Nhóm tuổi
                 .RuleFor(d => d.Beneficiaries, f => f.Name.FullName()) // Người thụ hưởng
                 .RuleFor(d => d.Duration, f => f.Random.Int(1, 20)) // Thời gian bảo hiểm (năm)
@@ -209,7 +209,6 @@ public class DatabaseSeeder
                 .RuleFor(d => d.AnnualPaymentAmount, f => f.Random.Decimal(500000, 5000000)) // Số tiền thanh toán hàng năm
                 .RuleFor(d => d.Premium, f => f.Random.Decimal(100000, 1000000)) // Phí bảo hiểm
                 .RuleFor(d => d.Deductible, f => f.Random.Decimal(500000, 5000000)) // Khoản khấu trừ
-                .RuleFor(d=> d.Status,f=>f.PickRandom<StatusType>())
                 .RuleFor(d => d.AgeGroup, f => f.PickRandom(new[] { "0-17", "18-25", "26-35", "36-45", "46-60", "60+" })) // Nhóm tuổi
                 .RuleFor(d => d.HospitalNetwork, f => f.Company.CompanyName()) // Mạng lưới bệnh viện
                 .RuleFor(d => d.PreExistingConditions, f => f.Random.Bool(0.2f) ? f.Lorem.Sentence() : "Không có") // Bệnh lý có sẵn (20% có bệnh)
@@ -244,7 +243,6 @@ public class DatabaseSeeder
                 .RuleFor(d => d.UpdatedAt, f => f.Random.Bool(0.5f) ? f.Date.Recent(30) : null) // 50% có ngày cập nhật
                 .RuleFor(d => d.DeleteAt, f => f.Random.Bool(0.1f) ? f.Date.Past(1) : null)
                 .RuleFor(n => n.CreatedBy, f => f.Random.Int(1,10))
-                .RuleFor(d=> d.Status,f=>f.PickRandom<StatusType>())
                 .RuleFor(n => n.UpdatedBy, f => f.Random.Bool() ? f.Random.Int(1,10): null)
                 .RuleFor(n => n.DeleteBy, f => f.Random.Bool(0.1f) ? f.Random.Int(1,10) : null);
 
@@ -265,7 +263,6 @@ public class DatabaseSeeder
                 .RuleFor(d => d.Duration, f => f.Random.Int(1, 10)) // Thời gian bảo hiểm (năm)
                 .RuleFor(d => d.RiskFactor, f => f.Random.Decimal(0.5m, 2.0m)) // Hệ số rủi ro
                 .RuleFor(d => d.Region, f => f.Address.City()) // Khu vực
-                .RuleFor(d=> d.Status,f=>f.PickRandom<StatusType>())
                 .RuleFor(d => d.CreatedAt, f => f.Date.Past(1)) // Ngày tạo trong vòng 1 năm qua
                 .RuleFor(d => d.UpdatedAt, f => f.Random.Bool(0.5f) ? f.Date.Recent(30) : null) // 50% có ngày cập nhật
                 .RuleFor(d => d.DeleteAt, f => f.Random.Bool(0.1f) ? f.Date.Past(1) : null)
