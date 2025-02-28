@@ -1,3 +1,4 @@
+using Bogus.DataSets;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Project_Sem3.Data;
@@ -64,7 +65,7 @@ public class InsurancePlansController : ControllerBase
 
     // 2. Lấy chi tiết gói bảo hiểm theo Id
     [HttpGet("{id}")]
-    public async Task<IActionResult> GetPlanById(int id)
+    public async Task<IActionResult> GetPlanById(int id )
     {
         if (id <= 0)
             return BadRequest(new { Message = "Invalid plan ID" });
@@ -82,9 +83,8 @@ public class InsurancePlansController : ControllerBase
                     p.Id,
                     p.Name,
                     p.Description,
-                    p.Type,
                     p.Status,
-                    p.CoverageAmount // Thêm trường này
+                    p.CoverageAmount, // Thêm trường này
                 })
                 .FirstOrDefaultAsync();
 
@@ -99,6 +99,43 @@ public class InsurancePlansController : ControllerBase
         }
     }
 
+    [HttpGet("{id}/{detailId}")]
+    public async Task<IActionResult> GetPlanAndDetail(int id , int detailId)
+    {
+      if (id <= 0)
+        return BadRequest(new { Message = "Invalid plan ID" });
+      try
+      {
+        var plan = await _context.InsurancePlans
+          .Where(p => p.Id == id && p.DeleteAt == null)
+          .Include(p => p.InsuranceContracts)
+          .Include(p => p.Creator)
+          .Include(p => p.Updater)
+          .Include(p => p.Deleter)
+          .Select(p => new
+          {
+            p.Id,
+            p.Name,
+            p.Description,
+            p.Status,
+            p.CoverageAmount, // Thêm trường này
+            LifeDetail = p.Type == InsuranceType.Life ? _context.InsuranceLifeDetails.Where(l => l.PlanId == p.Id && l.Id == detailId).FirstOrDefault() : null,
+            HealthDetail = p.Type == InsuranceType.Health ? _context.InsuranceHealthDetails.Where(h => h.PlanId == p.Id && h.Id == detailId).FirstOrDefault():null,
+            VehicleDetail = p.Type == InsuranceType.Vehicle ? _context.InsuranceVehicleDetails.Where(v => v.PlanId == p.Id && v.Id == detailId).FirstOrDefault():null,
+            PropertyDetail = p.Type == InsuranceType.Property ? _context.InsurancePropertyDetails.Where(pr => pr.PlanId == p.Id && pr.Id == detailId).FirstOrDefault() : null,
+          })
+          .FirstOrDefaultAsync();
+
+        if (plan == null)
+          return NotFound(new { Message = $"Insurance plan with ID {id} not found or has been deleted" });
+
+        return Ok(new { Data = plan });
+      }
+      catch (Exception ex)
+      {
+        return StatusCode(500, new { Message = "Internal server error", Error = ex.Message });
+      }
+    }
     // 3. Thêm mới gói bảo hiểm
     [HttpPost]
     public async Task<IActionResult> CreatePlan([FromBody] InsurancePlan plan)

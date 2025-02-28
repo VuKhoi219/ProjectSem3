@@ -1,0 +1,13 @@
+@using Microsoft.AspNetCore.Mvc.Rendering
+@model Project_Sem3.Models.ViewModel.PageHeaderViewModel
+
+@{
+  ViewBag.Title = "About Us";
+  Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<!-- Page Header Start -->
+@Html.Partial("~/Views/Shared/Components/_PageHeader.cshtml", Model)
+<!-- Page Header End -->
+<!-- Service Start -->
+@Html.Partial("~/Views/Shared/Components/_Service.cshtml")
+<!-- Service End -->

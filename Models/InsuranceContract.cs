@@ -16,6 +16,13 @@ public class InsuranceContract
     public int PlanId { get; set; }
 
     [Required]
+    public int DetailId
+    {
+      get;
+      set;
+    }
+
+    [Required]
     public DateTime StartDate { get; set; }
 
     [Required]
@@ -33,7 +40,7 @@ public class InsuranceContract
     public int? CreatedBy { get; set; }
     public int? UpdatedBy { get; set; }
     public int? DeleteBy { get; set; }
-    
+
     // Navigation Properties
     public virtual User User { get; set; }
     public virtual User Creator { get; set; }

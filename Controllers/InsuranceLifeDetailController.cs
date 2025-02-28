@@ -30,7 +30,6 @@ public class InsuranceLifeDetailController : ControllerBase
             }
 
             detail.CreatedAt = DateTime.UtcNow;
-            detail.Status = StatusType.Pending;
 
             _context.InsuranceLifeDetails.Add(detail);
             await _context.SaveChangesAsync();

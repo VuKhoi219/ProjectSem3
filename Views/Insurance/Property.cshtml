@@ -1,0 +1,103 @@
+@using Microsoft.AspNetCore.Mvc.Rendering
+@using Microsoft.AspNetCore.Mvc.TagHelpers
+@{
+    ViewData["Title"] = "Property (Home) Insurance";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container mt-5">
+  <div class="card shadow-lg p-4">
+    <h2 class="text-warning">Property (Home) Insurance</h2>
+    <p>Property insurance protects your home from risks such as fire, natural disasters, and theft.</p>
+    <h4>Benefits</h4>
+    <ul>
+      <li>Protection against fire damage</li>
+      <li>Covers losses due to natural disasters</li>
+      <li>Compensation for theft</li>
+      <li>Covers damages from earthquakes and floods</li>
+      <li>Supports home repair costs</li>
+    </ul>
+    <h4>Eligible Participants</h4>
+    <p>Owners of houses, apartments, or legally constructed buildings.</p>
+    <h4 class="mt-4">Available Property Insurance Plans</h4>
+    <div id="insuranceCards" class="owl-carousel owl-theme"></div>
+  </div>
+</div>
+
+@section Scripts {
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/owl.carousel.min.js"></script>
+  <script>
+    $(document).ready(function () {
+      loadInsurancePlans();
+    });
+
+    function loadInsurancePlans() {
+      showLoading();
+
+      $.ajax({
+        url: "/api/insurance-plans/type/Property", // Thay đổi type thành "Property"
+        method: "GET",
+        success: function (response) {
+          hideLoading();
+          console.log(response.data);
+          if (response.data && response.data.$values && response.data.$values.length > 0) {
+            displayInsuranceCards(response.data.$values);
+          } else {
+            $("#insuranceCards").html("<p class='text-muted'>No active Property insurance plans found.</p>");
+          }
+        },
+        error: function (xhr, status, error) {
+          hideLoading();
+          $("#insuranceCards").html("<p class='text-danger'>Error loading insurance plans: " + (xhr.responseText || "Unknown error") + "</p>");
+        }
+      });
+    }
+
+    function displayInsuranceCards(plans) {
+      let cardsHtml = "";
+      plans.forEach(plan => {
+        cardsHtml += `
+          <div class="item">
+            <div class="card border-warning"> <!-- Thay border-primary bằng border-warning -->
+              <div class="card-body">
+                <h5 class="card-title text-warning">${plan.name}</h5> <!-- Thay text-primary bằng text-warning -->
+                <p class="card-text">${plan.description}</p>
+                <p class="card-text"><strong>Coverage Amount:</strong> ${formatVND(plan.coverageAmount)}</p>
+                <button class="btn btn-warning" onclick="selectPlan(${plan.id}, '${plan.name}', ${plan.coverageAmount})">Select Plan</button> <!-- Thay btn-primary bằng btn-warning -->
+              </div>
+            </div>
+          </div>
+        `;
+      });
+      $("#insuranceCards").html(cardsHtml);
+
+      // Khởi tạo Owl Carousel
+      $("#insuranceCards").owlCarousel({
+        loop: true,
+        margin: 10,
+        nav: true,
+        responsive: {
+          0: { items: 1 },
+          600: { items: 2 },
+          1000: { items: 3 }
+        }
+      });
+    }
+
+    function formatVND(number) {
+      return number.toLocaleString("vi-VN", { style: "currency", currency: "VND" }).replace("₫", "").trim();
+    }
+
+    function selectPlan(planId, planName, coverageAmount) {
+      localStorage.setItem("selectedPlan", JSON.stringify({
+        id: planId,
+        name: planName,
+        coverageAmount: coverageAmount
+      }));
+      window.location.href = "/request/property"; // Chuyển hướng đến trang yêu cầu Property Insurance
+    }
+
+    // Placeholder functions
+  </script>
+}

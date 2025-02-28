@@ -1,0 +1,102 @@
+@using Microsoft.AspNetCore.Mvc.Rendering
+@using Microsoft.AspNetCore.Mvc.TagHelpers
+@{
+ViewData["Title"] = "Life Insurance";
+Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<div class="container mt-5">
+  <div class="card shadow-lg p-4">
+    <h2 class="text-primary">Life Insurance</h2>
+    <p>Life insurance helps ensure financial security for your family in case of unexpected risks.</p>
+    <h4>Benefits</h4>
+    <ul>
+      <li>Long-term financial protection</li>
+      <li>Medical expense support</li>
+      <li>Ensures children's future</li>
+      <li>Financial assistance in case of serious accidents</li>
+      <li>Accumulated savings with attractive interest rates</li>
+    </ul>
+    <h4>Eligible Participants</h4>
+    <!-- ... Nội dung khác giữ nguyên ... -->
+    <h4 class="mt-4">Available Life Insurance Plans</h4>
+    <div id="insuranceCards" class="owl-carousel owl-theme"></div>
+  </div>
+</div>
+
+@section Scripts {
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/owl.carousel.min.js"></script>
+<script>
+  $(document).ready(function () {
+    loadInsurancePlans();
+  });
+
+  function loadInsurancePlans() {
+    showLoading()
+
+    $.ajax({
+      url: "/api/insurance-plans/type/Life",
+      method: "GET",
+      success: function (response) {
+        hideLoading()
+        console.log(response.data);
+        if (response.data && response.data.$values && response.data.$values.length > 0) { // Sửa thành $values
+                  displayInsuranceCards(response.data.$values);
+        } else {
+          $("#insuranceCards").html("<p class='text-muted'>No active Life insurance plans found.</p>");
+        }
+      },
+      error: function (xhr, status, error) {
+        hideLoading()
+        $("#insuranceCards").html("<p class='text-danger'>Error loading insurance plans: " + (xhr.responseText || "Unknown error") + "</p>");
+      }
+    });
+  }
+
+  function displayInsuranceCards(plans) {
+    let cardsHtml = "";
+    plans.forEach(plan => {
+
+      cardsHtml += `
+                    <div class="item">
+                        <div class="card border-primary">
+                            <div class="card-body">
+                                <h5 class="card-title text-primary">${plan.name}</h5>
+                                <p class="card-text">${plan.description}</p>
+                                <p class="card-text"><strong>Coverage Amount:</strong> ${formatVND(plan.coverageAmount)}</p>
+                                <button class="btn btn-primary" onclick="selectPlan(${plan.id}, '${plan.name}', ${plan.coverageAmount})">Select Plan</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+    });
+    $("#insuranceCards").html(cardsHtml);
+
+    // Khởi tạo Owl Carousel
+    $("#insuranceCards").owlCarousel({
+      loop: true,
+      margin: 10,
+      nav: true,
+      responsive: {
+        0: { items: 1 },
+        600: { items: 2 },
+        1000: { items: 3 }
+      }
+    });
+  }
+
+  function formatVND(number) {
+    return number.toLocaleString("vi-VN", { style: "currency", currency: "VND" }).replace("₫", "").trim();
+  }
+
+  function selectPlan(planId, planName, coverageAmount) {
+    localStorage.setItem("selectedPlan", JSON.stringify({
+      id: planId,
+      name: planName,
+      coverageAmount: coverageAmount
+    }));
+    window.location.href = "/request/life";
+  }
+
+</script>
+}
