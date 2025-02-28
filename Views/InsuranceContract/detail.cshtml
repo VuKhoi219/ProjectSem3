@@ -1,0 +1,93 @@
+@model int
+
+@{
+ViewData["Title"] = "Payment detail";
+Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div>
+  @Model
+</div>
+
+<div class="container">
+  <div class="detail-card">
+    <h2 class="detail-title">Chi tiết giao dịch</h2>
+    <div class="detail-info">
+      <div id="transaction-details">
+        <!-- Các thông tin sẽ được hiển thị tại đây -->
+      </div>
+    </div>
+  </div>
+</div>
+@section Scripts {
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script>
+  // Đây là cách sử dụng Razor để truyền giá trị model vào JavaScript
+  const transactionId = @Model; // Model là số nguyên, không cần dấu nháy
+
+  // Kiểm tra trong console nếu model được truyền đúng
+  console.log(transactionId);
+
+  $(document).ready(function() {
+    // Gọi API để lấy thông tin chi tiết
+    $('#paymentTable').html('<div class="text-center"><img src="https://loading.io/spinners/dual-ring/lg.dual-ring-spinner.gif" alt="Loading..." /></div>');
+    $('#errorAlert').hide();
+
+    // Dùng transactionId cho API URL
+    $.ajax({
+      url: `/api/insurance-contract/${transactionId}`,  // Sử dụng transactionId thay vì hard-code giá trị
+      method: 'GET',
+      success: function(data) {
+        // Hiển thị thông tin giao dịch lên trang
+        const statusMap = {
+          0: 'Pending',
+          1: 'Completed',
+          2: 'Failed'
+        };
+        const statusText = statusMap[data.status] || 'N/A';
+        console.log(statusText)
+        const detailHtml = `
+                        <div class="detail-row">
+                            <span class="detail-label">Mã giao dịch:</span>
+                            <span class="detail-value">${data.id}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Mã người dùng:</span>
+                            <span class="detail-value">${data.userId}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Mã hợp đồng:</span>
+                            <span class="detail-value">${data.contractId}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Số tiền:</span>
+                            <span class="detail-value">${data.amount} VND</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Ngày thanh toán:</span>
+                            <span class="detail-value">${data.paymentDate}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Trạng thái:</span>
+                            <span class="detail-value">${statusText}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Hình ảnh:</span>
+                            <img src="${data.imageUrl}" alt="Image" class="detail-image">
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Ngày tạo:</span>
+                            <span class="detail-value">${data.createdAt}</span>
+                        </div>
+                    `;
+        $('#transaction-details').html(detailHtml);
+      },
+      error: function(error) {
+        alert('Lỗi khi tải thông tin giao dịch');
+      }
+    });
+  });
+</script>
+}

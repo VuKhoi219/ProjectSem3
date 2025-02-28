@@ -32,10 +32,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Repository\" />
-    </ItemGroup>
-
-    <ItemGroup>
       <_ContentIncludedByDefault Remove="TestProject1\obj\project.assets.json" />
       <_ContentIncludedByDefault Remove="TestProject1\obj\project.packagespec.json" />
       <_ContentIncludedByDefault Remove="TestProject1\obj\TestProject1.csproj.nuget.dgspec.json" />
@@ -105,11 +101,13 @@
       <_ContentIncludedByDefault Remove="Areas\Admin\Views\User\Details.cshtml" />
       <_ContentIncludedByDefault Remove="Areas\Admin\Views\User\Edit.cshtml" />
       <_ContentIncludedByDefault Remove="Areas\Admin\Views\User\Index.cshtml" />
+
       <_ContentIncludedByDefault Remove="Areas\Admin\Views\Role\Create.cshtml" />
       <_ContentIncludedByDefault Remove="Areas\Admin\Views\Role\Delete.cshtml" />
       <_ContentIncludedByDefault Remove="Areas\Admin\Views\Role\Details.cshtml" />
       <_ContentIncludedByDefault Remove="Areas\Admin\Views\Role\Edit.cshtml" />
       <_ContentIncludedByDefault Remove="Areas\Admin\Views\Role\Index.cshtml" />
+      <_ContentIncludedByDefault Remove="Views\insuranceTye\Life.cshtml" />
     </ItemGroup>
 
     <ItemGroup>
@@ -123,6 +121,29 @@
       <UpToDateCheckInput Remove="Areas\Admin\Views\Role\Details.cshtml" />
       <UpToDateCheckInput Remove="Areas\Admin\Views\Role\Edit.cshtml" />
       <UpToDateCheckInput Remove="Areas\Admin\Views\Role\Index.cshtml" />
+
+      <_ContentIncludedByDefault Remove="Views\Shared\_Layout.cshtml" />
+      <_ContentIncludedByDefault Remove="Views\Shared\_ValidationScriptsPartial.cshtml" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Compile Remove="Repository\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <EmbeddedResource Remove="Repository\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Content Remove="Repository\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Remove="Repository\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="wwwroot\user\scss\" />
     </ItemGroup>
 
 </Project>

@@ -164,9 +164,6 @@ namespace Project_Sem3.Migrations
                     b.Property<decimal>("AnnualPaymentAmount")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<decimal>("CoverageAmount")
-                        .HasColumnType("decimal(18,2)");
-
                     b.Property<DateTime?>("CreatedAt")
                         .HasColumnType("datetime2");
 
@@ -207,6 +204,9 @@ namespace Project_Sem3.Migrations
                     b.Property<decimal>("RiskFactor")
                         .HasColumnType("decimal(18,2)");
 
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
 
@@ -246,9 +246,6 @@ namespace Project_Sem3.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<decimal>("CoverageAmount")
-                        .HasColumnType("decimal(18,2)");
-
                     b.Property<DateTime?>("CreatedAt")
                         .HasColumnType("datetime2");
 
@@ -281,6 +278,9 @@ namespace Project_Sem3.Migrations
                     b.Property<decimal>("RiskFactor")
                         .HasColumnType("decimal(18,2)");
 
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
                     b.Property<int>("TermYears")
                         .HasColumnType("int");
 
@@ -311,6 +311,9 @@ namespace Project_Sem3.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<decimal>("CoverageAmount")
+                        .HasColumnType("decimal(18,2)");
+
                     b.Property<DateTime?>("CreatedAt")
                         .HasColumnType("datetime2");
 
@@ -323,7 +326,7 @@ namespace Project_Sem3.Migrations
                     b.Property<int?>("DeleteBy")
                         .HasColumnType("int");
 
-                    b.Property<string>("Destination")
+                    b.Property<string>("Description")
                         .IsRequired()
                         .HasMaxLength(225)
                         .HasColumnType("nvarchar(225)");
@@ -382,9 +385,6 @@ namespace Project_Sem3.Migrations
                     b.Property<decimal>("AnnualPaymentAmount")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<decimal>("CoverageAmount")
-                        .HasColumnType("decimal(18,2)");
-
                     b.Property<DateTime?>("CreatedAt")
                         .HasColumnType("datetime2");
 
@@ -427,6 +427,9 @@ namespace Project_Sem3.Migrations
                     b.Property<decimal>("RiskFactor")
                         .HasColumnType("decimal(18,2)");
 
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
 
@@ -455,9 +458,6 @@ namespace Project_Sem3.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<decimal>("AnnualPaymentAmount")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<decimal>("CoverageAmount")
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<DateTime?>("CreatedAt")
@@ -491,6 +491,9 @@ namespace Project_Sem3.Migrations
 
                     b.Property<decimal>("RiskFactor")
                         .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");

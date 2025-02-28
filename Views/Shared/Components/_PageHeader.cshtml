@@ -1,0 +1,22 @@
+@model Project_Sem3.Models.ViewModel.PageHeaderViewModel
+
+<div class="container-fluid page-header py-5 mb-5 wow fadeIn" data-wow-delay="0.1s">
+  <div class="container py-5">
+    <h1 class="display-4 animated slideInDown mb-4">@Model.Title</h1>
+    <nav aria-label="breadcrumb animated slideInDown">
+      <ol class="breadcrumb mb-0">
+        @foreach (var item in Model.BreadcrumbItems)
+        {
+        if (item == Model.BreadcrumbItems.Last())
+        {
+        <li class="breadcrumb-item active" aria-current="page">@item</li>
+        }
+        else
+        {
+        <li class="breadcrumb-item"><a href="@(item == "Home" ? "/" : "#")">@item</a></li>
+        }
+        }
+      </ol>
+    </nav>
+  </div>
+</div>
