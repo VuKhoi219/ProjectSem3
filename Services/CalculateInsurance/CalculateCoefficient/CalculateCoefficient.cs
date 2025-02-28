@@ -2,202 +2,259 @@ namespace Project_Sem3.Helper;
 
 public class CalculateCoefficient
 {
-    // hệ số lối sống 
-    public decimal lifestyleCoefficient(string Lifestyle )
+    // Hệ số lối sống - Đã dùng int[] từ trước, giữ nguyên
+    public decimal LifestyleCoefficient(int[] lifestyleIds)
     {
-        switch (Lifestyle)
-        {
-            case "Hút thuốc":
-                return 0.08m;
-            case "Uống rượu":
-                return 0.06m;
-            case "Béo phì" :
-                return 0.03m;
-            case "Không có":
-                return 0.01m;
-            default:
-                return 0.02m;
-        }
-    } 
-    // hệ số tuổi
-    public decimal ageCoefficient(int age)
-    {
-        if (age < 30 )
-        {
-            return 0.01m;
-        }
-        else if(age>= 30 && age < 40)
-        {
-            return 0.02m;
-        }
-        else if(age >=40 && age<50)
-        {
-            return 0.03m;
-        }
-        else
-        {
-            return 0.04m;
-        }
-    }
-    // hệ số sức khoẻ
-    public decimal healthCoefficient(string healthStatus)
-    {
-        switch (healthStatus.ToLower().Trim())
-        {
-            case "khỏe mạnh":
-                return 0.01m;
-            case "tiểu đường nhẹ":
-                return 0.02m;
-            case "tiểu đường nặng":
-                return 0.05m;
-            case "tăng huyết áp":
-                return 0.03m;
-            case "béo phì":
-                return 0.02m;
-            case "tim mạch":
-                return 0.02m;
-            case "hút thuốc":
-                return 0.02m;
-            default:
-                return 0.015m; // Nếu không xác định được trạng thái sức khỏe
-        }
-    }
-    // hệ số loại xe 
-    public decimal vehicleCoefficient(string vehicle,string typeBrand)
-    {
-        if (vehicle.Trim().ToLower() == "ô tô")
-        {
-            List<string> sportsCars = new List<string> { "Ferrari", "Lamborghini", "Porsche" };
-            List<string> sedans = new List<string> { "Toyota", "Honda" };
-            List<string> SUV = new List<string> { "BMW", "Mercedes" };
-            List<string> tram = new List<string> { "Tesla", "Rivian" };
+        decimal totalCoefficient = 0m;
 
-            if (sportsCars.Contains(typeBrand.ToLower().Trim()))
+        if (lifestyleIds == null || lifestyleIds.Length == 0)
+        {
+            return 0.002m; // Giá trị mặc định nếu không có lựa chọn
+        }
+
+        foreach (var id in lifestyleIds)
+        {
+            switch (id)
             {
-                return 0.1m; // Xe thể thao (được tăng giá trị vì hiệu suất cao)
-            }
-            else if (sedans.Contains(typeBrand.Trim().ToLower()))
-            {
-                return 0.04m; // Xe sedan (tăng lên vì chúng thường phổ biến và tiện nghi)
-            }
-            else if (SUV.Contains(typeBrand.Trim().ToLower()))
-            {
-                return 0.06m; // Xe SUV (tăng lên vì SUV thường lớn và đa dụng hơn)
-            }
-            else if (tram.Contains(typeBrand.Trim().ToLower()))
-            {
-                return 0.03m; // Xe điện (tăng vì giá trị cao của xe điện, nhất là Tesla)
-            }
-            else
-            {
-                return 0.02m; // Nếu không tìm thấy, trả về hệ số mặc định
+                case 0: // Hút thuốc
+                    totalCoefficient += 0.05m;
+                    break;
+                case 1: // Uống rượu
+                    totalCoefficient += 0.06m;
+                    break;
+                case 2: // Béo phì
+                    totalCoefficient += 0.03m;
+                    break;
+                case 3: // Không có
+                    totalCoefficient += 0.01m;
+                    break;
+                default:
+                    totalCoefficient += 0.02m; // Mặc định
+                    break;
             }
         }
-        else if(vehicle.Trim().ToLower() == "xe máy")
+
+        return totalCoefficient;
+    }
+
+    // Hệ số tuổi - Không cần int[], giữ nguyên vì chỉ nhận một giá trị tuổi
+    public decimal AgeCoefficient(int age)
+    {
+        if (age < 30)
         {
-            List<string> sportBikes = new List<string> { "Yamaha", "Kawasaki", "Ducati" };
-            List<string> cruisers = new List<string> { "Harley-Davidson", "Indian", "Honda" };
-            List<string> scooters = new List<string> { "Vespa", "Honda", "Piaggio" };
-            List<string> electricBikes = new List<string> { "Zero Motorcycles", "Harley-Davidson LiveWire", "Energica" };
-            if (sportBikes.Contains(typeBrand.Trim().ToLower()))
-            {
-                return 0.06m; // Xe thể thao
-            }
-            else if (cruisers.Contains(typeBrand.Trim().ToLower()))
-            {
-                return 0.04m; // Xe cruiser
-            }
-            else if (scooters.Contains(typeBrand.Trim().ToLower()))
-            {
-                return 0.01m; // Xe scooter
-            }
-            else if (electricBikes.Contains(typeBrand.Trim().ToLower()))
-            {
-                return 0.02m; // Xe điện
-            }
-            else
-            {
-                return 0.01m; // Nếu không tìm thấy, trả về hệ số mặc định
-            }
+            return 0.001m;
+        }
+        else if (age >= 30 && age < 40)
+        {
+            return 0.002m;
+        }
+        else if (age >= 40 && age < 50)
+        {
+            return 0.003m;
         }
         else
         {
-            return 0.01m;
+            return 0.004m;
         }
     }
-    
-    // hêj số tai nạn 
-    public decimal accidentCoefficient(int numberOfAccidents, int yearsWithoutAccident)
+
+    // Hệ số sức khỏe - Chuyển sang int[] để hỗ trợ nhiều trạng thái sức khỏe
+    public decimal HealthCoefficient(int[] healthStatusIds)
     {
-        // Nếu người lái xe không có tai nạn nào trong 5 năm
+        decimal totalCoefficient = 0m;
+
+        if (healthStatusIds == null || healthStatusIds.Length == 0)
+        {
+            return 0.05m; // Giá trị mặc định nếu không có lựa chọn
+        }
+
+        foreach (var id in healthStatusIds)
+        {
+            switch (id)
+            {
+                case 0: // Khỏe mạnh
+                    totalCoefficient += 0.01m;
+                    break;
+                case 1: // Tiểu đường nhẹ
+                    totalCoefficient += 0.02m;
+                    break;
+                case 2: // Tiểu đường nặng
+                    totalCoefficient += 0.05m;
+                    break;
+                case 3: // Tăng huyết áp
+                    totalCoefficient += 0.03m;
+                    break;
+                case 4: // Béo phì
+                    totalCoefficient += 0.02m;
+                    break;
+                case 5: // Tim mạch
+                    totalCoefficient += 0.02m;
+                    break;
+                case 6: // Hút thuốc
+                    totalCoefficient += 0.02m;
+                    break;
+                default:
+                    totalCoefficient += 0.015m; // Mặc định
+                    break;
+            }
+        }
+
+        return totalCoefficient;
+    }
+
+    // Hệ số loại xe - Chuyển sang int[] cho loại xe và thương hiệu
+    public decimal VehicleCoefficient(int[] vehicleInfo)
+    {
+        if (vehicleInfo == null || vehicleInfo.Length < 2)
+        {
+            return 0.01m; // Giá trị mặc định nếu thiếu thông tin
+        }
+
+        int vehicleType = vehicleInfo[0]; // 0: Ô tô, 1: Xe máy
+        int brandId = vehicleInfo[1];     // ID của thương hiệu
+
+        if (vehicleType == 0) // Ô tô
+        {
+            switch (brandId)
+            {
+                case 0: // Ferrari
+                case 1: // Lamborghini
+                case 2: // Porsche
+                    return 0.01m; // Xe thể thao
+                case 3: // Toyota
+                case 4: // Honda
+                    return 0.004m; // Xe sedan
+                case 5: // BMW
+                case 6: // Mercedes
+                    return 0.006m; // Xe SUV
+                case 7: // Tesla
+                case 8: // Rivian
+                    return 0.003m; // Xe điện
+                default:
+                    return 0.02m; // Mặc định
+            }
+        }
+        else if (vehicleType == 1) // Xe máy
+        {
+            switch (brandId)
+            {
+                case 0: // Yamaha
+                case 1: // Kawasaki
+                case 2: // Ducati
+                    return 0.006m; // Xe thể thao
+                case 3: // Harley-Davidson
+                case 4: // Indian
+                case 5: // Honda
+                    return 0.004m; // Xe cruiser
+                case 6: // Vespa
+                case 7: // Piaggio
+                    return 0.001m; // Xe scooter
+                case 8: // Zero Motorcycles
+                case 9: // Harley-Davidson LiveWire
+                    return 0.002m; // Xe điện
+                default:
+                    return 0.001m; // Mặc định
+            }
+        }
+
+        return 0.01m; // Mặc định cho loại xe khác
+    }
+
+    // Hệ số tai nạn - Giữ nguyên vì chỉ cần hai giá trị int
+    public decimal AccidentCoefficient(int numberOfAccidents, int yearsWithoutAccident)
+    {
         if (numberOfAccidents == 0 && yearsWithoutAccident >= 5)
         {
-            return 0.01m; // Hệ số cơ bản nếu không có tai nạn trong 5 năm
+            return 0.001m;
         }
-
-        // Nếu có tai nạn, tính hệ số theo số lượng tai nạn
         if (numberOfAccidents == 1)
         {
-            return 0.02m; // Một vụ tai nạn trong vòng 3 năm
+            return 0.002m;
         }
         else if (numberOfAccidents == 2)
         {
-            return 0.05m; // Hai vụ tai nạn trong vòng 3 năm
+            return 0.005m;
         }
         else if (numberOfAccidents >= 3)
         {
-            return 0.02m; // Ba vụ tai nạn trở lên trong vòng 3 năm
+            return 0.02m;
         }
-    
-        return 0.0m; // Nếu không có tai nạn, trả về hệ số cơ bản
+        return 0.0m;
     }
-    // hệ số thành phoos  
-    public decimal locationCoefficient(string city)
+
+    // Hệ số thành phố - Chuyển sang int[]
+    public decimal LocationCoefficient(int[] cityIds)
     {
-        List<string> majorCities = new List<string>
+        decimal totalCoefficient = 0m;
+
+        if (cityIds == null || cityIds.Length == 0)
         {
-            "Hà Nội",
-            "Hồ Chí Minh",
-            "Hải Phòng",
-            "Cần Thơ",
-            "Đà Nẵng",
-            "Biên Hòa",
-            "Hải Dương",
-            "Huế",
-            "Thuận An",
-            "Thủ Đức"
-        };
-        if (majorCities.Contains(city.Trim().ToLower()))
-        {
-            return 0.05m;
+            return 0.01m; // Mặc định
         }
-        return 0.01m;
+
+        foreach (var id in cityIds)
+        {
+            switch (id)
+            {
+                case 0: // Hà Nội
+                case 1: // Hồ Chí Minh
+                case 2: // Hải Phòng
+                case 3: // Cần Thơ
+                case 4: // Đà Nẵng
+                case 5: // Biên Hòa
+                case 6: // Hải Dương
+                case 7: // Huế
+                case 8: // Thuận An
+                case 9: // Thủ Đức
+                    totalCoefficient += 0.05m;
+                    break;
+                default:
+                    totalCoefficient += 0.01m;
+                    break;
+            }
+        }
+
+        return totalCoefficient;
     }
-    // hệ số thành phố có thiên tai 
-    public decimal disasterRiskCoefficient(string city)
+
+    // Hệ số thành phố có thiên tai - Chuyển sang int[]
+    public decimal DisasterRiskCoefficient(int[] cityIds)
     {
-        List<string> disasterCity = new List<string>
+        decimal totalCoefficient = 0m;
+
+        if (cityIds == null || cityIds.Length == 0)
         {
-            "Lạng Sơn",
-            "Cao Bằng",
-            "Lào Cai",
-            "Yên Bái",
-            "Phú Thọ",
-            "Bắc Giang",
-            "Bắc Kạn",
-            "Thái Nguyên",
-            "Hoà Bình",
-            "Ninh Bình",
-            "Thanh Hoá"
-        };
-        if (disasterCity.Contains(city))
-        {
-            return 0.05m;
+            return 0.001m; // Mặc định
         }
-        return 0.01m;
+
+        foreach (var id in cityIds)
+        {
+            switch (id)
+            {
+                case 0: // Lạng Sơn
+                case 1: // Cao Bằng
+                case 2: // Lào Cai
+                case 3: // Yên Bái
+                case 4: // Phú Thọ
+                case 5: // Bắc Giang
+                case 6: // Bắc Kạn
+                case 7: // Thái Nguyên
+                case 8: // Hoà Bình
+                case 9: // Ninh Bình
+                case 10: // Thanh Hoá
+                    totalCoefficient += 0.005m;
+                    break;
+                default:
+                    totalCoefficient += 0.001m;
+                    break;
+            }
+        }
+
+        return totalCoefficient;
     }
-    
-    public decimal assetAgeRiskCoefficient(int assetAge)
+
+    // Hệ số tuổi tài sản - Giữ nguyên vì chỉ nhận một giá trị int
+    public decimal AssetAgeRiskCoefficient(int assetAge)
     {
         if (assetAge <= 0)
         {
@@ -205,62 +262,104 @@ public class CalculateCoefficient
         }
         else if (assetAge <= 50)
         {
-            return 0.05m;
+            return 0.005m;
         }
         else
         {
-            return 0.1m;
+            return 0.01m;
         }
     }
-    // hệ số nghề nghiệp 
-    public decimal careerCoefficient(string career)
+
+
+    // Hệ số nghề nghiệp - Chuyển sang int[]
+    public decimal CareerCoefficient(int[] careerIds)
     {
-        List<string> careers = new List<string>
+        decimal totalCoefficient = 0m;
+
+        if (careerIds == null || careerIds.Length == 0)
         {
-            "Cứu hoả",
-            "Phi công",
-            "Khai thác gỗ",
-            "Thu gom rác thải và tái chế",
-            "Thợ hàn dưới nước",
-            "Công nhân dầu khí",
-            "Công nhân xây dựng",
-            "Ngư dân vùng biển sâu",
-            " Thợ làm sắt thép",
-            "Người đấu bò",
-            "Thợ mỏ",
-            "Làm nông",
-            "Thợ mỏ",
-            "Sĩ quan cảnh sát",
-            "Tài xế xe tải",
-            "Diễn viên đóng thế",
-        };
-        if (careers.Contains(career.ToLower().Trim()))
-        {
-            return 0.05m;
+            return 0.001m; // Mặc định
         }
 
-        return 0.01m;
+        foreach (var id in careerIds)
+        {
+            switch (id)
+            {
+                case 0: // Cứu hoả
+                case 1: // Phi công
+                case 2: // Khai thác gỗ
+                case 3: // Thu gom rác thải và tái chế
+                case 4: // Thợ hàn dưới nước
+                case 5: // Công nhân dầu khí
+                case 6: // Công nhân xây dựng
+                case 7: // Ngư dân vùng biển sâu
+                case 8: // Thợ làm sắt thép
+                case 9: // Người đấu bò
+                case 10: // Thợ mỏ
+                case 11: // Làm nông
+                case 12: // Sĩ quan cảnh sát
+                case 13: // Tài xế xe tải
+                case 14: // Diễn viên đóng thế
+                    totalCoefficient += 0.05m;
+                    break;
+                default:
+                    totalCoefficient += 0.01m;
+                    break;
+            }
+        }
+
+        return totalCoefficient;
     }
 
-    public decimal constructionMaterialRiskCoefficient(string material)
+    // Hệ số vật liệu xây dựng - Chuyển sang int[]
+    public decimal ConstructionMaterialRiskCoefficient(int[] materialIds)
     {
-        string t = "Gỗ";
-        if (t.Equals(material.Trim().ToLower()))
+        decimal totalCoefficient = 0m;
+
+        if (materialIds == null || materialIds.Length == 0)
         {
-            return 0.03m;
+            return 0.001m; // Mặc định
         }
 
-        return 0.01m;
+        foreach (var id in materialIds)
+        {
+            switch (id)
+            {
+                case 0: // Gỗ
+                    totalCoefficient += 0.003m;
+                    break;
+                default:
+                    totalCoefficient += 0.001m;
+                    break;
+            }
+        }
+
+        return totalCoefficient;
     }
 
-    public decimal crimeRiskCoefficient(string city)
+    // Hệ số rủi ro tội phạm - Chuyển sang int[]
+    public decimal CrimeRiskCoefficient(int[] cityIds)
     {
-        string t = "Buôn Ma Thuật";
-        if (t.Equals(city.Trim().ToLower()))
+        decimal totalCoefficient = 0m;
+
+        if (cityIds == null || cityIds.Length == 0)
         {
-            return 0.02m;
+            return 0.001m; // Mặc định
         }
 
-        return 0.01m;
+        foreach (var id in cityIds)
+        {
+            switch (id)
+            {
+                case 0: // Buôn Ma Thuột
+                    totalCoefficient += 0.002m;
+                    break;
+                default:
+                    totalCoefficient += 0.001m;
+                    break;
+            }
+        }
+
+        return totalCoefficient;
     }
 }

@@ -24,12 +24,13 @@ public class InsuranceHealthDetailController : ControllerBase
         {
             // Kiểm tra dữ liệu đầu vào
             if (detail == null || detail.PlanId <= 0 || detail.AnnualPaymentAmount <= 0 ||
-                detail.Premium <= 0 || detail.CoverageAmount <= 0 || detail.Deductible < 0)
+                detail.Premium <= 0 || detail.Deductible < 0)
             {
                 return BadRequest(new { Message = "Invalid insurance health detail data" });
             }
 
             detail.CreatedAt = DateTime.UtcNow;
+            detail.Status = StatusType.Pending;
 
             _context.InsuranceHealthDetails.Add(detail);
             await _context.SaveChangesAsync();
@@ -62,7 +63,6 @@ public class InsuranceHealthDetailController : ControllerBase
                     d.PlanId,
                     d.AnnualPaymentAmount,
                     d.Premium,
-                    d.CoverageAmount,
                     d.Deductible,
                     d.AgeGroup,
                     d.HospitalNetwork,
@@ -108,7 +108,6 @@ public class InsuranceHealthDetailController : ControllerBase
                     d.PlanId,
                     d.AnnualPaymentAmount,
                     d.Premium,
-                    d.CoverageAmount,
                     d.Deductible,
                     d.AgeGroup,
                     d.HospitalNetwork,
@@ -152,7 +151,6 @@ public class InsuranceHealthDetailController : ControllerBase
             existingDetail.PlanId = detail.PlanId;
             existingDetail.AnnualPaymentAmount = detail.AnnualPaymentAmount;
             existingDetail.Premium = detail.Premium;
-            existingDetail.CoverageAmount = detail.CoverageAmount;
             existingDetail.Deductible = detail.Deductible;
             existingDetail.AgeGroup = detail.AgeGroup;
             existingDetail.HospitalNetwork = detail.HospitalNetwork;
