@@ -1,7 +1,7 @@
 @model Project_Sem3.Models.User
 
 @{
-    ViewData["Title"] = "Details";
+ViewData["Title"] = "Details";
 }
 
 @section VendorStyles {
@@ -17,67 +17,104 @@
 
 <h1>Details</h1>
 
-<div>
-    <h4>User</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.FullName)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.FullName)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Email)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Email)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Password)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Password)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Phone)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Phone)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Gender)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Gender)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.CitizenIdentificationCard)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.CitizenIdentificationCard)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.DateOfBirth)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.DateOfBirth)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Status)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Status)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Role)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Role.Name)
-        </dd>
-    </dl>
+<div id="userDetails">
+  <h4>User</h4>
+  <hr />
+  <dl class="row">
+    <dt class="col-sm-2">
+      @Html.DisplayNameFor(model => model.FullName)
+    </dt>
+    <dd class="col-sm-10" id="FullName">
+      @Html.DisplayFor(model => model.FullName)
+    </dd>
+    <dt class="col-sm-2">
+      @Html.DisplayNameFor(model => model.Email)
+    </dt>
+    <dd class="col-sm-10" id="Email">
+      @Html.DisplayFor(model => model.Email)
+    </dd>
+    <dt class="col-sm-2">
+      @Html.DisplayNameFor(model => model.Password)
+    </dt>
+    <dd class="col-sm-10" id="Password">
+      @Html.DisplayFor(model => model.Password)
+    </dd>
+    <dt class="col-sm-2">
+      @Html.DisplayNameFor(model => model.Phone)
+    </dt>
+    <dd class="col-sm-10" id="Phone">
+      @Html.DisplayFor(model => model.Phone)
+    </dd>
+    <dt class="col-sm-2">
+      @Html.DisplayNameFor(model => model.Gender)
+    </dt>
+    <dd class="col-sm-10" id="Gender">
+      @Html.DisplayFor(model => model.Gender)
+    </dd>
+    <dt class="col-sm-2">
+      @Html.DisplayNameFor(model => model.CitizenIdentificationCard)
+    </dt>
+    <dd class="col-sm-10" id="CitizenIdentificationCard">
+      @Html.DisplayFor(model => model.CitizenIdentificationCard)
+    </dd>
+    <dt class="col-sm-2">
+      @Html.DisplayNameFor(model => model.DateOfBirth)
+    </dt>
+    <dd class="col-sm-10" id="DateOfBirth">
+      @Html.DisplayFor(model => model.DateOfBirth)
+    </dd>
+    <dt class="col-sm-2">
+      @Html.DisplayNameFor(model => model.Status)
+    </dt>
+    <dd class="col-sm-10" id="Status">
+      @Html.DisplayFor(model => model.Status)
+    </dd>
+    <dt class="col-sm-2">
+      @Html.DisplayNameFor(model => model.Role)
+    </dt>
+    <dd class="col-sm-10" id="Role">
+      @Html.DisplayFor(model => model.Role.Name)
+    </dd>
+  </dl>
 </div>
+
 <div>
-    <a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+  <a href="javascript:void(0)" id="loadUserDetails">Load User Details via AJAX</a> |
+  <a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a> |
+  <a asp-action="Index">Back to List</a>
 </div>
+
+@section Scripts {
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script>
+  $(document).ready(function() {
+    // Load user details via AJAX when the link is clicked
+    $('#loadUserDetails').on('click', function() {
+      var userId = '@Model.Id';  // Get the current user ID
+
+      $.ajax({
+        url: '/api/users' + userId,
+        type: 'GET',
+        success: function(data) {
+          if (data) {
+            // Update the page content with the fetched user data
+            $('#FullName').text(data.fullName);
+            $('#Email').text(data.email);
+            $('#Password').text(data.password); // You might want to hide password for security
+            $('#Phone').text(data.phone);
+            $('#Gender').text(data.gender);
+            $('#CitizenIdentificationCard').text(data.citizenIdentificationCard);
+            $('#DateOfBirth').text(data.dateOfBirth);
+            $('#Status').text(data.status);
+            $('#Role').text(data.role.name);
+          }
+        },
+        error: function(xhr, status, error) {
+          alert('Error loading user details.');
+        }
+      });
+    });
+  });
+</script>
+}

@@ -1,4 +1,4 @@
-@model Project_Sem3.Models.Notification
+@model Project_Sem3.Models.InsurancePlan
 
 @{
     ViewData["Title"] = "Create";
@@ -31,7 +31,7 @@
 
 <h1>Create</h1>
 
-<h4>Add New Notification</h4>
+<h4>Add New Insurance Plan</h4>
 <div class="row">
   <!-- FormValidation -->
   <div class="col-12">
@@ -48,18 +48,28 @@
         <form id="formValidationExamples" class="row g-6" asp-action="Create" method="post">
           <div asp-validation-summary="ModelOnly" class="text-danger"></div>
           <div class="form-group">
-            <label asp-for="UserId" class="control-label"></label>
-            <select asp-for="UserId" id="userId" class ="form-control" asp-items="ViewBag.UserId"></select>
+            <label asp-for="Name" class="control-label"></label>
+            <input asp-for="Name" id="name" class="form-control" />
+            <span asp-validation-for="Name" class="text-danger"></span>
           </div>
           <div class="form-group">
-            <label asp-for="Message" class="control-label"></label>
-            <input asp-for="Message" id="message" class="form-control" />
-            <span asp-validation-for="Message" class="text-danger"></span>
+            <label asp-for="Description" class="control-label"></label>
+            <input asp-for="Description" id="description" class="form-control" />
+            <span asp-validation-for="Description" class="text-danger"></span>
           </div>
-          <div class="col-md-6 form-check">
-            <label class="form-check-label">
-              <input class="form-check-input" id="isRead" asp-for="IsRead" /> @Html.DisplayNameFor(model => model.IsRead)
-            (Confirm your message!)</label>
+          <div class="form-group">
+            <label asp-for="Type" class="control-label"></label>
+            <input asp-for="Type" id="type" class="form-control" />
+            <span asp-validation-for="Type" class="text-danger"></span>
+          </div>
+          <div class="form-group">
+            <label asp-for="CoverageAmount" class="control-label"></label>
+            <input asp-for="CoverageAmount" id="coverageAmount" class="form-control" />
+            <span asp-validation-for="CoverageAmount" class="text-danger"></span>
+          </div>
+          <div class="form-group">
+            <label asp-for="CreatedBy" class="control-label"></label>
+            <input asp-for="CreatedBy" id="createdBy" class ="form-control"/>
           </div>
           <div class="col-12 col-md-6">
             <div class="form-check">
@@ -86,32 +96,44 @@
 <script>
   $(document).ready(function() {
     $('#formValidationExamples').on('submit', function(e) {
-      e.preventDefault(); // Prevent the default form submit
+      e.preventDefault(); // Prevent the default form submission
 
       // Get the form data
-      const notificationData = {
-        userId: $('#userId').val(), // Assuming your select has id="userId"
-        message: $('#message').val(), // Assuming your input for message has id="message"
-        isRead: $('#isRead').prop('checked') // Assuming your checkbox for "IsRead" has id="isRead"
+      const insurancePlanData = {
+        Name: $('#name').val(), // Assuming your input has id="Name"
+        Description: $('#description').val(), // Assuming your input has id="Description"
+        Type: $('#type').val(), // Assuming your input has id="Type"
+        CoverageAmount: $('#coverageAmount').val(), // Assuming your input has id="CoverageAmount"
+        CreatedBy: $('#createdBy').val(), // Assuming your input has id="CreatedBy"
       };
 
-      // Call the API to create the notification
+      // Check if the user agreed to the terms
+      const isAgreed = $('#formValidationCheckbox').prop('checked');
+      if (!isAgreed) {
+        alert("You must agree to the terms and conditions.");
+        return;
+      }
+
+      // Call the API to create the insurance plan
       $.ajax({
-        url: '/api/notifications', // Use the correct URL for your Create Notification action
+        url: '/api/insurance-plans', // Use the correct URL for your Create action
         method: 'POST',
         contentType: 'application/json',
-        data: JSON.stringify(notificationData), // Send the data as JSON
+        data: JSON.stringify(insurancePlanData), // Send the data as JSON
         success: function(response) {
           // Success action, you can display a success message or redirect
-          alert("Notification created successfully!");
+          alert("Insurance Plan created successfully!");
           $('#formValidationExamples')[0].reset(); // Optionally reset the form
+          // Redirect to the Index page after success
         },
         error: function(xhr, status, error) {
           // Error action, you can display an error message
-          alert("Error creating notification. Please try again.");
+          alert("Error creating insurance plan. Please try again.");
         }
       });
     });
   });
 </script>
 }
+
+

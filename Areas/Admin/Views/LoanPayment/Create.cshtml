@@ -1,4 +1,4 @@
-@model Project_Sem3.Models.Notification
+@model Project_Sem3.Models.LoanPayment
 
 @{
     ViewData["Title"] = "Create";
@@ -31,7 +31,7 @@
 
 <h1>Create</h1>
 
-<h4>Add New Notification</h4>
+<h4>Add New Loan Payment</h4>
 <div class="row">
   <!-- FormValidation -->
   <div class="col-12">
@@ -48,18 +48,34 @@
         <form id="formValidationExamples" class="row g-6" asp-action="Create" method="post">
           <div asp-validation-summary="ModelOnly" class="text-danger"></div>
           <div class="form-group">
-            <label asp-for="UserId" class="control-label"></label>
-            <select asp-for="UserId" id="userId" class ="form-control" asp-items="ViewBag.UserId"></select>
+            <label asp-for="BorrowId" class="control-label"></label>
+            <input asp-for="BorrowId" id="borrowId" class="form-control"/>
+            @* <select asp-for="BorrowId" id="borrowId" class ="form-control" asp-items="ViewBag.BorrowId"></select> *@
           </div>
           <div class="form-group">
-            <label asp-for="Message" class="control-label"></label>
-            <input asp-for="Message" id="message" class="form-control" />
-            <span asp-validation-for="Message" class="text-danger"></span>
+            <label asp-for="PaymentAmount" class="control-label"></label>
+            <input asp-for="PaymentAmount" id="paymentAmount" class="form-control" />
+            <span asp-validation-for="PaymentAmount" class="text-danger"></span>
           </div>
-          <div class="col-md-6 form-check">
-            <label class="form-check-label">
-              <input class="form-check-input" id="isRead" asp-for="IsRead" /> @Html.DisplayNameFor(model => model.IsRead)
-            (Confirm your message!)</label>
+          <div class="form-group">
+            <label asp-for="PaymentImage" class="control-label"></label>
+            <input asp-for="PaymentImage" id="paymentImage" class="form-control" />
+            <span asp-validation-for="PaymentImage" class="text-danger"></span>
+          </div>
+          <div class="form-group">
+            <label asp-for="OverdueDays" class="control-label"></label>
+            <input asp-for="OverdueDays" id="overdueDays" class="form-control" />
+            <span asp-validation-for="OverdueDays" class="text-danger"></span>
+          </div>
+          <div class="form-group">
+            <label asp-for="PenaltyInterest" class="control-label"></label>
+            <input asp-for="PenaltyInterest" id="penaltyInterest" class="form-control" />
+            <span asp-validation-for="PenaltyInterest" class="text-danger"></span>
+          </div>
+          <div class="form-group">
+            <label asp-for="CreatedBy" class="control-label"></label>
+            <input asp-for="CreatedBy" id="createdBy" class="form-control" />
+            <span asp-validation-for="CreatedBy" class="text-danger"></span>
           </div>
           <div class="col-12 col-md-6">
             <div class="form-check">
@@ -89,26 +105,30 @@
       e.preventDefault(); // Prevent the default form submit
 
       // Get the form data
-      const notificationData = {
-        userId: $('#userId').val(), // Assuming your select has id="userId"
-        message: $('#message').val(), // Assuming your input for message has id="message"
-        isRead: $('#isRead').prop('checked') // Assuming your checkbox for "IsRead" has id="isRead"
+      const loanPaymentData = {
+        borrowId: $('#borrowId').val(), // Assuming your select has id="BorrowId"
+        paymentAmount: $('#paymentAmount').val(), // Assuming your input for payment amount has id="PaymentAmount"
+        paymentDate: $('#paymentDate').val(), // Assuming your input for payment date has id="PaymentDate"
+        paymentImage: $('#paymentImage').val(), // Assuming your input for payment image has id="PaymentImage"
+        overdueDays: $('#overdueDays').val(), // Assuming your input for overdue days has id="OverdueDays"
+        penaltyInterest: $('#penaltyInterest').val(), // Assuming your input for penalty interest has id="PenaltyInterest"
+        createdBy: $('#createdBy').val(),
       };
 
-      // Call the API to create the notification
+      // Call the API to create the loan payment
       $.ajax({
-        url: '/api/notifications', // Use the correct URL for your Create Notification action
+        url: '/api/loan-payment/', // Use the correct URL for your Create Loan Payment action
         method: 'POST',
         contentType: 'application/json',
-        data: JSON.stringify(notificationData), // Send the data as JSON
+        data: JSON.stringify(loanPaymentData), // Send the data as JSON
         success: function(response) {
           // Success action, you can display a success message or redirect
-          alert("Notification created successfully!");
+          alert("Loan Payment created successfully!");
           $('#formValidationExamples')[0].reset(); // Optionally reset the form
         },
         error: function(xhr, status, error) {
           // Error action, you can display an error message
-          alert("Error creating notification. Please try again.");
+          alert("Error creating loan payment. Please try again.");
         }
       });
     });
