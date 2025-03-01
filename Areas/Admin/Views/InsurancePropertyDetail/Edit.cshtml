@@ -1,0 +1,163 @@
+@model Project_Sem3.Models.InsurancePropertyDetail
+
+@{
+    ViewData["Title"] = "Edit";
+}
+
+@section VendorStyles {
+    <link rel="stylesheet" href="~/vendor/libs/bootstrap-select/bootstrap-select.css" />
+    <link rel="stylesheet" href="~/vendor/libs/select2/select2.css" />
+    <link rel="stylesheet" href="~/vendor/libs/flatpickr/flatpickr.css" />
+    <link rel="stylesheet" href="~/vendor/libs/typeahead-js/typeahead.css" />
+    <link rel="stylesheet" href="~/vendor/libs/tagify/tagify.css" />
+    <link rel="stylesheet" href="~/vendor/libs/form-validation/form-validation.css" />
+}
+
+@section VendorScripts {
+    <script src="~/vendor/libs/select2/select2.js"></script>
+    <script src="~/vendor/libs/bootstrap-select/bootstrap-select.js"></script>
+    <script src="~/vendor/libs/moment/moment.js"></script>
+    <script src="~/vendor/libs/flatpickr/flatpickr.js"></script>
+    <script src="~/vendor/libs/typeahead-js/typeahead.js"></script>
+    <script src="~/vendor/libs/tagify/tagify.js"></script>
+    <script src="~/vendor/libs/form-validation/popular.js"></script>
+    <script src="~/vendor/libs/form-validation/bootstrap5.js"></script>
+    <script src="~/vendor/libs/form-validation/auto-focus.js"></script>
+}
+
+@section PageScripts {
+    <script src="~/js/form-validation.js"></script>
+}
+
+<h1>Edit</h1>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <form id="editInsurancePropertyDetailForm" class="row g-6" method="post" asp-action="Edit">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    <input type="hidden" asp-for="Id" id="insurancePropertyDetailId" />
+
+                    <div class="form-group">
+                        <label asp-for="PropertyType" class="control-label"></label>
+                        <input asp-for="PropertyType" class="form-control" id="propertyType" />
+                        <span asp-validation-for="PropertyType" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="Location" class="control-label"></label>
+                        <input asp-for="Location" class="form-control" id="location" />
+                        <span asp-validation-for="Location" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="Duration" class="control-label"></label>
+                        <input asp-for="Duration" class="form-control" id="duration" type="number" />
+                        <span asp-validation-for="Duration" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="RiskFactor" class="control-label"></label>
+                        <input asp-for="RiskFactor" class="form-control" id="riskFactor" type="number" step="0.01" />
+                        <span asp-validation-for="RiskFactor" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="Region" class="control-label"></label>
+                        <input asp-for="Region" class="form-control" id="region" />
+                        <span asp-validation-for="Region" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="PlanId" class="control-label"></label>
+                        <select asp-for="PlanId" class="form-control" id="planId" asp-items="ViewBag.PlanId"></select>
+                        <span asp-validation-for="PlanId" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="AnnualPaymentAmount" class="control-label"></label>
+                        <input asp-for="AnnualPaymentAmount" class="form-control" id="annualPaymentAmount" type="number" step="0.01" />
+                        <span asp-validation-for="AnnualPaymentAmount" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="Premium" class="control-label"></label>
+                        <input asp-for="Premium" class="form-control" id="premium" type="number" step="0.01" />
+                        <span asp-validation-for="Premium" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="Deductible" class="control-label"></label>
+                        <input asp-for="Deductible" class="form-control" id="deductible" type="number" step="0.01" />
+                        <span asp-validation-for="Deductible" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-12">
+                        <div class="form-check">
+                            <input type="checkbox" class="form-check-input" id="insurancePropertyDetailTerms" name="insurancePropertyDetailTerms" />
+                            <label class="form-check-label" for="insurancePropertyDetailTerms"> Agree to our terms and conditions</label>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <input type="submit" value="Save" class="btn btn-primary" />
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('#planId').select2({
+                placeholder: "Select an Insurance Plan",
+                allowClear: true
+            });
+
+            $('#editInsurancePropertyDetailForm').on('submit', function (e) {
+                e.preventDefault();
+
+                const insurancePropertyDetailData = {
+                    id: $('#insurancePropertyDetailId').val(),
+                    propertyType: $('#propertyType').val(),
+                    location: $('#location').val(),
+                    duration: $('#duration').val(),
+                    riskFactor: $('#riskFactor').val(),
+                    region: $('#region').val(),
+                    planId: $('#planId').val(),
+                    annualPaymentAmount: $('#annualPaymentAmount').val(),
+                    premium: $('#premium').val(),
+                    deductible: $('#deductible').val(),
+                    termsAgreed: $('#insurancePropertyDetailTerms').prop('checked')
+                };
+
+                if (!insurancePropertyDetailData.termsAgreed) {
+                    alert("You must agree to the terms and conditions.");
+                    return;
+                }
+
+                $.ajax({
+                    url: '/Admin/InsurancePropertyDetail/Edit/' + insurancePropertyDetailData.id,
+                    method: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(insurancePropertyDetailData),
+                    success: function (response) {
+                        alert("Insurance Property Detail updated successfully!");
+                        window.location.href = '/Admin/InsurancePropertyDetail/Index';
+                    },
+                    error: function (xhr, status, error) {
+                        alert("Error updating Insurance Property Detail: " + error);
+                    }
+                });
+            });
+        });
+    </script>
+}

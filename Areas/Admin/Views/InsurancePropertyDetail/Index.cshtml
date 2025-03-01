@@ -1,0 +1,61 @@
+@model IEnumerable<Project_Sem3.Models.InsurancePropertyDetail>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+@section VendorStyles {
+    <link rel="stylesheet" href="~/vendor/libs/datatables-bs5/datatables.bootstrap5.css">
+    <link rel="stylesheet" href="~/vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.css">
+}
+
+@section VendorScripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+}
+
+<div class="card">
+    <h5 class="card-header">Insurance Property Detail List</h5>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-striped table-bordered">
+                <thead>
+                    <tr>
+                        <th>Id</th>
+                        <th>Property Type</th>
+                        <th>Location</th>
+                        <th>Duration (Months)</th>
+                        <th>Risk Factor</th>
+                        <th>Region</th>
+                        <th>Plan Id</th>
+                        <th>Annual Payment</th>
+                        <th>Premium</th>
+                        <th>Deductible</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var detail in Model)
+                    {
+                        <tr>
+                            <td>@detail.Id</td>
+                            <td>@detail.PropertyType</td>
+                            <td>@detail.Location</td>
+                            <td>@detail.Duration</td>
+                            <td>@detail.RiskFactor</td>
+                            <td>@detail.Region</td>
+                            <td>@detail.PlanId</td>
+                            <td>@detail.AnnualPaymentAmount</td>
+                            <td>@detail.Premium</td>
+                            <td>@detail.Deductible</td>
+                            <td>
+                                <a href="@Url.Action("Details", "InsurancePropertyDetail", new { id = detail.Id })" class="btn btn-info btn-sm">View</a>
+                                <a href="@Url.Action("Edit", "InsurancePropertyDetail", new { id = detail.Id })" class="btn btn-primary btn-sm">Edit</a>
+                                <a href="@Url.Action("Delete", "InsurancePropertyDetail", new { id = detail.Id })" class="btn btn-danger btn-sm">Delete</a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
