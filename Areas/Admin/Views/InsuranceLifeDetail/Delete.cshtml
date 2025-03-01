@@ -1,4 +1,4 @@
-@model Project_Sem3.Models.InsuranceVehicleDetail
+@model Project_Sem3.Models.InsuranceLifeDetail
 
 @{
 ViewData["Title"] = "Delete";
@@ -8,26 +8,26 @@ ViewData["Title"] = "Delete";
 
 <h3>Are you sure you want to delete this?</h3>
 <div>
-  <h4>Insurance Vehicle Detail</h4>
+  <h4>Insurance Life Detail</h4>
   <hr />
   <dl class="row">
     <dt class="col-sm-2">
-      @Html.DisplayNameFor(model => model.VehicleType)
+      @Html.DisplayNameFor(model => model.TermYears)
     </dt>
     <dd class="col-sm-10">
-      @Html.DisplayFor(model => model.VehicleType)
+      @Html.DisplayFor(model => model.TermYears)
     </dd>
     <dt class="col-sm-2">
-      @Html.DisplayNameFor(model => model.VehicleModel)
+      @Html.DisplayNameFor(model => model.AgeGroup)
     </dt>
     <dd class="col-sm-10">
-      @Html.DisplayFor(model => model.VehicleModel)
+      @Html.DisplayFor(model => model.AgeGroup)
     </dd>
     <dt class="col-sm-2">
-      @Html.DisplayNameFor(model => model.VehicleYear)
+      @Html.DisplayNameFor(model => model.Beneficiaries)
     </dt>
     <dd class="col-sm-10">
-      @Html.DisplayFor(model => model.VehicleYear)
+      @Html.DisplayFor(model => model.Beneficiaries)
     </dd>
     <dt class="col-sm-2">
       @Html.DisplayNameFor(model => model.Duration)
@@ -75,7 +75,7 @@ ViewData["Title"] = "Delete";
 
   <form asp-action="Delete" id="deleteForm">
     <input type="hidden" asp-for="Id" />
-    <input type="submit" value="Delete" class="btn btn-danger deleteInsuranceVehicleDetailButton" data-insurance-vehicle-detail-id="@Model.Id" /> |
+    <input type="submit" value="Delete" class="btn btn-danger deleteInsuranceLifeDetailButton" data-insurance-life-detail-id="@Model.Id" /> |
     <a asp-action="Index">Back to List</a>
   </form>
 </div>
@@ -85,32 +85,27 @@ ViewData["Title"] = "Delete";
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 <script>
   $(document).ready(function () {
-    // Handle delete action when delete button is clicked
-    $('.deleteInsuranceVehicleDetailButton').on('click', function (e) {
-      e.preventDefault(); // Prevent the default form submission
+    $('.deleteInsuranceLifeDetailButton').on('click', function (e) {
+      e.preventDefault();
 
-      // Get the ID of the insurance vehicle detail
-      const insuranceVehicleDetailId = $(this).data('insurance-vehicle-detail-id');
+      const insuranceLifeDetailId = $(this).data('insurance-life-detail-id');
 
-      // Confirm the action with the user before proceeding
-      if (!confirm('Are you sure you want to delete this insurance vehicle detail?')) {
-        return; // If the user cancels, stop the process
+      if (!confirm('Are you sure you want to delete this insurance life detail?')) {
+        return;
       }
 
-      // Get the anti-forgery token from the form
       const token = $('input[name="__RequestVerificationToken"]').val();
 
-      // Send an AJAX request to delete the insurance vehicle detail
       $.ajax({
-        url: '/Admin/InsuranceVehicleDetail/Delete/' + insuranceVehicleDetailId,
+        url: '/Admin/InsuranceLifeDetail/Delete/' + insuranceLifeDetailId,
         method: 'POST',
-        data: { __RequestVerificationToken: token }, // Include the token in the data
+        data: { __RequestVerificationToken: token },
         success: function (response) {
-          alert("Insurance Vehicle Detail deleted successfully!");
-          window.location.href = '/Admin/InsuranceVehicleDetail/Index'; // Redirect to Index
+          alert("Insurance Life Detail deleted successfully!");
+          window.location.href = '/Admin/InsuranceLifeDetail/Index';
         },
         error: function (xhr, status, error) {
-          alert("Error deleting Insurance Vehicle Detail: " + error);
+          alert("Error deleting Insurance Life Detail: " + error);
         }
       });
     });

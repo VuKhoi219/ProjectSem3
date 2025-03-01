@@ -19,11 +19,10 @@ namespace Project_Sem3.Areas.Admin.Controllers
             _context = context;
         }
 
-        // GET: Admin/InsuranceVehicleDetail
+        // GET: Admin/InsuranceVehicleDetail/Index
         public async Task<IActionResult> Index()
         {
-            var myDbContext = _context.InsuranceDetails.Include(i => i.Creator).Include(i => i.Deleter).Include(i => i.Updater);
-            return View(await myDbContext.ToListAsync());
+            return View(await _context.InsuranceVehicleDetails.ToListAsync());
         }
 
         // GET: Admin/InsuranceVehicleDetail/Details/5
@@ -34,46 +33,37 @@ namespace Project_Sem3.Areas.Admin.Controllers
                 return NotFound();
             }
 
-            var insuranceDetails = await _context.InsuranceDetails
-                .Include(i => i.Creator)
-                .Include(i => i.Deleter)
-                .Include(i => i.Updater)
+            var insuranceVehicleDetail = await _context.InsuranceVehicleDetails
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (insuranceDetails == null)
+            if (insuranceVehicleDetail == null)
             {
                 return NotFound();
             }
 
-            return View(insuranceDetails);
+            return View(insuranceVehicleDetail);
         }
 
         // GET: Admin/InsuranceVehicleDetail/Create
         public IActionResult Create()
         {
-            ViewData["CreatedBy"] = new SelectList(_context.Users, "Id", "CitizenIdentificationCard");
-            ViewData["DeleteBy"] = new SelectList(_context.Users, "Id", "CitizenIdentificationCard");
-            ViewData["UpdatedBy"] = new SelectList(_context.Users, "Id", "CitizenIdentificationCard");
+            ViewData["PlanId"] = new SelectList(_context.InsurancePlans, "Id", "Name");
             return View();
         }
 
-        // POST: Admin/InsuranceVehicleDetail/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,PlanId,AnnualPaymentAmount,Premium,Deductible,CreatedAt,UpdatedAt,DeleteAt,CreatedBy,UpdatedBy,DeleteBy")] InsuranceDetails insuranceDetails)
-        {
-            if (ModelState.IsValid)
-            {
-                _context.Add(insuranceDetails);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-            ViewData["CreatedBy"] = new SelectList(_context.Users, "Id", "CitizenIdentificationCard", insuranceDetails.CreatedBy);
-            ViewData["DeleteBy"] = new SelectList(_context.Users, "Id", "CitizenIdentificationCard", insuranceDetails.DeleteBy);
-            ViewData["UpdatedBy"] = new SelectList(_context.Users, "Id", "CitizenIdentificationCard", insuranceDetails.UpdatedBy);
-            return View(insuranceDetails);
-        }
+        // // POST: Admin/InsuranceVehicleDetail/Create
+        // [HttpPost]
+        // [ValidateAntiForgeryToken]
+        // public async Task<IActionResult> Create([Bind("Id,VehicleType,VehicleModel,VehicleYear,Duration,RiskFactor,Region,PlanId,AnnualPaymentAmount,Premium,Deductible")] InsuranceVehicleDetail insuranceVehicleDetail)
+        // {
+        //     if (ModelState.IsValid)
+        //     {
+        //         _context.Add(insuranceVehicleDetail);
+        //         await _context.SaveChangesAsync();
+        //         return RedirectToAction(nameof(Index));
+        //     }
+        //     ViewData["PlanId"] = new SelectList(_context.InsurancePlans, "Id", "Name", insuranceVehicleDetail.PlanId);
+        //     return View(insuranceVehicleDetail);
+        // }
 
         // GET: Admin/InsuranceVehicleDetail/Edit/5
         public async Task<IActionResult> Edit(int? id)
@@ -83,25 +73,21 @@ namespace Project_Sem3.Areas.Admin.Controllers
                 return NotFound();
             }
 
-            var insuranceDetails = await _context.InsuranceDetails.FindAsync(id);
-            if (insuranceDetails == null)
+            var insuranceVehicleDetail = await _context.InsuranceVehicleDetails.FindAsync(id);
+            if (insuranceVehicleDetail == null)
             {
                 return NotFound();
             }
-            ViewData["CreatedBy"] = new SelectList(_context.Users, "Id", "CitizenIdentificationCard", insuranceDetails.CreatedBy);
-            ViewData["DeleteBy"] = new SelectList(_context.Users, "Id", "CitizenIdentificationCard", insuranceDetails.DeleteBy);
-            ViewData["UpdatedBy"] = new SelectList(_context.Users, "Id", "CitizenIdentificationCard", insuranceDetails.UpdatedBy);
-            return View(insuranceDetails);
+            ViewData["PlanId"] = new SelectList(_context.InsurancePlans, "Id", "Name", insuranceVehicleDetail.PlanId);
+            return View(insuranceVehicleDetail);
         }
 
         // POST: Admin/InsuranceVehicleDetail/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,PlanId,AnnualPaymentAmount,Premium,Deductible,CreatedAt,UpdatedAt,DeleteAt,CreatedBy,UpdatedBy,DeleteBy")] InsuranceDetails insuranceDetails)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,VehicleType,VehicleModel,VehicleYear,Duration,RiskFactor,Region,PlanId,AnnualPaymentAmount,Premium,Deductible")] InsuranceVehicleDetail insuranceVehicleDetail)
         {
-            if (id != insuranceDetails.Id)
+            if (id != insuranceVehicleDetail.Id)
             {
                 return NotFound();
             }
@@ -110,12 +96,12 @@ namespace Project_Sem3.Areas.Admin.Controllers
             {
                 try
                 {
-                    _context.Update(insuranceDetails);
+                    _context.Update(insuranceVehicleDetail);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!InsuranceDetailsExists(insuranceDetails.Id))
+                    if (!InsuranceVehicleDetailExists(insuranceVehicleDetail.Id))
                     {
                         return NotFound();
                     }
@@ -126,10 +112,8 @@ namespace Project_Sem3.Areas.Admin.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["CreatedBy"] = new SelectList(_context.Users, "Id", "CitizenIdentificationCard", insuranceDetails.CreatedBy);
-            ViewData["DeleteBy"] = new SelectList(_context.Users, "Id", "CitizenIdentificationCard", insuranceDetails.DeleteBy);
-            ViewData["UpdatedBy"] = new SelectList(_context.Users, "Id", "CitizenIdentificationCard", insuranceDetails.UpdatedBy);
-            return View(insuranceDetails);
+            ViewData["PlanId"] = new SelectList(_context.InsurancePlans, "Id", "Name", insuranceVehicleDetail.PlanId);
+            return View(insuranceVehicleDetail);
         }
 
         // GET: Admin/InsuranceVehicleDetail/Delete/5
@@ -140,17 +124,14 @@ namespace Project_Sem3.Areas.Admin.Controllers
                 return NotFound();
             }
 
-            var insuranceDetails = await _context.InsuranceDetails
-                .Include(i => i.Creator)
-                .Include(i => i.Deleter)
-                .Include(i => i.Updater)
+            var insuranceVehicleDetail = await _context.InsuranceVehicleDetails
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (insuranceDetails == null)
+            if (insuranceVehicleDetail == null)
             {
                 return NotFound();
             }
 
-            return View(insuranceDetails);
+            return View(insuranceVehicleDetail);
         }
 
         // POST: Admin/InsuranceVehicleDetail/Delete/5
@@ -158,19 +139,19 @@ namespace Project_Sem3.Areas.Admin.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var insuranceDetails = await _context.InsuranceDetails.FindAsync(id);
-            if (insuranceDetails != null)
+            var insuranceVehicleDetail = await _context.InsuranceVehicleDetails.FindAsync(id);
+            if (insuranceVehicleDetail != null)
             {
-                _context.InsuranceDetails.Remove(insuranceDetails);
+                _context.InsuranceVehicleDetails.Remove(insuranceVehicleDetail);
             }
 
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
-        private bool InsuranceDetailsExists(int id)
+        private bool InsuranceVehicleDetailExists(int id)
         {
-            return _context.InsuranceDetails.Any(e => e.Id == id);
+            return _context.InsuranceVehicleDetails.Any(e => e.Id == id);
         }
     }
 }

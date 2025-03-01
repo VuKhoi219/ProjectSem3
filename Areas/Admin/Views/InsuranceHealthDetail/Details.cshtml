@@ -1,0 +1,79 @@
+@model Project_Sem3.Models.InsuranceHealthDetail
+
+@{
+ViewData["Title"] = "Details";
+}
+
+<h1>Details</h1>
+
+<div>
+  <h4>Insurance Health Detail</h4>
+  <hr />
+  <dl class="row">
+    <dt class="col-sm-2">
+      @Html.DisplayNameFor(model => model.AgeGroup)
+    </dt>
+    <dd class="col-sm-10">
+      @Html.DisplayFor(model => model.AgeGroup)
+    </dd>
+    <dt class="col-sm-2">
+      @Html.DisplayNameFor(model => model.HospitalNetwork)
+    </dt>
+    <dd class="col-sm-10">
+      @Html.DisplayFor(model => model.HospitalNetwork)
+    </dd>
+    <dt class="col-sm-2">
+      @Html.DisplayNameFor(model => model.PreExistingConditions)
+    </dt>
+    <dd class="col-sm-10">
+      @Html.DisplayFor(model => model.PreExistingConditions)
+    </dd>
+    <dt class="col-sm-2">
+      @Html.DisplayNameFor(model => model.Duration)
+    </dt>
+    <dd class="col-sm-10">
+      @Html.DisplayFor(model => model.Duration)
+    </dd>
+    <dt class="col-sm-2">
+      @Html.DisplayNameFor(model => model.RiskFactor)
+    </dt>
+    <dd class="col-sm-10">
+      @Html.DisplayFor(model => model.RiskFactor)
+    </dd>
+    <dt class="col-sm-2">
+      @Html.DisplayNameFor(model => model.Region)
+    </dt>
+    <dd class="col-sm-10">
+      @Html.DisplayFor(model => model.Region)
+    </dd>
+    <dt class="col-sm-2">
+      @Html.DisplayNameFor(model => model.PlanId)
+    </dt>
+    <dd class="col-sm-10">
+      @Html.DisplayFor(model => model.PlanId)
+      @* Nếu có navigation property InsurancePlan, thay bằng: @Html.DisplayFor(model => model.InsurancePlan.Name) *@
+    </dd>
+    <dt class="col-sm-2">
+      @Html.DisplayNameFor(model => model.AnnualPaymentAmount)
+    </dt>
+    <dd class="col-sm-10">
+      @Html.DisplayFor(model => model.AnnualPaymentAmount)
+    </dd>
+    <dt class="col-sm-2">
+      @Html.DisplayNameFor(model => model.Premium)
+    </dt>
+    <dd class="col-sm-10">
+      @Html.DisplayFor(model => model.Premium)
+    </dd>
+    <dt class="col-sm-2">
+      @Html.DisplayNameFor(model => model.Deductible)
+    </dt>
+    <dd class="col-sm-10">
+      @Html.DisplayFor(model => model.Deductible)
+    </dd>
+  </dl>
+</div>
+<div>
+  <a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a> |
+  <a asp-action="Index">Back to List</a>
+</div>

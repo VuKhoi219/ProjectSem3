@@ -1,4 +1,4 @@
-@model Project_Sem3.Models.InsuranceVehicleDetail
+@model Project_Sem3.Models.InsuranceLifeDetail
 
 @{
 ViewData["Title"] = "Edit";
@@ -10,7 +10,7 @@ ViewData["Title"] = "Edit";
 <link rel="stylesheet" href="~/vendor/libs/flatpickr/flatpickr.css" />
 <link rel="stylesheet" href="~/vendor/libs/typeahead-js/typeahead.css" />
 <link rel="stylesheet" href="~/vendor/libs/tagify/tagify.css" />
-<link rel="stylesheet" href="~/vendor/libs/rm-validation/form-validation.css" />
+<link rel="stylesheet" href="~/vendor/libs/form-validation/form-validation.css" />
 }
 
 @section VendorScripts {
@@ -32,30 +32,29 @@ ViewData["Title"] = "Edit";
 <h1>Edit</h1>
 
 <div class="row">
-  <!-- FormValidation -->
   <div class="col-12">
     <div class="card">
       <div class="card-body">
-        <form id="editInsuranceVehicleDetailForm" class="row g-6" method="post" asp-action="Edit">
+        <form id="editInsuranceLifeDetailForm" class="row g-6" method="post" asp-action="Edit">
           <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-          <input type="hidden" asp-for="Id" id="insuranceVehicleDetailId" />
+          <input type="hidden" asp-for="Id" id="insuranceLifeDetailId" />
 
           <div class="form-group">
-            <label asp-for="VehicleType" class="control-label"></label>
-            <input asp-for="VehicleType" class="form-control" id="vehicleType" />
-            <span asp-validation-for="VehicleType" class="text-danger"></span>
+            <label asp-for="TermYears" class="control-label"></label>
+            <input asp-for="TermYears" class="form-control" id="termYears" type="number" />
+            <span asp-validation-for="TermYears" class="text-danger"></span>
           </div>
 
           <div class="form-group">
-            <label asp-for="VehicleModel" class="control-label"></label>
-            <input asp-for="VehicleModel" class="form-control" id="vehicleModel" />
-            <span asp-validation-for="VehicleModel" class="text-danger"></span>
+            <label asp-for="AgeGroup" class="control-label"></label>
+            <input asp-for="AgeGroup" class="form-control" id="ageGroup" />
+            <span asp-validation-for="AgeGroup" class="text-danger"></span>
           </div>
 
           <div class="form-group">
-            <label asp-for="VehicleYear" class="control-label"></label>
-            <input asp-for="VehicleYear" class="form-control" id="vehicleYear" type="number" />
-            <span asp-validation-for="VehicleYear" class="text-danger"></span>
+            <label asp-for="Beneficiaries" class="control-label"></label>
+            <input asp-for="Beneficiaries" class="form-control" id="beneficiaries" />
+            <span asp-validation-for="Beneficiaries" class="text-danger"></span>
           </div>
 
           <div class="form-group">
@@ -102,8 +101,8 @@ ViewData["Title"] = "Edit";
 
           <div class="col-12">
             <div class="form-check">
-              <input type="checkbox" class="form-check-input" id="insuranceVehicleDetailTerms" name="insuranceVehicleDetailTerms" />
-              <label class="form-check-label" for="insuranceVehicleDetailTerms"> Agree to our terms and conditions</label>
+              <input type="checkbox" class="form-check-input" id="insuranceLifeDetailTerms" name="insuranceLifeDetailTerms" />
+              <label class="form-check-label" for="insuranceLifeDetailTerms"> Agree to our terms and conditions</label>
             </div>
           </div>
 
@@ -114,7 +113,6 @@ ViewData["Title"] = "Edit";
       </div>
     </div>
   </div>
-  <!-- /FormValidation -->
 </div>
 <div>
   <a asp-action="Index">Back to List</a>
@@ -125,22 +123,19 @@ ViewData["Title"] = "Edit";
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 <script>
   $(document).ready(function () {
-    // Initialize Select2 for PlanId dropdown
     $('#planId').select2({
       placeholder: "Select an Insurance Plan",
       allowClear: true
     });
 
-    // When the form is submitted
-    $('#editInsuranceVehicleDetailForm').on('submit', function (e) {
-      e.preventDefault(); // Prevent default form submission
+    $('#editInsuranceLifeDetailForm').on('submit', function (e) {
+      e.preventDefault();
 
-      // Get form data
-      const insuranceVehicleDetailData = {
-        id: $('#insuranceVehicleDetailId').val(),
-        vehicleType: $('#vehicleType').val(),
-        vehicleModel: $('#vehicleModel').val(),
-        vehicleYear: $('#vehicleYear').val(),
+      const insuranceLifeDetailData = {
+        id: $('#insuranceLifeDetailId').val(),
+        termYears: $('#termYears').val(),
+        ageGroup: $('#ageGroup').val(),
+        beneficiaries: $('#beneficiaries').val(),
         duration: $('#duration').val(),
         riskFactor: $('#riskFactor').val(),
         region: $('#region').val(),
@@ -148,27 +143,25 @@ ViewData["Title"] = "Edit";
         annualPaymentAmount: $('#annualPaymentAmount').val(),
         premium: $('#premium').val(),
         deductible: $('#deductible').val(),
-        termsAgreed: $('#insuranceVehicleDetailTerms').prop('checked')
+        termsAgreed: $('#insuranceLifeDetailTerms').prop('checked')
       };
 
-      // Check if terms are agreed
-      if (!insuranceVehicleDetailData.termsAgreed) {
+      if (!insuranceLifeDetailData.termsAgreed) {
         alert("You must agree to the terms and conditions.");
         return;
       }
 
-      // Send AJAX request to update Insurance Vehicle Detail
       $.ajax({
-        url: '/Admin/InsuranceVehicleDetail/Edit/' + insuranceVehicleDetailData.id, // Update URL to match controller
-        method: 'POST', // Use POST since the controller uses POST for Edit
+        url: '/Admin/InsuranceLifeDetail/Edit/' + insuranceLifeDetailData.id,
+        method: 'POST',
         contentType: 'application/json',
-        data: JSON.stringify(insuranceVehicleDetailData),
+        data: JSON.stringify(insuranceLifeDetailData),
         success: function (response) {
-          alert("Insurance Vehicle Detail updated successfully!");
-          window.location.href = '/Admin/InsuranceVehicleDetail/Index'; // Redirect to Index
+          alert("Insurance Life Detail updated successfully!");
+          window.location.href = '/Admin/InsuranceLifeDetail/Index';
         },
         error: function (xhr, status, error) {
-          alert("Error updating Insurance Vehicle Detail: " + error);
+          alert("Error updating Insurance Life Detail: " + error);
         }
       });
     });

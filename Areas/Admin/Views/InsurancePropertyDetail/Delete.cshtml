@@ -1,0 +1,108 @@
+@model Project_Sem3.Models.InsurancePropertyDetail
+
+@{
+    ViewData["Title"] = "Delete";
+}
+
+<h1>Delete</h1>
+
+<h3>Are you sure you want to delete this?</h3>
+<div>
+    <h4>Insurance Property Detail</h4>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.PropertyType)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.PropertyType)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Location)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Location)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Duration)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Duration)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.RiskFactor)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.RiskFactor)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Region)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Region)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.PlanId)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.PlanId)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.AnnualPaymentAmount)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.AnnualPaymentAmount)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Premium)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Premium)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Deductible)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Deductible)
+        </dd>
+    </dl>
+
+    <form asp-action="Delete" id="deleteForm">
+        <input type="hidden" asp-for="Id" />
+        <input type="submit" value="Delete" class="btn btn-danger deleteInsurancePropertyDetailButton" data-insurance-property-detail-id="@Model.Id" /> |
+        <a asp-action="Index">Back to List</a>
+    </form>
+</div>
+
+@section Scripts {
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('.deleteInsurancePropertyDetailButton').on('click', function (e) {
+                e.preventDefault();
+
+                const insurancePropertyDetailId = $(this).data('insurance-property-detail-id');
+
+                if (!confirm('Are you sure you want to delete this insurance property detail?')) {
+                    return;
+                }
+
+                const token = $('input[name="__RequestVerificationToken"]').val();
+
+                $.ajax({
+                    url: '/Admin/InsurancePropertyDetail/Delete/' + insurancePropertyDetailId,
+                    method: 'POST',
+                    data: { __RequestVerificationToken: token },
+                    success: function (response) {
+                        alert("Insurance Property Detail deleted successfully!");
+                        window.location.href = '/Admin/InsurancePropertyDetail/Index';
+                    },
+                    error: function (xhr, status, error) {
+                        alert("Error deleting Insurance Property Detail: " + error);
+                    }
+                });
+            });
+        });
+    </script>
+}
