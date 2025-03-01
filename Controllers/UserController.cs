@@ -156,25 +156,24 @@ public class UserController : ControllerBase
     [HttpPost("signin")]
     public async Task<IActionResult> SignIn([FromBody] UserLoginDto request)
     {
-        var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == request.Email);
-        if (user == null || !BCrypt.Net.BCrypt.Verify(request.Password, user.Password))
-            return Unauthorized(new { message = "Email hoặc mật khẩu không đúng!" });
+      var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == request.Email);
 
-        var userDto = new UserDto
-        {
-            Id = user.Id,
-            FullName = user.FullName,
-            Email = user.Email,
-            Phone = user.Phone,
-            Gender = user.Gender,
-            CitizenIdentificationCard = user.CitizenIdentificationCard,
-            DateOfBirth = user.DateOfBirth,
-            Status = user.Status,
-            RoleId = user.RoleId
-        };
+      if (user == null || !BCrypt.Net.BCrypt.Verify(request.Password, user.Password))
+        return Unauthorized(new { message = "Email hoặc mật khẩu không đúng!" });
 
-        return Ok(new { message = "Đăng nhập thành công!", user = userDto });
+      // ✅ Lưu userId vào Session
+      HttpContext.Session.SetInt32("UserId", user.Id);
+
+      return Ok(new
+      {
+        message = "Đăng nhập thành công!",
+        userId = user.Id,
+        fullName = user.FullName,
+        email = user.Email,
+        roleId = user.RoleId
+      });
     }
+
 
     // ✅ 7. DTOs (Định nghĩa trong cùng file)
     public class UserDto

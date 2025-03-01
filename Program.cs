@@ -36,6 +36,13 @@ builder.Services.AddScoped<CalculateInsuranceServices>();
 builder.Services.AddScoped<LoanPaymentServices>();
 builder.Services.AddScoped<CalculatePenaltyPercentage>();
 builder.Services.AddScoped<CalculateCheckIfOverdue>();
+builder.Services.AddDistributedMemoryCache();
+builder.Services.AddSession(options =>
+{
+  options.IdleTimeout = TimeSpan.FromMinutes(30); // Thời gian hết hạn session (30 phút)
+  options.Cookie.HttpOnly = true;
+  options.Cookie.IsEssential = true;
+});
 
 var app = builder.Build();
 
@@ -59,6 +66,7 @@ if (args.Contains("--seed"))
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 
+app.UseSession();
 app.UseRouting();
 
 app.UseAuthorization();
