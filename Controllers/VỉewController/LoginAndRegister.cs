@@ -3,14 +3,15 @@ using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 namespace Project_Sem3.Controllers.VỉewController;
 
-public class InsuranceContract : BaseController
+public class LoginAndRegister : BaseController
 {
-  public IActionResult Index()
+  public IActionResult Login()
   {
     return View();
   }
-  public IActionResult Detail(int id)
+
+  public IActionResult Register()
   {
-    return View(id);
+    return View();
   }
 }

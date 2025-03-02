@@ -27,9 +27,7 @@ public class InsuranceContract
 
     [Required]
     public DateTime EndDate { get; set; }
-
-    [Required]
-    public ContractStatus Status { get; set; }
+    public ContractStatus? Status { get; set; }
 
     public DateTime? CreatedAt { get; set; }
 
@@ -42,14 +40,14 @@ public class InsuranceContract
     public int? DeleteBy { get; set; }
 
     // Navigation Properties
-    public virtual User User { get; set; }
-    public virtual User Creator { get; set; }
-    public virtual User Updater { get; set; }
-    public virtual User Deleter { get; set; }
-    public virtual InsurancePlan Plan { get; set; }
+    public virtual User? User { get; set; }
+    public virtual User? Creator { get; set; }
+    public virtual User? Updater { get; set; }
+    public virtual User? Deleter { get; set; }
+    public virtual InsurancePlan? Plan { get; set; }
 
     // Relationship
-    public virtual ICollection<Payment> Payments { get; set; }
+    public virtual ICollection<Payment>? Payments { get; set; }
 }
 public enum ContractStatus
 {
