@@ -5,6 +5,7 @@ public class NavbarViewModel
   public string CurrentController { get; set; }
   public string CurrentAction { get; set; }
   public List<NavItem> Items { get; set; } = new List<NavItem>();
+  public bool IsLoggedIn { get; set; }
 }
 
 public class NavItem

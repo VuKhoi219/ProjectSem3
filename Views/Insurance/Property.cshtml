@@ -28,6 +28,8 @@
   <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/owl.carousel.min.js"></script>
   <script>
+    const currentUserId = @ViewData["UserId"] ?? null;
+
     $(document).ready(function () {
       loadInsurancePlans();
     });
@@ -90,14 +92,17 @@
     }
 
     function selectPlan(planId, planName, coverageAmount) {
-      localStorage.setItem("selectedPlan", JSON.stringify({
-        id: planId,
-        name: planName,
-        coverageAmount: coverageAmount
-      }));
-      window.location.href = "/request/property"; // Chuyển hướng đến trang yêu cầu Property Insurance
+      if(!currentUserId){
+        alert("Please log in to use the service")
+      }
+      else {
+        localStorage.setItem("selectedPlan", JSON.stringify({
+          id: planId,
+          name: planName,
+          coverageAmount: coverageAmount
+        }));
+        window.location.href = "/request/property";
+      }
     }
-
-    // Placeholder functions
   </script>
 }

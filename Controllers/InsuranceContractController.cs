@@ -162,13 +162,11 @@ public async Task<IActionResult> GetInsuranceContractsByUserId(int userId, [From
             {
                 return BadRequest(new { Message = "Invalid insurance contract data" });
             }
-
             contract.CreatedAt = DateTime.UtcNow;
+            contract.CreatedBy = contract.UserId;
             contract.Status = ContractStatus.Pending; // Mặc định là Pending
-
             _context.InsuranceContracts.Add(contract);
             await _context.SaveChangesAsync();
-
             return Ok(true);
         }
         catch (Exception e)

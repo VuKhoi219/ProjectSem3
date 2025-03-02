@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Project_Sem3.Controllers.VỉewController;
 
-public class RequestController : Controller
+public class RequestController : BaseController
 {
   public IActionResult Life()
   {

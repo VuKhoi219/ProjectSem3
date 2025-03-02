@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 namespace Project_Sem3.Controllers.VỉewController;
 
-public class InsuranceController : Controller
+public class InsuranceController : BaseController
 {
   public IActionResult Life()
   {

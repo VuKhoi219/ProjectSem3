@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Linq.Dynamic.Core;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using BCrypt.Net;
@@ -20,20 +21,20 @@ public class UserController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetAllUsers()
     {
-        var users = await _context.Users
-            .Select(user => new UserDto
-            {
-                Id = user.Id,
-                FullName = user.FullName,
-                Email = user.Email,
-                Phone = user.Phone,
-                Gender = user.Gender,
-                CitizenIdentificationCard = user.CitizenIdentificationCard,
-                DateOfBirth = user.DateOfBirth,
-                Status = user.Status,
-                RoleId = user.RoleId
-            })
-            .ToListAsync();
+      var users = await _context.Users
+        .Select(user => new
+        {
+          Id = user.Id,
+          FullName = user.FullName,
+          Email = user.Email,
+          Phone = user.Phone,
+          Gender = user.Gender,
+          CitizenIdentificationCard = user.CitizenIdentificationCard,
+          DateOfBirth = user.DateOfBirth,
+          Status = user.Status,
+          RoleId = user.RoleId
+        })
+        .ToListAsync();
 
         return Ok(users);
     }
@@ -42,32 +43,36 @@ public class UserController : ControllerBase
     [HttpGet("{id}")]
     public async Task<IActionResult> GetUserById(int id)
     {
-        var user = await _context.Users.FindAsync(id);
+        var user = await _context.Users.Where(u => u.Id == id).Select(user => new
+        {
+          Id = user.Id,
+          FullName = user.FullName,
+          Email = user.Email,
+          Phone = user.Phone,
+          Gender = user.Gender,
+          CitizenIdentificationCard = user.CitizenIdentificationCard,
+          DateOfBirth = user.DateOfBirth,
+          Status = user.Status,
+          RoleId = user.RoleId
+        }).FirstOrDefaultAsync();
         if (user == null)
             return NotFound(new { message = "Người dùng không tồn tại." });
-
-        var userDto = new UserDto
-        {
-            Id = user.Id,
-            FullName = user.FullName,
-            Email = user.Email,
-            Phone = user.Phone,
-            Gender = user.Gender,
-            CitizenIdentificationCard = user.CitizenIdentificationCard,
-            DateOfBirth = user.DateOfBirth,
-            Status = user.Status,
-            RoleId = user.RoleId
-        };
-
-        return Ok(userDto);
+        return Ok(user);
     }
 
     // ✅ 3. Thêm người dùng mới (Sign Up)
     [HttpPost]
-    public async Task<IActionResult> CreateUser([FromBody] UserCreateDto request)
+    public async Task<IActionResult> CreateUser([FromBody] User request)
     {
-        if (await _context.Users.AnyAsync(u => u.Email == request.Email))
-            return BadRequest(new { message = "Email đã tồn tại!" });
+// Kiểm tra trùng lặp và thông báo cụ thể
+      if (await _context.Users.AnyAsync(u => u.Email == request.Email))
+        return BadRequest(new { message = "Email đã tồn tại!" });
+
+      if (!string.IsNullOrWhiteSpace(request.Phone) && await _context.Users.AnyAsync(u => u.Phone == request.Phone))
+        return BadRequest(new { message = "Số điện thoại đã tồn tại!" });
+
+      if (!string.IsNullOrWhiteSpace(request.CitizenIdentificationCard) && await _context.Users.AnyAsync(u => u.CitizenIdentificationCard == request.CitizenIdentificationCard))
+        return BadRequest(new { message = "CCCD/CMND đã tồn tại!" });
 
         var user = new User
         {
@@ -78,33 +83,18 @@ public class UserController : ControllerBase
             Gender = request.Gender,
             CitizenIdentificationCard = request.CitizenIdentificationCard,
             DateOfBirth = request.DateOfBirth,
-            Status = request.Status,
-            RoleId = request.RoleId,
+            Status = Status.Active, // Mặc định Active
+            RoleId = request.RoleId ?? 2, // Sửa lỗi ở đây
             CreatedAt = DateTime.UtcNow
         };
-
         _context.Users.Add(user);
         await _context.SaveChangesAsync();
-
-        var userDto = new UserDto
-        {
-            Id = user.Id,
-            FullName = user.FullName,
-            Email = user.Email,
-            Phone = user.Phone,
-            Gender = user.Gender,
-            CitizenIdentificationCard = user.CitizenIdentificationCard,
-            DateOfBirth = user.DateOfBirth,
-            Status = user.Status,
-            RoleId = user.RoleId
-        };
-
-        return CreatedAtAction(nameof(GetUserById), new { id = user.Id }, new { message = "Người dùng đã được tạo!", user = userDto });
+        return CreatedAtAction(nameof(GetUserById), new { id = user.Id }, new { message = "Người dùng đã được tạo!", user = user });
     }
 
     // ✅ 4. Cập nhật thông tin người dùng
     [HttpPut("{id}")]
-    public async Task<IActionResult> UpdateUser(int id, [FromBody] UserUpdateDto request)
+    public async Task<IActionResult> UpdateUser(int id, [FromBody] User request)
     {
         var user = await _context.Users.FindAsync(id);
         if (user == null)
@@ -122,7 +112,7 @@ public class UserController : ControllerBase
 
         await _context.SaveChangesAsync();
 
-        var userDto = new UserDto
+        var userDto = new User
         {
             Id = user.Id,
             FullName = user.FullName,
@@ -152,16 +142,21 @@ public class UserController : ControllerBase
         return Ok(new { message = "Người dùng đã được xóa!" });
     }
 
-    // ✅ 6. API Đăng nhập (Sign In)
     [HttpPost("signin")]
     public async Task<IActionResult> SignIn([FromBody] UserLoginDto request)
     {
+      Console.WriteLine($"Content-Type: {Request.ContentType}");
+      Console.WriteLine($"Body: {await new StreamReader(Request.Body).ReadToEndAsync()}");
+      if (request == null)
+        return BadRequest(new { message = "Dữ liệu đầu vào không hợp lệ!" });
+
+      Console.WriteLine($"Request received: Email={request.Email}, Password={request.Password}");
+
       var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == request.Email);
 
       if (user == null || !BCrypt.Net.BCrypt.Verify(request.Password, user.Password))
         return Unauthorized(new { message = "Email hoặc mật khẩu không đúng!" });
 
-      // ✅ Lưu userId vào Session
       HttpContext.Session.SetInt32("UserId", user.Id);
 
       return Ok(new
@@ -173,52 +168,6 @@ public class UserController : ControllerBase
         roleId = user.RoleId
       });
     }
-
-
-    // ✅ 7. DTOs (Định nghĩa trong cùng file)
-    public class UserDto
-    {
-        public int Id { get; set; }
-        public string FullName { get; set; }
-        public string Email { get; set; }
-        public string Phone { get; set; }
-        public Gender Gender { get; set; }
-        public string CitizenIdentificationCard { get; set; }
-        public DateTime DateOfBirth { get; set; }
-        public Status Status { get; set; }
-        public int RoleId { get; set; }
-    }
-
-    public class UserCreateDto
-    {
-        public string FullName { get; set; }
-
-        [EmailAddress]
-        public string Email { get; set; }
-
-        [MinLength(6)]
-        public string Password { get; set; }
-
-        public string Phone { get; set; }
-        public Gender Gender { get; set; }
-        public string CitizenIdentificationCard { get; set; }
-        public DateTime DateOfBirth { get; set; }
-        public Status Status { get; set; }
-        public int RoleId { get; set; }
-    }
-
-    public class UserUpdateDto
-    {
-        public string FullName { get; set; }
-        public string Email { get; set; }
-        public string Phone { get; set; }
-        public Gender Gender { get; set; }
-        public string CitizenIdentificationCard { get; set; }
-        public DateTime DateOfBirth { get; set; }
-        public Status Status { get; set; }
-        public int RoleId { get; set; }
-    }
-
     public class UserLoginDto
     {
         [EmailAddress]

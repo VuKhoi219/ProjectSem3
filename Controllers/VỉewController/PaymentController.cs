@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Project_Sem3.Controllers.VỉewController;
 
-public class PaymentController : Controller
+public class PaymentController : BaseController
 {
   public IActionResult Index()
   {

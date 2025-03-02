@@ -34,28 +34,27 @@ public class User
     [Required]
     public DateTime DateOfBirth { get; set; }
 
-    public Status Status { get; set; }
+    public Status? Status { get; set; }
 
     public DateTime? CreatedAt { get; set; }
 
     public DateTime? UpdatedAt { get; set; }
 
     public DateTime? DeleteAt { get; set; }
-    [Required]
-    public int RoleId { get; set; }
+    public int? RoleId { get; set; }
 
     // Navigation properties
-    public Role Role { get; set; }
+    public Role? Role { get; set; }
 
     // Relationships
-    public virtual ICollection<Role> Roles { get; set; }
-    public virtual ICollection<InsuranceContract> InsuranceContracts { get; set; }
-    public virtual ICollection<InsurancePlan> CreatedInsurancePlans { get; set; }
-    public virtual ICollection<InsurancePlan> UpdatedInsurancePlans { get; set; }
-    public virtual ICollection<InsurancePlan> DeletedInsurancePlans { get; set; }
-    public virtual ICollection<Payment> Payments { get; set; }
-    public virtual ICollection<Notification> Notifications { get; set; }
-    public virtual ICollection<BorrowCapital> BorrowCapitals { get; set; }
+    public virtual ICollection<Role>? Roles { get; set; }
+    public virtual ICollection<InsuranceContract>? InsuranceContracts { get; set; }
+    public virtual ICollection<InsurancePlan>? CreatedInsurancePlans { get; set; }
+    public virtual ICollection<InsurancePlan>? UpdatedInsurancePlans { get; set; }
+    public virtual ICollection<InsurancePlan>? DeletedInsurancePlans { get; set; }
+    public virtual ICollection<Payment>? Payments { get; set; }
+    public virtual ICollection<Notification>? Notifications { get; set; }
+    public virtual ICollection<BorrowCapital>? BorrowCapitals { get; set; }
 }
 
 public enum Gender

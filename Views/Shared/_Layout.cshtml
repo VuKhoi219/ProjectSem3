@@ -1,6 +1,7 @@
 ﻿@using Microsoft.AspNetCore.Mvc
 @using Microsoft.AspNetCore.Mvc.Rendering
 @using Microsoft.AspNetCore.Mvc.TagHelpers
+@using Project_Sem3.Models.ViewModel
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -34,8 +35,7 @@
 </div>
 <header>
   @Html.Partial("_Header")
-  @Html.Partial("_Navbar")
-</header>
+  @await Html.PartialAsync("_Navbar", (NavbarViewModel)ViewData["NavbarModel"])</header>
 <div >
   <main role="main" class="pb-3">
     @RenderBody()

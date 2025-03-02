@@ -1,12 +1,12 @@
 using Microsoft.AspNetCore.Mvc;
+using Project_Sem3.Controllers.VỉewController;
 using Project_Sem3.Models.ViewModel;
 
-public class HomeController : Controller
+public class HomeController : BaseController
 {
     public IActionResult Index()
     {
-        return View();
-    }
+      return View();    }
 
     public IActionResult AboutUs()
     {
