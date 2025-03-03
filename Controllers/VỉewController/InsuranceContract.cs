@@ -9,8 +9,8 @@ public class InsuranceContract : BaseController
   {
     return View();
   }
-  public IActionResult Detail(int id)
+  public IActionResult Detail()
   {
-    return View(id);
+    return View();
   }
 }

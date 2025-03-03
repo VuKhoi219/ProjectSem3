@@ -1,107 +1,142 @@
 @{
-    ViewData["Title"] = "Create Payment";
+ViewData["Title"] = "Create Payment";
 }
 
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@ViewData["Title"]</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <link rel="stylesheet" href="~/css/Project_Sem3.styles.css" />
-    <style>
-        body {
-            background-color: #f4f7f6;
-        }
-        .container {
-            margin-top: 50px;
-        }
-        .form-group label {
-            font-weight: bold;
-        }
-        .alert {
-            display: none;
-        }
-        .btn-custom {
-            background-color: #28a745;
-            color: white;
-        }
-        .btn-custom:hover {
-            background-color: #218838;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>@ViewData["Title"]</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <link rel="stylesheet" href="~/css/Project_Sem3.styles.css" />
+  <style>
+    body {
+      background-color: #f4f7f6;
+    }
+    .container {
+      margin-top: 50px;
+    }
+    .form-group label {
+      font-weight: bold;
+    }
+    .alert {
+      display: none;
+    }
+    .btn-custom {
+      background-color: #28a745;
+      color: white;
+    }
+    .btn-custom:hover {
+      background-color: #218838;
+    }
+    #loadingSpinner {
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <h2 class="text-center mb-4">Create Payment</h2>
+<div class="container">
+  <h2 class="text-center mb-4">Create Payment</h2>
 
-        <!-- Success and Error Alerts -->
-        <div id="successAlert" class="alert alert-success">
-            <strong>Success!</strong> Payment created successfully.
-        </div>
-        <div id="errorAlert" class="alert alert-danger">
-            <strong>Error!</strong> Something went wrong, please try again.
-        </div>
+  <!-- Success and Error Alerts -->
+  <div id="successAlert" class="alert alert-success">
+    <strong>Success!</strong> Payment created successfully.
+  </div>
+  <div id="errorAlert" class="alert alert-danger">
+    <strong>Error!</strong> Something went wrong, please try again.
+  </div>
 
-        <!-- Payment Form -->
-        <form id="paymentForm">
-            <div class="form-group">
-                <label for="userId">User ID</label>
-                <input type="number" class="form-control" id="userId" placeholder="Enter User ID" required>
-            </div>
-            <div class="form-group">
-                <label for="contractId">Contract ID</label>
-                <input type="number" class="form-control" id="contractId" placeholder="Enter Contract ID" required>
-            </div>
-            <div class="form-group">
-                <label for="amount">Amount</label>
-                <input type="number" class="form-control" id="amount" placeholder="Enter Amount" required>
-            </div>
-            <div class="form-group">
-                <label for="imageUrl">Image URL</label>
-                <input type="url" class="form-control" id="imageUrl" placeholder="Enter Image URL" required>
-            </div>
-            <button type="submit" class="btn btn-custom btn-block">Create Payment</button>
-        </form>
+  <!-- Loading Spinner -->
+  <div id="loadingSpinner" class="spinner-border text-success" role="status">
+    <span class="sr-only">Loading...</span>
+  </div>
+
+  <!-- Payment Form -->
+  <form id="paymentForm" enctype="multipart/form-data">
+    <div class="form-group">
+      <label for="contractId">Contract ID</label>
+      <input type="number" class="form-control" id="contractId" placeholder="Enter Contract ID" required>
     </div>
+    <div class="form-group">
+      <label for="amount">Amount</label>
+      <input type="number" class="form-control" id="amount" placeholder="Enter Amount" required>
+    </div>
+    <div class="form-group">
+      <label for="paymentImage">Payment Image</label>
+      <input type="file" class="form-control-file" id="paymentImage" accept=".jpg,.jpeg,.png,.pdf" required>
+    </div>
+    <button type="submit" class="btn btn-custom btn-block">Create Payment</button>
+  </form>
+</div>
 
-    @section Scripts {
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-        <script>
-            $(document).ready(function() {
-                $('#paymentForm').on('submit', function(e) {
-                    e.preventDefault(); // Ngừng form submit mặc định
+@section Scripts {
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script>
+  $(document).ready(function() {
+    $('#paymentForm').on('submit', function(e) {
+      e.preventDefault();
 
-                    // Lấy dữ liệu từ form
-                    const paymentData = {
-                        userId: $('#userId').val(),
-                        contractId: $('#contractId').val(),
-                        amount: $('#amount').val(),
-                        imageUrl: $('#imageUrl').val()
-                    };
-                  showLoading(); // Hiển thị spinner xoay
-                  // Gọi API để tạo Payment
-                    $.ajax({
-                        url: '/api/payments',
-                        method: 'POST',
-                        contentType: 'application/json',
-                        data: JSON.stringify(paymentData),
-                        success: function(response) {
-                          showSuccess(); // Chuyển spinner thành dấu tích xanh
-                          setTimeout(function() {
-                            window.location.href = "/Payment/Index";
-                          }, 2000); // Chờ 2 giây (2000ms) rồi chuyển hướng
-                        },
-                        error: function(xhr, status, error) {
-                          hideLoading(); // Ẩn spinner nếu lỗi
-                            $('#successAlert').hide();
-                        }
-                    });
-                });
-            });
-        </script>
-    }
+      // Hiển thị loading spinner
+      showLoading();
+
+      // Tạo FormData để upload file
+      const formData = new FormData();
+      formData.append('file', $('#paymentImage')[0].files[0]);
+
+      // Bước 1: Upload file trước
+      $.ajax({
+        url: '/api/upload',
+        method: 'POST',
+        data: formData,
+        processData: false,
+        contentType: false,
+        success: function(fileResponse) {
+          // Sau khi upload file thành công, lấy URL của file
+          const imageUrl = fileResponse.filePath;
+
+          // Bước 2: Tạo payment với URL vừa upload
+          const paymentData = {
+            userId: @ViewData["UserId"] ?? null,
+            contractId: $('#contractId').val(),
+            amount: $('#amount').val(),
+            imageUrl: imageUrl
+          };
+
+          $.ajax({
+            url: '/api/payments',
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify(paymentData),
+            success: function(paymentResponse) {
+              $('#successAlert').show();
+              $('#errorAlert').hide();
+              setTimeout(function() {
+                window.location.href = "/Payment/Index";
+              }, 2000);
+            },
+            error: function(xhr, status, error) {
+              hideLoading();
+              $('#successAlert').hide();
+              $('#errorAlert').show();
+            }
+          });
+        },
+        error: function(xhr, status, error) {
+          hideLoading();
+          $('#successAlert').hide();
+          $('#errorAlert').show();
+        }
+      });
+    });
+
+  });
+</script>
+}
 </body>
 </html>

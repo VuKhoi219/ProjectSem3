@@ -34,7 +34,7 @@ public class InsuranceHealthDetailController : ControllerBase
             _context.InsuranceHealthDetails.Add(detail);
             await _context.SaveChangesAsync();
 
-            return Ok(true);
+            return Ok(new { Success = true, DetailId = detail.Id });
         }
         catch (Exception e)
         {

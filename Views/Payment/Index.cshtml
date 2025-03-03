@@ -75,7 +75,7 @@ Layout = "~/Views/Shared/_Layout.cshtml";
 <script>
   function loadPayments(page = 1, pageSize = 10) {
     // Hiển thị loading spinner
-    let id = 1
+    let id = @ViewData["UserId"] ?? null;
 
     showLoading(); // Hiển thị spinner xoay
     $.ajax({
@@ -103,8 +103,6 @@ Layout = "~/Views/Shared/_Layout.cshtml";
                                     <td>${statusText}</td>
                                     <td>
                                         <button onclick="detailPayment(${payment.id || ''})"><i class='bx bx-paste'></i></button>
-                                        <button onclick="editPayment(${payment.id || ''})"><i class='bx bx-edit-alt'></i></button>
-                                        <button onclick="deletePayment(${payment.id || ''})"><i class='bx bxs-trash-alt'></i></button>
                                     </td>
                                 </tr>`;
         });

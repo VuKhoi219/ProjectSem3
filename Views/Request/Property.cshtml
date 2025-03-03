@@ -172,9 +172,12 @@ Layout = "~/Views/Shared/_Layout.cshtml";
     calculateInsurance();
     setupEventListeners();
   });
-
   function formatVND(number) {
     return number.toLocaleString("vi-VN", { style: "currency", currency: "VND" }).replace("₫", "").trim();
+  }
+  function parseVNDToNumber(vndString) {
+    // Loại bỏ tất cả dấu chấm và thay bằng "" để đảm bảo chỉ còn số nguyên
+    return parseFloat(vndString.replace(/\./g, ""));
   }
 
   function calculateEndDate() {
@@ -273,9 +276,9 @@ Layout = "~/Views/Shared/_Layout.cshtml";
     const materialIds = $('input[name="material"]:checked').map(function() { return parseInt(this.value); }).get();
     const detail = $("#detail").val() || "";
     const contractDuration = parseInt($("#contractDuration").val()) || 0;
-    const annualPaymentAmount = $("#annualPaymentAmount").val() ? parseFloat($("#annualPaymentAmount").val().replace(/,/g, '')) : 0;
-    const premium = $("#premium").val() ? parseFloat($("#premium").val().replace(/,/g, '')) : 0;
-    const deductible = $("#deductible").val() ? parseFloat($("#deductible").val().replace(/,/g, '')) : 0;
+    const annualPaymentAmount = $("#annualPaymentAmount").val() ? parseVNDToNumber($("#annualPaymentAmount").val()) : 0;
+    const premium = $("#premium").val() ? parseVNDToNumber($("#premium").val()) : 0;
+    const deductible = $("#deductible").val() ? parseVNDToNumber($("#deductible").val()) : 0;
     const riskFactor = $("#riskFactor").val() ? parseFloat($("#riskFactor").val()) : 0;
     const region = $("#region").val() || null;
 
@@ -343,6 +346,7 @@ Layout = "~/Views/Shared/_Layout.cshtml";
         detailId = response.detailId;
         console.log("detailId:", detailId);
         const dataContract = getContractValue(detailId);
+        alert("miss")
         saveContract(dataContract);
       },
       error: function (xhr) {
