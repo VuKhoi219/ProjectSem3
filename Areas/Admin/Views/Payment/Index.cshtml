@@ -1,98 +1,3 @@
-@* @model IEnumerable<Project_Sem3.Models.Payment> *@
-@* *@
-@* @{ *@
-@* ViewData["Title"] = "Index"; *@
-@* } *@
-@* *@
-@* @section VendorStyles { *@
-@*   <link rel="stylesheet" href="~/vendor/libs/datatables-bs5/datatables.bootstrap5.css"> *@
-@*   <link rel="stylesheet" href="~/vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.css"> *@
-@*   <link rel="stylesheet" href="~/vendor/libs/flatpickr/flatpickr.css" /> *@
-@* } *@
-@* *@
-@* @section VendorScripts { *@
-@*   <script src="~/vendor/libs/datatables-bs5/datatables-bootstrap5.js"></script> *@
-@*   <!-- Flat Picker --> *@
-@*   <script src="~/vendor/libs/moment/moment.js"></script> *@
-@*   <script src="~/vendor/libs/flatpickr/flatpickr.js"></script> *@
-@*   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script> *@
-@* } *@
-@* *@
-@* <!-- Advanced Search --> *@
-@* <div class="card"> *@
-@*   <h5 class="card-header d-flex justify-content-between">Payment List *@
-@*     <a href="@Url.Action("Create", "Payment")" class="float-right btn btn-primary ">Create New Payment</a></h5> *@
-@*   <div class="card-datatable table-responsive"> *@
-@*     <table id="dataTable" class="dt-advanced-search table border-top"> *@
-@*       <thead> *@
-@*       <tr> *@
-@*         <th><input type="checkbox" id="select-all" /></th> <!-- Checkbox for selecting all --> *@
-@*         <th>Id</th> *@
-@*         <th>User</th> *@
-@*         <th>Contract</th> *@
-@*         <th>Amount</th> *@
-@*         <th>Image Url</th> *@
-@*         <th>Status</th> *@
-@*         <th>Action</th> *@
-@*       </tr> *@
-@*       </thead> *@
-@*     </table> *@
-@*   </div> *@
-@* </div> *@
-@* <!-- /Advanced Search --> *@
-@* @section Scripts { *@
-@*   <script> *@
-@*   var dataTable = $('.dt-advanced-search'); *@
-@*   dataTable.DataTable({ *@
-@*     processing: true, *@
-@*     serverSide: true, *@
-@*     ajax: { *@
-@*       url: '/api/payments', // Update this to your API endpoint for payments *@
-@*       type: 'GET', *@
-@*       data: function (d) { *@
-@*         d.page = (d.start / d.length) + 1; *@
-@*         d.pageSize = d.length; *@
-@*         d.search = d.search.value; *@
-@*         d.orderColumn = d.columns[d.order[0].column].data; *@
-@*         d.orderDir = d.order[0].dir; *@
-@*         return d; *@
-@*       }, *@
-@*       success: function(response) { *@
-@*         let data = response.data; *@
-@*         if (!data || !Array.isArray(data)) { *@
-@*           $('#paymentTable').html('<div class="alert alert-warning">No data available</div>'); *@
-@*           return; *@
-@*         } *@
-@* *@
-@*         let html = '<table class="table table-striped table-hover">'; *@
-@*         html += '<thead class="thead-dark"><tr><th>ID</th><th>User ID</th><th>Amount</th><th>Actions</th></tr></thead><tbody>'; *@
-@* *@
-@*         data.forEach(payment => { *@
-@*           html += `<tr> *@
-@*                                 <td>${payment.id || 'N/A'}</td> *@
-@*                                 <td>${payment.userFullname || 'N/A'}</td> *@
-@*                                 <td>${(payment.contractId || 'N/A')}</td> *@
-@*                                 <td>${(payment.amount || 0).toLocaleString()}</td> *@
-@*                                 <td>${(payment.imageUrl || 0).toLocaleString()}</td> *@
-@*                                 <td>${(payment.status || 0).toLocaleString()}</td> *@
-@*                                 <td> *@
-@*                                     <button class="btn btn-warning btn-sm" onclick="editPayment(${payment.id})">Edit</button> *@
-@*                                     <button class="btn btn-danger btn-sm" onclick="deletePayment(${payment.id})">Delete</button> *@
-@*                                 </td> *@
-@*                             </tr>`; *@
-@*         }); *@
-@*         } *@
-@*     } *@
-@*   }); *@
-@* *@
-@*   $('#select-all').on('click', function () { *@
-@*     var rows = dataTable.rows({ 'search': 'applied' }).nodes(); // Get visible rows after search/filtering *@
-@*     $('input[type="checkbox"]', rows).prop('checked', this.checked); *@
-@*   }); *@
-@* </script> *@
-@* } *@
-@* *@
-
 @model IEnumerable<Project_Sem3.Models.Payment>
 
 @{
@@ -116,7 +21,7 @@ ViewData["Title"] = "Index";
 
 
 @section Scripts {
-<script>
+  <script>
   var dataTable = $('#dataTable').DataTable({
     processing: true,
     serverSide: true,
@@ -131,7 +36,7 @@ ViewData["Title"] = "Index";
         d.orderDir = d.order[0].dir;
         return d;
       },
-      dataSrc: 'data'
+      dataSrc: 'data',
     },
     columns: [
       { data: 'id' },
@@ -144,56 +49,25 @@ ViewData["Title"] = "Index";
         orderable: false,
         searchable: false,
         render: function (data, type, row) {
-          return '<button class="btn btn-sm btn-primary btn-edit" data-id="' + row.id + '">Sửa</button> ' +
-            '<button class="btn btn-sm btn-danger btn-delete" data-id="' + row.id + '">Xóa</button> ' +
-            '<button class="btn btn-sm btn-info btn-detail" data-id="' + row.id + '">Chi tiết</button>';
+          return '<button class="btn btn-sm btn-primary btn-edit" data-id="' + row.id + '">Edit</button> ' +
+            '<button class="btn btn-sm btn-danger btn-delete" data-id="' + row.id + '">Delete</button> ' +
+            '<button class="btn btn-sm btn-info btn-detail" data-id="' + row.id + '">View</button>';
         }
       }
-    ],
-    @*initComplete: function () {
-      // Checkbox select-all functionality
-      $('#select-all').on('click', function () {
-        var rows = dataTable.rows({'search': 'applied'}).nodes();
-        $('input[type="checkbox"]', rows).prop('checked', this.checked);
+    ]
+  });
+      dataTable.on('click', '.btn-edit', function () {
+        var paymentId = $(this).data('id');
+        window.location.href = '/Admin/Payment/Edit/' + paymentId;
       });
-    },*@
-});
-
-
-  function editPayment(paymentId) {
-    // Navigate to the edit page or handle the editing logic
-    window.location.href = '/Payment/Edit/' + paymentId;
-  }
-
-  function deletePayment(paymentId) {
-    // Perform the deletion via an API or show a confirmation
-    Swal.fire({
-      title: 'Are you sure?',
-      text: 'This action cannot be undone.',
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonText: 'Yes, delete it!',
-      cancelButtonText: 'No, keep it'
-    }).then((result) => {
-      if (result.isConfirmed) {
-        $.ajax({
-          url: '/api/payments/' + paymentId, // Adjust the API endpoint
-          type: 'DELETE',
-          success: function (response) {
-            if (response.success) {
-              Swal.fire('Deleted!', 'The payment has been deleted.', 'success');
-              dataTable.ajax.reload();  // Reload the DataTable after deletion
-            } else {
-              Swal.fire('Error!', 'Could not delete the payment. Please try again.', 'error');
-            }
-          },
-          error: function () {
-            Swal.fire('Error!', 'Something went wrong. Please try again.', 'error');
-          }
-        });
-      }
+    dataTable.on('click', '.btn-delete', function () {
+      var paymentId = $(this).data('id');
+      window.location.href = '/Admin/Payment/Delete/' + paymentId;
     });
-  }
+    dataTable.on('click', '.btn-detail', function () {
+      var paymentId = $(this).data('id');
+      window.location.href = '/Admin/Payment/Delete/' + paymentId;
+    });
 </script>
 }
 
@@ -205,7 +79,6 @@ ViewData["Title"] = "Index";
     <table id="dataTable" class="dt-advanced-search table border-top">
       <thead>
       <tr>
-        <th><input type="checkbox" id="select-all" /></th> <!-- Checkbox for selecting all -->
         <th>Id</th>
         <th>User</th>
         <th>Contract</th>

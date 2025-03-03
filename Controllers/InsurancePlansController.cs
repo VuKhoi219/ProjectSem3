@@ -1,3 +1,4 @@
+using System.Linq.Expressions;
 using Bogus.DataSets;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -17,51 +18,79 @@ public class InsurancePlansController : ControllerBase
 
     // 1. Lấy danh sách gói bảo hiểm với phân trang
     [HttpGet]
-    public async Task<IActionResult> GetAllPlans(int page = 1, int pageSize = 10)
+    public async Task<IActionResult> GetAllInsurancePlans(
+    [FromQuery] int page = 1,
+    [FromQuery] int pageSize = 10,
+    [FromQuery] string? search = null,
+    [FromQuery] string? orderColumn = null,
+    [FromQuery] string? orderDir = null)
+{
+    try
     {
-        if (page < 1 || pageSize < 1)
-            return BadRequest(new { Message = "Page and pageSize must be greater than 0" });
+        // Starting the query, including the related insurance contracts and details
+        var query = _context.InsurancePlans.AsQueryable();
 
-        try
+        // Handle search query (for Name, Description, Type, and Status)
+        if (!string.IsNullOrEmpty(search))
         {
-            var query = _context.InsurancePlans.Where(p => p.DeleteAt == null);
-            int totalRecords = await query.CountAsync();
-            if (totalRecords == 0)
-                return Ok(new { Message = "No insurance plans found", Data = new List<object>() });
+            query = query.Where(x =>
+                (x.Name != null && EF.Functions.Like(x.Name, $"%{search}%")) || // Search Name
+                (x.Description != null && EF.Functions.Like(x.Description, $"%{search}%")) || // Search Description
+                (x.Type.ToString() != null && EF.Functions.Like(x.Type.ToString(), $"%{search}%")) // Search Type
+            );
+        }
 
-            var plans = await query
-                .Include(p => p.InsuranceContracts)
-                .OrderBy(p => p.Id)
-                .Skip((page - 1) * pageSize)
-                .Take(pageSize)
-                .Select(p => new
-                {
-                    p.Id,
-                    p.Name,
-                    p.Description,
-                    p.Type,
-                    p.Status,
-                    p.CoverageAmount // Thêm trường này
-                })
-                .ToListAsync();
+        // Handle sorting by dynamic column and direction
+        if (!string.IsNullOrEmpty(orderColumn) && !string.IsNullOrEmpty(orderDir))
+        {
+            var parameter = Expression.Parameter(typeof(InsurancePlan), "x");
+            var property = Expression.Property(parameter, orderColumn);
+            var lambda = Expression.Lambda<Func<InsurancePlan, object>>(Expression.Convert(property, typeof(object)), parameter);
 
-            return Ok(new
+            if (orderDir.ToLower() == "asc")
             {
-                Data = plans,
-                Pagination = new
-                {
-                    TotalRecords = totalRecords,
-                    TotalPages = (int)Math.Ceiling((double)totalRecords / pageSize),
-                    CurrentPage = page,
-                    PageSize = pageSize
-                }
-            });
+                query = query.OrderBy(lambda);
+            }
+            else if (orderDir.ToLower() == "desc")
+            {
+                query = query.OrderByDescending(lambda);
+            }
         }
-        catch (Exception ex)
+
+        // Get the total count for pagination
+        var totalCount = await query.CountAsync();
+
+        // Paginate the results
+        var pagedInsurancePlans = await query.Skip((page - 1) * pageSize).Take(pageSize).ToListAsync();
+
+        // Return the response in the desired format
+        var result = new
         {
-            return StatusCode(500, new { Message = "Internal server error", Error = ex.Message });
-        }
+            data = pagedInsurancePlans.Select(ip => new
+            {
+                ip.Id,
+                ip.Name,
+                ip.Description,
+                Type = ip.Type.ToString(),
+                ip.CoverageAmount,
+                ip.UpdatedAt
+            }).ToArray(),
+            recordsTotal = await _context.InsurancePlans.CountAsync(),
+            recordsFiltered = totalCount,
+            page = page,
+            pageSize = pageSize
+        };
+
+        return Ok(result);
     }
+    catch (Exception e)
+    {
+        // Log the error (optional)
+        Console.WriteLine(e);
+        return StatusCode(500, new { Message = "An error occurred", Error = e.Message });
+    }
+}
+
 
     // 2. Lấy chi tiết gói bảo hiểm theo Id
     [HttpGet("{id}")]

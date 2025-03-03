@@ -1,53 +1,94 @@
 @model IEnumerable<Project_Sem3.Models.Notification>
 
 @{
-  ViewData["Title"] = "Index";
+ViewData["Title"] = "Notification List";
 }
 
 @section VendorStyles {
-  <!-- Add any vendor stylesheets you might still need -->
-  <link rel="stylesheet" href="~/vendor/libs/datatables-bs5/datatables.bootstrap5.css">
-  <link rel="stylesheet" href="~/vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.css">
+<link rel="stylesheet" href="~/vendor/libs/datatables-bs5/datatables.bootstrap5.css">
+<link rel="stylesheet" href="~/vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.css">
+<link rel="stylesheet" href="~/vendor/libs/flatpickr/flatpickr.css" />
 }
 
 @section VendorScripts {
-  <!-- Add any scripts you need for this page -->
-  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="~/vendor/libs/datatables-bs5/datatables-bootstrap5.js"></script>
+<!-- Flat Picker -->
+<script src="~/vendor/libs/moment/moment.js"></script>
+<script src="~/vendor/libs/flatpickr/flatpickr.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 }
 
-<p>
-  <a asp-action="Create">Create New</a>
-</p>
-<!-- Table to show users -->
-<div class="card">
-  <h5 class="card-header">Notification List</h5>
-  <div class="card-body">
-    <div class="table-responsive">
-      <table class="table table-striped table-bordered">
-        <thead>
-        <tr>
-          <th>Id</th>
-          <th>User</th>
-          <th>Message</th>
-          <th>Actions</th>
-        </tr>
-        </thead>
-        <tbody>
-        @foreach (var notification in Model)
-        {
-          <tr>
-            <td>@notification.Id</td>
-            <td>@notification.User.FullName</td>
-            <td>@notification.Message</td>
-            <td>
-              <a href="@Url.Action("Details", "Notification", new { id = notification.Id })" class="btn btn-info btn-sm">View</a>
-              <a href="@Url.Action("Edit", "Notification", new { id = notification.Id })" class="btn btn-primary btn-sm">Edit</a>
-              <a href="@Url.Action("Delete", "Notification", new { id = notification.Id })" class="btn btn-danger btn-sm">Delete</a>
-            </td>
-          </tr>
+@section Scripts {
+<script>
+  var dataTable = $('#dataTable').DataTable({
+    processing: true,
+    serverSide: true,
+    ajax: {
+      url: '/api/notifications',  // Adjust URL to the correct API endpoint for notifications
+      type: 'GET',
+      data: function (d) {
+        d.page = (d.start / d.length) + 1;
+        d.pageSize = d.length;
+        d.search = d.search.value;
+        d.orderColumn = d.columns[d.order[0].column].data;
+        d.orderDir = d.order[0].dir;
+        return d;
+      },
+      dataSrc: 'data',
+    },
+    columns: [
+      { data: 'id' },
+      { data: 'userName' },  // Full name of the user
+      { data: 'message' },
+      { data: 'isRead', render: function (data) {
+          return data ? 'Read' : 'Unread';  // Display "Read" or "Unread"
+        }},
+      {
+        data: null,
+        orderable: false,
+        searchable: false,
+        render: function (data, type, row) {
+          return '<button class="btn btn-sm btn-primary btn-edit" data-id="' + row.id + '">Edit</button> ' +
+            '<button class="btn btn-sm btn-danger btn-delete" data-id="' + row.id + '">Delete</button> ' +
+            '<button class="btn btn-sm btn-info btn-detail" data-id="' + row.id + '">View</button>';
         }
-        </tbody>
-      </table>
-    </div>
+      }
+    ]
+  });
+
+  dataTable.on('click', '.btn-edit', function () {
+    var notificationId = $(this).data('id');
+    window.location.href = '/Admin/Notification/Edit/' + notificationId;
+  });
+
+  dataTable.on('click', '.btn-delete', function () {
+    var notificationId = $(this).data('id');
+    window.location.href = '/Admin/Notification/Delete/' + notificationId;
+  });
+
+  dataTable.on('click', '.btn-detail', function () {
+    var notificationId = $(this).data('id');
+    window.location.href = '/Admin/Notification/Details/' + notificationId;  // Adjust to the view URL
+  });
+</script>
+}
+
+<!-- Advanced Search -->
+<div class="card">
+  <h5 class="card-header d-flex justify-content-between">Notification List
+    <a href="@Url.Action("Create", "Notification")" class="float-right btn btn-primary">Create New Notification</a></h5>
+  <div class="card-datatable table-responsive">
+    <table id="dataTable" class="dt-advanced-search table border-top">
+      <thead>
+      <tr>
+        <th>Id</th>
+        <th>User</th>
+        <th>Message</th>
+        <th>Status</th>
+        <th>Action</th>
+      </tr>
+      </thead>
+    </table>
   </div>
 </div>
+<!-- /Advanced Search -->

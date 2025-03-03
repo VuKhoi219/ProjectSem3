@@ -1,3 +1,4 @@
+using System.Linq.Expressions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Project_Sem3.Data; // Giả sử đây là namespace chứa DbContext
@@ -45,45 +46,76 @@ public class NotificationsController : ControllerBase
 
     // 2. Read - Lấy tất cả Notifications với phân trang, chỉ lấy record chưa xóa mềm
     [HttpGet]
-    public async Task<IActionResult> GetAllNotifications(int page, int pageSize)
+    public async Task<IActionResult> GetAllNotifications(
+    [FromQuery] int page = 1,
+    [FromQuery] int pageSize = 10,
+    [FromQuery] string? search = null,
+    [FromQuery] string? orderColumn = null,
+    [FromQuery] string? orderDir = null)
+{
+    try
     {
-        try
+        var query = _context.Notifications.Include(n => n.User).AsQueryable(); // Include User for the UserId reference
+
+        // Handle search query
+        if (!string.IsNullOrEmpty(search))
         {
-            var totalRecords = await _context.Notifications
-                .Where(n => n.DeleteAt == null)
-                .CountAsync();
-            var totalPages = (int)Math.Ceiling((double)totalRecords / pageSize);
+            query = query.Where(x =>
+                (x.Message != null && EF.Functions.Like(x.Message, $"%{search}%")) || // Search by Message
+                (x.User.FullName != null && EF.Functions.Like(x.User.FullName, $"%{search}%")) // Search by User FullName
+            );
+        }
 
-            var notifications = await _context.Notifications
-                .Where(n => n.DeleteAt == null) // Chỉ lấy những record chưa bị xóa mềm
-                .Select(n => new
-                {
-                    n.Id,
-                    n.UserId,
-                    n.Message,
-                    n.IsRead,
-                    CreatedAt = n.CreatedAt.HasValue ? n.CreatedAt.Value.ToString("yyyy-MM-dd HH:mm:ss") : null,
-                    UpdatedAt = n.UpdatedAt.HasValue ? n.UpdatedAt.Value.ToString("yyyy-MM-dd HH:mm:ss") : null
-                })
-                .OrderBy(n => n.Id)
-                .Skip((page - 1) * pageSize)
-                .Take(pageSize)
-                .ToListAsync();
+        // Handle sorting
+        if (!string.IsNullOrEmpty(orderColumn) && !string.IsNullOrEmpty(orderDir))
+        {
+            var parameter = Expression.Parameter(typeof(Notification), "x");
+            var property = Expression.Property(parameter, orderColumn);
+            var lambda = Expression.Lambda<Func<Notification, object>>(Expression.Convert(property, typeof(object)), parameter);
 
-            return Ok(new
+            if (orderDir.ToLower() == "asc")
             {
-                Data = notifications,
-                TotalRecords = totalRecords,
-                TotalPages = totalPages,
-                CurrentPage = page,
-                PageSize = pageSize
-            });
+                query = query.OrderBy(lambda);
+            }
+            else if (orderDir.ToLower() == "desc")
+            {
+                query = query.OrderByDescending(lambda);
+            }
         }
-        catch (Exception e)
+
+        // Get total count for pagination
+        var totalCount = await query.CountAsync();
+
+        // Paginate the results
+        var pagedNotifications = await query.Skip((page - 1) * pageSize).Take(pageSize).ToListAsync();
+
+        // Return the response in the desired format
+        var result = new
         {
-            return StatusCode(500, new { Message = "An error occurred", Error = e.Message });
-        }
+            data = pagedNotifications.Select(n => new
+            {
+                n.Id,
+                UserName = n.User.FullName, // Show the FullName of the User associated with the notification
+                n.Message,
+                n.IsRead,
+                n.CreatedAt,
+                n.UpdatedAt
+            }).ToArray(),
+            recordsTotal = await _context.Notifications.CountAsync(),
+            recordsFiltered = totalCount,
+            page = page,
+            pageSize = pageSize
+        };
+
+        return Ok(result);
     }
+    catch (Exception e)
+    {
+        Console.WriteLine(e);
+        return StatusCode(500, new { Message = "An error occurred", Error = e.Message });
+    }
+}
+
 
     // 2.1 Read - Lấy Notification theo Id
     [HttpGet("{id}")]

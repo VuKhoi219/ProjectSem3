@@ -1,61 +1,96 @@
 @model IEnumerable<Project_Sem3.Models.User>
 
 @{
-    ViewData["Title"] = "Index";
+ViewData["Title"] = "User List";
 }
 
 @section VendorStyles {
-<!-- Add any vendor stylesheets you might still need -->
 <link rel="stylesheet" href="~/vendor/libs/datatables-bs5/datatables.bootstrap5.css">
 <link rel="stylesheet" href="~/vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.css">
+<link rel="stylesheet" href="~/vendor/libs/flatpickr/flatpickr.css" />
 }
 
 @section VendorScripts {
-<!-- Add any scripts you need for this page -->
+<script src="~/vendor/libs/datatables-bs5/datatables-bootstrap5.js"></script>
+<!-- Flat Picker -->
+<script src="~/vendor/libs/moment/moment.js"></script>
+<script src="~/vendor/libs/flatpickr/flatpickr.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 }
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<!-- Table to show users -->
-<div class="card">
-  <h5 class="card-header">User List</h5>
-  <div class="card-body">
-    <div class="table-responsive">
-      <table class="table table-striped table-bordered">
-        <thead>
-        <tr>
-          <th>Id</th>
-          <th>Full Name</th>
-          <th>Email</th>
-          <th>Phone</th>
-          <th>Gender</th>
-          <th>Citizen Identification Card</th>
-          <th>Status</th>
-          <th>Actions</th>
-        </tr>
-        </thead>
-        <tbody>
-        @foreach (var user in Model)
-        {
-          <tr>
-            <td>@user.Id</td>
-            <td>@user.FullName</td>
-            <td>@user.Email</td>
-            <td>@user.Phone</td>
-            <td>@user.Gender</td>
-            <td>@user.CitizenIdentificationCard</td>
-            <td>@user.Status</td>
-            <td>
-              <a href="@Url.Action("Details", "User", new { id = user.Id })" class="btn btn-info btn-sm">View</a>
-              <a href="@Url.Action("Edit", "User", new { id = user.Id })" class="btn btn-primary btn-sm">Edit</a>
-              <a href="@Url.Action("Delete", "User", new { id = user.Id })" class="btn btn-danger btn-sm">Delete</a>
-            </td>
-          </tr>
+@section Scripts {
+<script>
+  var dataTable = $('#dataTable').DataTable({
+    processing: true,
+    serverSide: true,
+    ajax: {
+      url: '/api/users',  // Adjust URL to the correct API endpoint for users
+      type: 'GET',
+      data: function (d) {
+        d.page = (d.start / d.length) + 1;
+        d.pageSize = d.length;
+        d.search = d.search.value;
+        d.orderColumn = d.columns[d.order[0].column].data;
+        d.orderDir = d.order[0].dir;
+        return d;
+      },
+      dataSrc: 'data',
+    },
+    columns: [
+      { data: 'id' },
+      { data: 'fullName' },
+      { data: 'email' },
+      { data: 'phone' },
+      { data: 'status', render: function (data) {
+          return data === 1 ? 'Active' : (data === 0 ? 'Inactive' : 'Deleted');
+        }},
+      {
+        data: null,
+        orderable: false,
+        searchable: false,
+        render: function (data, type, row) {
+          return '<button class="btn btn-sm btn-primary btn-edit" data-id="' + row.id + '">Edit</button> ' +
+            '<button class="btn btn-sm btn-danger btn-delete" data-id="' + row.id + '">Delete</button> ' +
+            '<button class="btn btn-sm btn-info btn-detail" data-id="' + row.id + '">View</button>';
         }
-        </tbody>
-      </table>
-    </div>
+      }
+    ]
+  });
+
+  dataTable.on('click', '.btn-edit', function () {
+    var userId = $(this).data('id');
+    window.location.href = '/Admin/User/Edit/' + userId;
+  });
+
+  dataTable.on('click', '.btn-delete', function () {
+    var userId = $(this).data('id');
+    window.location.href = '/Admin/User/Delete/' + userId;
+  });
+
+  dataTable.on('click', '.btn-detail', function () {
+    var userId = $(this).data('id');
+    window.location.href = '/Admin/User/Details/' + userId;  // Adjust to the view URL
+  });
+</script>
+}
+
+<!-- Advanced Search -->
+<div class="card">
+  <h5 class="card-header d-flex justify-content-between">User List
+    <a href="@Url.Action("Create", "User")" class="float-right btn btn-primary">Create New User</a></h5>
+  <div class="card-datatable table-responsive">
+    <table id="dataTable" class="dt-advanced-search table border-top">
+      <thead>
+      <tr>
+        <th>Id</th>
+        <th>Full Name</th>
+        <th>Email</th>
+        <th>Phone</th>
+        <th>Status</th>
+        <th>Action</th>
+      </tr>
+      </thead>
+    </table>
   </div>
 </div>
+<!-- /Advanced Search -->
