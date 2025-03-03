@@ -1,93 +1,147 @@
-@model int
-
+@using Microsoft.AspNetCore.Mvc
 @{
-ViewData["Title"] = "Payment detail";
+ViewData["Title"] = "Payments";
 Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<div>
-  @Model
-</div>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    margin: 20px;
+    background-color: #f4f4f4;
+  }
+  .insurance-card {
+    background: white;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    max-width: 600px;
+    display: none; /* Ẩn ban đầu cho đến khi dữ liệu được tải */
+  }
+  .insurance-card h2 {
+    color: #2c3e50;
+    margin-top: 0;
+  }
+  .detail-section {
+    margin-top: 15px;
+  }
+  .detail-section p {
+    margin: 5px 0;
+  }
+  .label {
+    font-weight: bold;
+    color: #34495e;
+  }
+  .loading {
+    font-size: 18px;
+    color: #7f8c8d;
+  }
+  .error {
+    color: red;
+  }
+</style>
+<h1>Chi tiết hợp đồng bảo hiểm</h1>
+<div id="loading" class="loading">Đang tải dữ liệu...</div>
+<div id="error" class="error"></div>
 
-<div class="container">
-  <div class="detail-card">
-    <h2 class="detail-title">Chi tiết giao dịch</h2>
-    <div class="detail-info">
-      <div id="transaction-details">
-        <!-- Các thông tin sẽ được hiển thị tại đây -->
-      </div>
-    </div>
+<div id="insurance-card" class="insurance-card">
+  <h2 id="plan-name"></h2>
+  <p><span class="label">Mô tả:</span> <span id="description"></span></p>
+  <p><span class="label">Số tiền bảo hiểm:</span> <span id="coverage-amount"></span></p>
+  <p><span class="label">Ngày bắt đầu:</span> <span id="start-date"></span></p>
+  <p><span class="label">Ngày kết thúc:</span> <span id="end-date"></span></p>
+  <div id="detail-section" class="detail-section">
+    <h3 id="detail-title"></h3>
+    <!-- Các trường chi tiết sẽ được thêm dynamically -->
   </div>
 </div>
-@section Scripts {
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+<!-- Thêm jQuery -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
-  // Đây là cách sử dụng Razor để truyền giá trị model vào JavaScript
-  const transactionId = @Model; // Model là số nguyên, không cần dấu nháy
-
-  // Kiểm tra trong console nếu model được truyền đúng
-  console.log(transactionId);
-
+  const contract = JSON.parse(localStorage.getItem("contract")) || {};
+  const contractId = contract.id;
+  const planId = contract.planId;
   $(document).ready(function() {
-    // Gọi API để lấy thông tin chi tiết
-    $('#paymentTable').html('<div class="text-center"><img src="https://loading.io/spinners/dual-ring/lg.dual-ring-spinner.gif" alt="Loading..." /></div>');
-    $('#errorAlert').hide();
-
-    // Dùng transactionId cho API URL
+    // Gọi API khi trang được tải
     $.ajax({
-      url: `/api/insurance-contract/${transactionId}`,  // Sử dụng transactionId thay vì hard-code giá trị
+      url: '/api/insurance-contracts/contract-detail/'+contractId+'/'+planId,
       method: 'GET',
-      success: function(data) {
-        // Hiển thị thông tin giao dịch lên trang
-        const statusMap = {
-          0: 'Pending',
-          1: 'Completed',
-          2: 'Failed'
-        };
-        const statusText = statusMap[data.status] || 'N/A';
-        console.log(statusText)
-        const detailHtml = `
-                        <div class="detail-row">
-                            <span class="detail-label">Mã giao dịch:</span>
-                            <span class="detail-value">${data.id}</span>
-                        </div>
-                        <div class="detail-row">
-                            <span class="detail-label">Mã người dùng:</span>
-                            <span class="detail-value">${data.userId}</span>
-                        </div>
-                        <div class="detail-row">
-                            <span class="detail-label">Mã hợp đồng:</span>
-                            <span class="detail-value">${data.contractId}</span>
-                        </div>
-                        <div class="detail-row">
-                            <span class="detail-label">Số tiền:</span>
-                            <span class="detail-value">${data.amount} VND</span>
-                        </div>
-                        <div class="detail-row">
-                            <span class="detail-label">Ngày thanh toán:</span>
-                            <span class="detail-value">${data.paymentDate}</span>
-                        </div>
-                        <div class="detail-row">
-                            <span class="detail-label">Trạng thái:</span>
-                            <span class="detail-value">${statusText}</span>
-                        </div>
-                        <div class="detail-row">
-                            <span class="detail-label">Hình ảnh:</span>
-                            <img src="${data.imageUrl}" alt="Image" class="detail-image">
-                        </div>
-                        <div class="detail-row">
-                            <span class="detail-label">Ngày tạo:</span>
-                            <span class="detail-value">${data.createdAt}</span>
-                        </div>
-                    `;
-        $('#transaction-details').html(detailHtml);
+      success: function(response) {
+        // Ẩn loading khi có dữ liệu
+        $('#loading').hide();
+
+        // Giả sử response trả về dạng giống dữ liệu bạn cung cấp
+        const data = response.data;
+        const insurancePlan = data.insurancePlan;
+
+        // Hiển thị thông tin chung
+        $('#plan-name').text(`Gói bảo hiểm: ${insurancePlan.name}`);
+        $('#description').text(insurancePlan.description);
+        $('#coverage-amount').text(insurancePlan.coverageAmount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
+        $('#start-date').text(new Date(data.startDate).toLocaleDateString('vi-VN'));
+        $('#end-date').text(new Date(data.endDate).toLocaleDateString('vi-VN'));
+
+        // Hiển thị chi tiết tùy theo loại (life, health, vehicle, property)
+        const detailSection = $('#detail-section');
+        if (insurancePlan.lifeDetail) {
+          $('#detail-title').text('Chi tiết bảo hiểm nhân thọ');
+          appendDetail(detailSection, 'Thời hạn (năm)', insurancePlan.lifeDetail.termYears);
+          appendDetail(detailSection, 'Nhóm tuổi', insurancePlan.lifeDetail.ageGroup);
+          appendDetail(detailSection, 'Thời gian (tháng)', insurancePlan.lifeDetail.duration);
+          appendDetail(detailSection, 'Hệ số rủi ro', insurancePlan.lifeDetail.riskFactor);
+          appendDetail(detailSection, 'Khu vực', insurancePlan.lifeDetail.region);
+          appendDetail(detailSection, 'Thanh toán hàng năm', insurancePlan.lifeDetail.annualPaymentAmount);
+          appendDetail(detailSection, 'Phí bảo hiểm', insurancePlan.lifeDetail.premium);
+          appendDetail(detailSection, 'Khấu trừ', insurancePlan.lifeDetail.deductible);
+        } else if (insurancePlan.healthDetail) {
+          $('#detail-title').text('Chi tiết bảo hiểm sức khỏe');
+          appendDetail(detailSection, 'Nhóm tuổi', insurancePlan.healthDetail.ageGroup);
+          appendDetail(detailSection, 'Mạng lưới bệnh viện', insurancePlan.healthDetail.hospitalNetwork);
+          appendDetail(detailSection, 'Bệnh có sẵn', insurancePlan.healthDetail.preExistingConditions);
+          appendDetail(detailSection, 'Thời gian (tháng)', insurancePlan.healthDetail.duration);
+          appendDetail(detailSection, 'Hệ số rủi ro', insurancePlan.healthDetail.riskFactor);
+          appendDetail(detailSection, 'Khu vực', insurancePlan.healthDetail.region);
+          appendDetail(detailSection, 'Thanh toán hàng năm', insurancePlan.healthDetail.annualPaymentAmount);
+          appendDetail(detailSection, 'Phí bảo hiểm', insurancePlan.healthDetail.premium);
+          appendDetail(detailSection, 'Khấu trừ', insurancePlan.healthDetail.deductible);
+        } else if (insurancePlan.vehicleDetail) {
+          $('#detail-title').text('Chi tiết bảo hiểm xe cộ');
+          appendDetail(detailSection, 'Loại xe', insurancePlan.vehicleDetail.vehicleType);
+          appendDetail(detailSection, 'Model xe', insurancePlan.vehicleDetail.vehicleModel);
+          appendDetail(detailSection, 'Năm sản xuất', insurancePlan.vehicleDetail.vehicleYear);
+          appendDetail(detailSection, 'Thời gian (tháng)', insurancePlan.vehicleDetail.duration);
+          appendDetail(detailSection, 'Hệ số rủi ro', insurancePlan.vehicleDetail.riskFactor);
+          appendDetail(detailSection, 'Khu vực', insurancePlan.vehicleDetail.region);
+          appendDetail(detailSection, 'Thanh toán hàng năm', insurancePlan.vehicleDetail.annualPaymentAmount);
+          appendDetail(detailSection, 'Phí bảo hiểm', insurancePlan.vehicleDetail.premium);
+          appendDetail(detailSection, 'Khấu trừ', insurancePlan.vehicleDetail.deductible);
+        } else if (insurancePlan.propertyDetail) {
+          $('#detail-title').text('Chi tiết bảo hiểm tài sản');
+          appendDetail(detailSection, 'Loại tài sản', insurancePlan.propertyDetail.propertyType);
+          appendDetail(detailSection, 'Vị trí', insurancePlan.propertyDetail.location);
+          appendDetail(detailSection, 'Thời gian (tháng)', insurancePlan.propertyDetail.duration);
+          appendDetail(detailSection, 'Hệ số rủi ro', insurancePlan.propertyDetail.riskFactor);
+          appendDetail(detailSection, 'Khu vực', insurancePlan.propertyDetail.region);
+          appendDetail(detailSection, 'Thanh toán hàng năm', insurancePlan.propertyDetail.annualPaymentAmount);
+          appendDetail(detailSection, 'Phí bảo hiểm', insurancePlan.propertyDetail.premium);
+          appendDetail(detailSection, 'Khấu trừ', insurancePlan.propertyDetail.deductible);
+        }
+
+        // Hiển thị card khi dữ liệu đã được điền
+        $('#insurance-card').show();
       },
-      error: function(error) {
-        alert('Lỗi khi tải thông tin giao dịch');
+      error: function(xhr, status, error) {
+        $('#loading').hide();
+        $('#error').text('Lỗi khi tải dữ liệu: ' + error);
       }
     });
+
+    // Hàm hỗ trợ để thêm chi tiết
+    function appendDetail(section, label, value) {
+      section.append(`<p><span class="label">${label}:</span> ${value}</p>`);
+    }
   });
+
 </script>
-}
