@@ -332,4 +332,71 @@ public async Task<IActionResult> GetInsuranceContractsByUserId(int userId, [From
             return StatusCode(500, new { Message = "An error occurred", Error = e.Message });
         }
     }
+[HttpGet("contract-detail/{contractId}/{planId}")]
+public async Task<IActionResult> GetContractDetail(int contractId, int planId)
+{
+    try
+    {
+        var contract = await _context.InsuranceContracts
+            .AsNoTracking() // Tăng hiệu suất cho read-only
+            .Where(c => c.Id == contractId)
+            .Select(c => new
+            {
+                Id = c.Id,
+                StartDate = c.StartDate,
+                EndDate = c.EndDate,
+                Status = c.Status,
+                InsurancePlan = c.PlanId == planId
+                    ? _context.InsurancePlans
+                        .Where(l => l.Id == planId)
+                        .Select(p => new
+                        {
+                            Id = p.Id,
+                            Name = p.Name,
+                            Description = p.Description,
+                            Status = p.Status,
+                            CoverageAmount = p.CoverageAmount,
+                            LifeDetail = p.Type == InsuranceType.Life
+                                ? _context.InsuranceLifeDetails
+                                    .Where(l => l.PlanId == p.Id && l.Id == c.DetailId)
+                                    .FirstOrDefault()
+                                : null,
+                            HealthDetail = p.Type == InsuranceType.Health
+                                ? _context.InsuranceHealthDetails
+                                    .Where(h => h.PlanId == p.Id && h.Id == c.DetailId)
+                                    .FirstOrDefault()
+                                : null,
+                            VehicleDetail = p.Type == InsuranceType.Vehicle
+                                ? _context.InsuranceVehicleDetails
+                                    .Where(v => v.PlanId == p.Id && v.Id == c.DetailId)
+                                    .FirstOrDefault()
+                                : null,
+                            PropertyDetail = p.Type == InsuranceType.Property
+                                ? _context.InsurancePropertyDetails
+                                    .Where(pr => pr.PlanId == p.Id && pr.Id == c.DetailId)
+                                    .FirstOrDefault()
+                                : null
+                        })
+                        .FirstOrDefault() // Thêm FirstOrDefault() để vật thể hóa InsurancePlan
+                    : null
+            })
+            .FirstOrDefaultAsync();
+
+        if (contract == null)
+        {
+            return NotFound(new { Message = $"Contract with ID {contractId} not found or has been deleted" });
+        }
+
+        if (contract.InsurancePlan == null)
+        {
+            return NotFound(new { Message = $"Plan with ID {planId} not found for contract {contractId}" });
+        }
+
+        return Ok(new { Data = contract });
+    }
+    catch (Exception ex)
+    {
+        return StatusCode(500, new { Message = "Internal server error", Error = ex.Message });
+    }
+}
 }

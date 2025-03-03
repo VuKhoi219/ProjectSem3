@@ -1,6 +1,7 @@
 using System.Linq.Expressions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 using Project_Sem3.Data;
 using Project_Sem3.Models;
 
@@ -248,4 +249,6 @@ public class InsuranceLifeDetailController : ControllerBase
             return StatusCode(500, new { Message = "An error occurred", Error = e.Message });
         }
     }
+
+
 }

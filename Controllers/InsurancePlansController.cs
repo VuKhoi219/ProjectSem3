@@ -137,10 +137,6 @@ public class InsurancePlansController : ControllerBase
       {
         var plan = await _context.InsurancePlans
           .Where(p => p.Id == id && p.DeleteAt == null)
-          .Include(p => p.InsuranceContracts)
-          .Include(p => p.Creator)
-          .Include(p => p.Updater)
-          .Include(p => p.Deleter)
           .Select(p => new
           {
             p.Id,

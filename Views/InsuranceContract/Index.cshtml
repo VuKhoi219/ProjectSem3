@@ -70,7 +70,7 @@ Layout = "~/Views/Shared/_Layout.cshtml";
 <script>
   function loadPayments(page = 1, pageSize = 10) {
     // Hiển thị loading spinner
-    let id = 1
+    let id =  @ViewData["UserId"] ?? null;
 
     showLoading(); // Hiển thị spinner xoay
     $.ajax({
@@ -86,7 +86,7 @@ Layout = "~/Views/Shared/_Layout.cshtml";
         showSuccess();
 
         let html = '<table class="table table-striped table-hover">';
-        html += '<thead class="thead-dark"><tr><th>ID</th><th>Start date</th><th>End date</th><th>Status</th><th>Actions</th></tr></thead>';
+        html += '<thead class="thead-dark"><tr><th>ID</th><th>Plan Id</th><th>Start date</th><th>End date</th><th>Status</th><th>Actions</th></tr></thead>';
         html += '<tbody>';
 
         data.forEach(ict => {
@@ -94,13 +94,13 @@ Layout = "~/Views/Shared/_Layout.cshtml";
           const statusText = statusMap[ict.status] || 'N/A';
           html += `<tr id="payment-row-${ict.id}">
                                     <td>${ict.id}</td>
+                                    <td>${ict.planId}</td>
                                     <td>${ict.startDate}</td>
                                     <td>${ict.endDate}</td>
                                     <td>${statusText}</td>
                                     <td>
-                                        <button onclick="detailPayment(${ict.id || ''})"><i class='bx bx-paste'></i></button>
-                                        <button onclick="editPayment(${ict.id || ''})"><i class='bx bx-edit-alt'></i></button>
-                                        <button onclick="deletePayment(${ict.id || ''})"><i class='bx bxs-trash-alt'></i></button>
+                                        <button onclick="detailPayment(${ict.id || ''}, ${ict.planId || ''})"><i class='bx bx-paste'></i></button>
+
                                     </td>
                                 </tr>`;
         });
@@ -132,39 +132,12 @@ Layout = "~/Views/Shared/_Layout.cshtml";
     });
   }
 
-  function detailPayment(id){}
-  function editPayment(id) {
-    alert('Edit payment with ID ' + id);
-    // Implement the edit functionality here
-  }
-
-  function deletePayment(id) {
-    if (confirm('Are you sure you want to delete this payment?')) {
-      showLoading(); // Hiển thị spinner xoay
-
-      // Implement the delete functionality here
-      $.ajax({
-        url: `/api/insurance-contracts/${id}`,  // Sử dụng transactionId thay vì hard-code giá trị
-        method: 'DELETE',
-        success: function() {
-          showSuccess(); // Chuyển spinner thành dấu tích xanh
-          // Xóa dòng khỏi bảng mà không load lại trang
-          $(`#payment-row-${id}`).remove();
-
-          // Kiểm tra nếu bảng trống thì hiển thị thông báo
-          if ($('#paymentTable tbody tr').length === 0) {
-            $('#paymentTable').html('<div class="text-center">No data available</div>');
-          }
-        },
-        error: function(error) {
-          hideLoading(); // Ẩn spinner nếu lỗi
-          alert('Lỗi khi tải thông tin giao dịch');
-        }
-      });
+  function detailPayment(id , planId){
+      localStorage.setItem("contract", JSON.stringify({
+        id: id,
+        planId: planId,
+      }));
+      window.location.href = "/insuranceContract/detail";
     }
-  }
-  $(document).ready(function() {
-    loadPayments();
-  });
 </script>
 }
