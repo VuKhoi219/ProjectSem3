@@ -1,3 +1,4 @@
+using System.Linq.Expressions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Project_Sem3.Data;
@@ -18,44 +19,77 @@ public class InsuranceContractsController : ControllerBase
 
     // 1. Get All - Lấy tất cả InsuranceContracts với phân trang, chỉ lấy record chưa xóa mềm
     [HttpGet]
-    public async Task<IActionResult> GetAllInsuranceContracts(int page = 1, int pageSize = 10)
+    public async Task<IActionResult> GetAllInsuranceContracts(
+        [FromQuery] int page = 1,
+        [FromQuery] int pageSize = 10,
+        [FromQuery] string? search = null,
+        [FromQuery] string? orderColumn = null,
+        [FromQuery] string? orderDir = null)
     {
         try
         {
-            var totalRecords = await _context.InsuranceContracts
-                .Where(c => c.DeleteAt == null)
-                .CountAsync();
-            var totalPages = (int)Math.Ceiling((double)totalRecords / pageSize);
+            // Starting the query, including related entities (User and Plan)
+            var query = _context.InsuranceContracts
+                                 .Include(ic => ic.User)
+                                 .Include(ic => ic.Plan)
+                                 .AsQueryable();
 
-            var contracts = await _context.InsuranceContracts
-                .Where(c => c.DeleteAt == null)
-                .Select(c => new
-                {
-                    c.Id,
-                    c.UserId,
-                    c.PlanId,
-                    c.StartDate,
-                    c.EndDate,
-                    c.Status,
-                    CreatedAt = c.CreatedAt.HasValue ? c.CreatedAt.Value.ToString("yyyy-MM-dd HH:mm:ss") : null,
-                    UpdatedAt = c.UpdatedAt.HasValue ? c.UpdatedAt.Value.ToString("yyyy-MM-dd HH:mm:ss") : null
-                })
-                .OrderBy(c => c.Id)
-                .Skip((page - 1) * pageSize)
-                .Take(pageSize)
-                .ToListAsync();
-
-            return Ok(new
+            // Handle search query (for User, Plan, Status, etc.)
+            if (!string.IsNullOrEmpty(search))
             {
-                Data = contracts,
-                TotalRecords = totalRecords,
-                TotalPages = totalPages,
-                CurrentPage = page,
-                PageSize = pageSize
-            });
+                query = query.Where(x =>
+                    (x.UserId != null && EF.Functions.Like(x.UserId.ToString(), $"%{search}%")) || // Search User Name
+                    (x.PlanId != null && EF.Functions.Like(x.PlanId.ToString(), $"%{search}%")) || // Search Plan Name
+                    (x.Status.ToString() != null && EF.Functions.Like(x.Status.ToString(), $"%{search}%")) // Search Status
+                );
+            }
+
+            // Handle sorting by dynamic column and direction
+            if (!string.IsNullOrEmpty(orderColumn) && !string.IsNullOrEmpty(orderDir))
+            {
+                var parameter = Expression.Parameter(typeof(InsuranceContract), "x");
+                var property = Expression.Property(parameter, orderColumn);
+                var lambda = Expression.Lambda<Func<InsuranceContract, object>>(Expression.Convert(property, typeof(object)), parameter);
+
+                if (orderDir.ToLower() == "asc")
+                {
+                    query = query.OrderBy(lambda);
+                }
+                else if (orderDir.ToLower() == "desc")
+                {
+                    query = query.OrderByDescending(lambda);
+                }
+            }
+
+            // Get the total count for pagination
+            var totalCount = await query.CountAsync();
+
+            // Paginate the results
+            var pagedInsuranceContracts = await query.Skip((page - 1) * pageSize).Take(pageSize).ToListAsync();
+
+            // Return the response in the desired format
+            var result = new
+            {
+                data = pagedInsuranceContracts.Select(ic => new
+                {
+                    ic.Id,
+                    ic.UserId,
+                    ic.PlanId,
+                    ic.Status,
+                    ic.StartDate,
+                    ic.EndDate
+                }).ToArray(),
+                recordsTotal = await _context.InsuranceContracts.CountAsync(),
+                recordsFiltered = totalCount,
+                page = page,
+                pageSize = pageSize
+            };
+
+            return Ok(result);
         }
         catch (Exception e)
         {
+            // Log the error (optional)
             Console.WriteLine(e);
             return StatusCode(500, new { Message = "An error occurred", Error = e.Message });
         }

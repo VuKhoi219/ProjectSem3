@@ -1,57 +1,95 @@
 @model IEnumerable<Project_Sem3.Models.InsurancePlan>
 
 @{
-    ViewData["Title"] = "Index";
+ViewData["Title"] = "Insurance Plan List";
 }
 
 @section VendorStyles {
-<!-- Add any vendor stylesheets you might still need -->
 <link rel="stylesheet" href="~/vendor/libs/datatables-bs5/datatables.bootstrap5.css">
 <link rel="stylesheet" href="~/vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.css">
+<link rel="stylesheet" href="~/vendor/libs/flatpickr/flatpickr.css" />
 }
 
 @section VendorScripts {
-<!-- Add any scripts you need for this page -->
+<script src="~/vendor/libs/datatables-bs5/datatables-bootstrap5.js"></script>
+<script src="~/vendor/libs/moment/moment.js"></script>
+<script src="~/vendor/libs/flatpickr/flatpickr.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 }
 
-<p>
-  <a asp-action="Create">Create New</a>
-</p>
-<!-- Table to show users -->
-<div class="card">
-  <h5 class="card-header">Insurance Plan List</h5>
-  <div class="card-body">
-    <div class="table-responsive">
-      <table class="table table-striped table-bordered">
-        <thead>
-        <tr>
-          <th>Id</th>
-          <th>Plan Name</th>
-          <th>Description</th>
-          <th>Insurance Type</th>
-          <th>Coverage Amount</th>
-          <th>Actions</th>
-        </tr>
-        </thead>
-        <tbody>
-        @foreach (var plan in Model)
-        {
-        <tr>
-          <td>@plan.Id</td>
-          <td>@plan.Name</td>
-          <td>@plan.Description</td>
-          <td>@plan.Type</td>
-          <td>@plan.CoverageAmount</td>
-          <td>
-            <a href="@Url.Action("Details", "InsurancePlan", new { id = plan.Id })" class="btn btn-info btn-sm">View</a>
-            <a href="@Url.Action("Edit", "InsurancePlan", new { id = plan.Id })" class="btn btn-primary btn-sm">Edit</a>
-            <a href="@Url.Action("Delete", "InsurancePlan", new { id = plan.Id })" class="btn btn-danger btn-sm">Delete</a>
-          </td>
-        </tr>
+@section Scripts {
+<script>
+  var dataTable = $('#dataTable').DataTable({
+    processing: true,
+    serverSide: true,
+    ajax: {
+      url: '/api/insurance-plans',  // Adjust URL to the correct API endpoint for insurance plans
+      type: 'GET',
+      data: function (d) {
+        d.page = (d.start / d.length) + 1;
+        d.pageSize = d.length;
+        d.search = d.search.value;
+        d.orderColumn = d.columns[d.order[0].column].data;
+        d.orderDir = d.order[0].dir;
+        return d;
+      },
+      dataSrc: 'data',
+    },
+    columns: [
+      { data: 'id' },
+      { data: 'name' },
+      { data: 'description' },
+      { data: 'type', render: function (data) {
+          return data === 0 ? 'Life' : (data === 1 ? 'Health' : (data === 2 ? 'Vehicle' : 'Property'));
+        }},
+      { data: 'coverageAmount' },
+      {
+        data: null,
+        orderable: false,
+        searchable: false,
+        render: function (data, type, row) {
+          return '<button class="btn btn-sm btn-primary btn-edit" data-id="' + row.id + '">Edit</button> ' +
+            '<button class="btn btn-sm btn-danger btn-delete" data-id="' + row.id + '">Delete</button> ' +
+            '<button class="btn btn-sm btn-info btn-detail" data-id="' + row.id + '">View</button>';
         }
-        </tbody>
-      </table>
-    </div>
+      }
+    ]
+  });
+
+  dataTable.on('click', '.btn-edit', function () {
+    var planId = $(this).data('id');
+    window.location.href = '/Admin/InsurancePlan/Edit/' + planId;
+  });
+
+  dataTable.on('click', '.btn-delete', function () {
+    var planId = $(this).data('id');
+    window.location.href = '/Admin/InsurancePlan/Delete/' + planId;
+  });
+
+  dataTable.on('click', '.btn-detail', function () {
+    var planId = $(this).data('id');
+    window.location.href = '/Admin/InsurancePlan/Details/' + planId;  // Adjust to the view URL
+  });
+</script>
+}
+
+<!-- Advanced Search -->
+<div class="card">
+  <h5 class="card-header d-flex justify-content-between">Insurance Plan List
+    <a href="@Url.Action("Create", "InsurancePlan")" class="float-right btn btn-primary">Create New Plan</a></h5>
+  <div class="card-datatable table-responsive">
+    <table id="dataTable" class="dt-advanced-search table border-top">
+      <thead>
+      <tr>
+        <th>Id</th>
+        <th>Name</th>
+        <th>Description</th>
+        <th>Type</th>
+        <th>Coverage Amount</th>
+        <th>Action</th>
+      </tr>
+      </thead>
+    </table>
   </div>
 </div>
+<!-- /Advanced Search -->

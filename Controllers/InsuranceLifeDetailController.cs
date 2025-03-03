@@ -1,3 +1,4 @@
+using System.Linq.Expressions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Project_Sem3.Data;
@@ -44,53 +45,80 @@ public class InsuranceLifeDetailController : ControllerBase
 
     // 2. Read - Lấy tất cả InsuranceLifeDetails với phân trang, chỉ lấy record chưa xóa mềm
     [HttpGet]
-    public async Task<IActionResult> GetAllInsuranceLifeDetails(int page = 1, int pageSize = 10)
+    public async Task<IActionResult> GetAllInsuranceLifeDetails(
+    [FromQuery] int page = 1,
+    [FromQuery] int pageSize = 10,
+    [FromQuery] string? search = null,
+    [FromQuery] string? orderColumn = null,
+    [FromQuery] string? orderDir = null)
+{
+    try
     {
-        try
+        var query = _context.InsuranceLifeDetails.Include(il => il.Plan).AsQueryable();
+
+        // Handle search query
+        if (!string.IsNullOrEmpty(search))
         {
-            var totalRecords = await _context.InsuranceLifeDetails
-                .Where(d => d.DeleteAt == null)
-                .CountAsync();
-            var totalPages = (int)Math.Ceiling((double)totalRecords / pageSize);
+          query = query.Where(x =>
+            (x.AgeGroup != null && EF.Functions.Like(x.AgeGroup, $"%{search}%")) || // Search AgeGroup
+            (x.Beneficiaries != null && EF.Functions.Like(x.Beneficiaries, $"%{search}%")) || // Search Beneficiaries
+            (x.Duration.ToString() != null &&
+             EF.Functions.Like(x.Duration.ToString(), $"%{search}%")) || // Search Duration
+            (x.RiskFactor.ToString() != null &&
+             EF.Functions.Like(x.RiskFactor.ToString(), $"%{search}%")) || // Search RiskFactor
+            (x.Region != null && EF.Functions.Like(x.Region, $"%{search}%"))); // Search Region
+        }
 
-            var details = await _context.InsuranceLifeDetails
-                .Where(d => d.DeleteAt == null)
-                .Select(d => new
-                {
-                    d.Id,
-                    d.PlanId,
-                    d.AnnualPaymentAmount,
-                    d.Premium,
-                    d.Deductible,
-                    d.TermYears,
-                    d.AgeGroup,
-                    d.Beneficiaries,
-                    d.Duration,
-                    d.RiskFactor,
-                    d.Region,
-                    CreatedAt = d.CreatedAt.HasValue ? d.CreatedAt.Value.ToString("yyyy-MM-dd HH:mm:ss") : null,
-                    UpdatedAt = d.UpdatedAt.HasValue ? d.UpdatedAt.Value.ToString("yyyy-MM-dd HH:mm:ss") : null
-                })
-                .OrderBy(d => d.Id)
-                .Skip((page - 1) * pageSize)
-                .Take(pageSize)
-                .ToListAsync();
+        // Handle sorting by dynamic column and direction
+        if (!string.IsNullOrEmpty(orderColumn) && !string.IsNullOrEmpty(orderDir))
+        {
+            var parameter = Expression.Parameter(typeof(InsuranceLifeDetail), "x");
+            var property = Expression.Property(parameter, orderColumn);
+            var lambda = Expression.Lambda<Func<InsuranceLifeDetail, object>>(Expression.Convert(property, typeof(object)), parameter);
 
-            return Ok(new
+            if (orderDir.ToLower() == "asc")
             {
-                Data = details,
-                TotalRecords = totalRecords,
-                TotalPages = totalPages,
-                CurrentPage = page,
-                PageSize = pageSize
-            });
+                query = query.OrderBy(lambda);
+            }
+            else if (orderDir.ToLower() == "desc")
+            {
+                query = query.OrderByDescending(lambda);
+            }
         }
-        catch (Exception e)
+
+        // Get the total count for pagination
+        var totalCount = await query.CountAsync();
+
+        // Paginate the results
+        var pagedInsuranceLifeDetails = await query.Skip((page - 1) * pageSize).Take(pageSize).ToListAsync();
+
+        // Return the response in the desired format
+        var result = new
         {
-            Console.WriteLine(e);
-            return StatusCode(500, new { Message = "An error occurred", Error = e.Message });
-        }
+            data = pagedInsuranceLifeDetails.Select(il => new
+            {
+                il.Id,
+                il.AgeGroup,
+                il.Beneficiaries,
+                il.Duration,
+                il.RiskFactor,
+                il.Region,
+            }).ToArray(),
+            recordsTotal = await _context.InsuranceLifeDetails.CountAsync(),
+            recordsFiltered = totalCount,
+            page = page,
+            pageSize = pageSize
+        };
+
+        return Ok(result);
     }
+    catch (Exception e)
+    {
+        Console.WriteLine(e);
+        return StatusCode(500, new { Message = "An error occurred", Error = e.Message });
+    }
+}
+
 
     // 2.1 Read - Lấy InsuranceLifeDetail theo Id, chỉ lấy record chưa xóa mềm
     [HttpGet("{id}")]

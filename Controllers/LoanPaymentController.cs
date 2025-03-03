@@ -1,3 +1,4 @@
+using System.Linq.Expressions;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -22,25 +23,78 @@ public class LoanPaymentController : Controller
   }
 
   [HttpGet]
-  public async Task<IActionResult> GetLoanPayments()
-  {
+  public async Task<IActionResult> GetAllLoanPayments(
+    [FromQuery] int page = 1,
+    [FromQuery] int pageSize = 10,
+    [FromQuery] string? search = null,
+    [FromQuery] string? orderColumn = null,
+    [FromQuery] string? orderDir = null)
+{
     try
     {
-      var result = await _context.LoanPayments.Select(lp => new
-      {
-        lp.Id,
-        lp.BorrowId,
-        lp.PaymentAmount,
-        lp.PaymentDate,
-      }).ToListAsync();
-      return Ok(result);
+        var query = _context.LoanPayments.Include(lp => lp.BorrowCapital).ThenInclude(b => b.User).AsQueryable();
+
+        // Handle search query
+        if (!string.IsNullOrEmpty(search))
+        {
+            query = query.Where(x =>
+                (x.PaymentAmount.ToString() != null && EF.Functions.Like(x.PaymentAmount.ToString(), $"%{search}%")) || // Search PaymentAmount
+                (x.OverdueDays.ToString() != null && EF.Functions.Like(x.OverdueDays.ToString(), $"%{search}%")) || // Search OverdueDays
+                (x.PenaltyInterest.ToString() != null && EF.Functions.Like(x.PenaltyInterest.ToString(), $"%{search}%")) || // Search PenaltyInterest
+                (x.Status.ToString() != null && EF.Functions.Like(x.Status.ToString(), $"%{search}%")) || // Search Status
+                (x.BorrowCapital != null && EF.Functions.Like(x.BorrowCapital.ToString(), $"%{search}%")) // Search BorrowId
+            );
+        }
+
+        // Handle sorting by dynamic column and direction
+        if (!string.IsNullOrEmpty(orderColumn) && !string.IsNullOrEmpty(orderDir))
+        {
+            var parameter = Expression.Parameter(typeof(LoanPayment), "x");
+            var property = Expression.Property(parameter, orderColumn);
+            var lambda = Expression.Lambda<Func<LoanPayment, object>>(Expression.Convert(property, typeof(object)), parameter);
+
+            if (orderDir.ToLower() == "asc")
+            {
+                query = query.OrderBy(lambda);
+            }
+            else if (orderDir.ToLower() == "desc")
+            {
+                query = query.OrderByDescending(lambda);
+            }
+        }
+
+        // Get the total count for pagination
+        var totalCount = await query.CountAsync();
+
+        // Paginate the results
+        var pagedLoanPayments = await query.Skip((page - 1) * pageSize).Take(pageSize).ToListAsync();
+
+        // Return the response in the desired format
+        var result = new
+        {
+            data = pagedLoanPayments.Select(lp => new
+            {
+                lp.Id,
+                lp.PaymentAmount,
+                lp.PaymentDate,
+                lp.OverdueDays,
+                lp.PenaltyInterest,
+            }).ToArray(),
+            recordsTotal = await _context.LoanPayments.CountAsync(),
+            recordsFiltered = totalCount,
+            page = page,
+            pageSize = pageSize
+        };
+
+        return Ok(result);
     }
     catch (Exception e)
     {
-      Console.WriteLine(e);
-      throw;
+        Console.WriteLine(e);
+        return StatusCode(500, new { Message = "An error occurred", Error = e.Message });
     }
-  }
+}
+
 
   [HttpGet("{id}")]
   public async Task<IActionResult> GetLoanPaymentById(int id)

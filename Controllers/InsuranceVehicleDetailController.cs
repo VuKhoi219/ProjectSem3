@@ -1,3 +1,4 @@
+using System.Linq.Expressions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Project_Sem3.Data;
@@ -45,53 +46,80 @@ public class InsuranceVehicleDetailsController : ControllerBase
 
     // 2. Read - Lấy tất cả InsuranceVehicleDetails với phân trang, chỉ lấy record chưa xóa mềm
     [HttpGet]
-    public async Task<IActionResult> GetAllInsuranceVehicleDetails(int page = 1, int pageSize = 10)
+    public async Task<IActionResult> GetAllInsuranceVehicleDetails(
+    [FromQuery] int page = 1,
+    [FromQuery] int pageSize = 10,
+    [FromQuery] string? search = null,
+    [FromQuery] string? orderColumn = null,
+    [FromQuery] string? orderDir = null)
+{
+    try
     {
-        try
+        var query = _context.InsuranceVehicleDetails.Include(ivd => ivd.Plan).AsQueryable();
+
+        // Handle search query
+        if (!string.IsNullOrEmpty(search))
         {
-            var totalRecords = await _context.InsuranceVehicleDetails
-                .Where(d => d.DeleteAt == null)
-                .CountAsync();
-            var totalPages = (int)Math.Ceiling((double)totalRecords / pageSize);
+            query = query.Where(x =>
+                (x.VehicleType != null && EF.Functions.Like(x.VehicleType, $"%{search}%")) || // Search VehicleType
+                (x.VehicleModel != null && EF.Functions.Like(x.VehicleModel, $"%{search}%")) || // Search VehicleModel
+                (x.VehicleYear.ToString() != null && EF.Functions.Like(x.VehicleYear.ToString(), $"%{search}%")) || // Search VehicleYear
+                (x.Region != null && EF.Functions.Like(x.Region, $"%{search}%")) || // Search Region
+                (x.Plan != null && EF.Functions.Like(x.Plan.ToString(), $"%{search}%")) // Search Plan Name
+            );
+        }
 
-            var details = await _context.InsuranceVehicleDetails
-                .Where(d => d.DeleteAt == null)
-                .Select(d => new
-                {
-                    d.Id,
-                    d.PlanId,
-                    d.AnnualPaymentAmount,
-                    d.Premium,
-                    d.Deductible,
-                    d.VehicleType,
-                    d.VehicleModel,
-                    d.VehicleYear,
-                    d.Duration,
-                    d.RiskFactor,
-                    d.Region,
-                    CreatedAt = d.CreatedAt.HasValue ? d.CreatedAt.Value.ToString("yyyy-MM-dd HH:mm:ss") : null,
-                    UpdatedAt = d.UpdatedAt.HasValue ? d.UpdatedAt.Value.ToString("yyyy-MM-dd HH:mm:ss") : null
-                })
-                .OrderBy(d => d.Id)
-                .Skip((page - 1) * pageSize)
-                .Take(pageSize)
-                .ToListAsync();
+        // Handle sorting by dynamic column and direction
+        if (!string.IsNullOrEmpty(orderColumn) && !string.IsNullOrEmpty(orderDir))
+        {
+            var parameter = Expression.Parameter(typeof(InsuranceVehicleDetail), "x");
+            var property = Expression.Property(parameter, orderColumn);
+            var lambda = Expression.Lambda<Func<InsuranceVehicleDetail, object>>(Expression.Convert(property, typeof(object)), parameter);
 
-            return Ok(new
+            if (orderDir.ToLower() == "asc")
             {
-                Data = details,
-                TotalRecords = totalRecords,
-                TotalPages = totalPages,
-                CurrentPage = page,
-                PageSize = pageSize
-            });
+                query = query.OrderBy(lambda);
+            }
+            else if (orderDir.ToLower() == "desc")
+            {
+                query = query.OrderByDescending(lambda);
+            }
         }
-        catch (Exception e)
+
+        // Get the total count for pagination
+        var totalCount = await query.CountAsync();
+
+        // Paginate the results
+        var pagedInsuranceVehicleDetails = await query.Skip((page - 1) * pageSize).Take(pageSize).ToListAsync();
+
+        // Return the response in the desired format
+        var result = new
         {
-            Console.WriteLine(e);
-            return StatusCode(500, new { Message = "An error occurred", Error = e.Message });
-        }
+            data = pagedInsuranceVehicleDetails.Select(ivd => new
+            {
+                ivd.Id,
+                ivd.VehicleType,
+                ivd.VehicleModel,
+                ivd.VehicleYear,
+                ivd.Duration,
+                ivd.RiskFactor,
+                ivd.Region,
+            }).ToArray(),
+            recordsTotal = await _context.InsuranceVehicleDetails.CountAsync(),
+            recordsFiltered = totalCount,
+            page = page,
+            pageSize = pageSize
+        };
+
+        return Ok(result);
     }
+    catch (Exception e)
+    {
+        Console.WriteLine(e);
+        return StatusCode(500, new { Message = "An error occurred", Error = e.Message });
+    }
+}
+
 
     // 2.1 Read - Lấy InsuranceVehicleDetail theo Id, chỉ lấy record chưa xóa mềm
     [HttpGet("{id}")]

@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Linq.Dynamic.Core;
+using System.Linq.Expressions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using BCrypt.Net;
@@ -19,25 +20,81 @@ public class UserController : ControllerBase
 
     // ✅ 1. Lấy danh sách tất cả người dùng
     [HttpGet]
-    public async Task<IActionResult> GetAllUsers()
+    public async Task<IActionResult> GetAllUsers(
+    [FromQuery] int page = 1,
+    [FromQuery] int pageSize = 10,
+    [FromQuery] string? search = null,
+    [FromQuery] string? orderColumn = null,
+    [FromQuery] string? orderDir = null)
+{
+    try
     {
-      var users = await _context.Users
-        .Select(user => new
-        {
-          Id = user.Id,
-          FullName = user.FullName,
-          Email = user.Email,
-          Phone = user.Phone,
-          Gender = user.Gender,
-          CitizenIdentificationCard = user.CitizenIdentificationCard,
-          DateOfBirth = user.DateOfBirth,
-          Status = user.Status,
-          RoleId = user.RoleId
-        })
-        .ToListAsync();
+        var query = _context.Users.AsQueryable(); // Start with the Users query.
 
-        return Ok(users);
+        // Handle search query. Apply the search to relevant fields (adjust this based on your model).
+        if (!string.IsNullOrEmpty(search))
+        {
+            query = query.Where(x =>
+                (x.FullName != null && EF.Functions.Like(x.FullName, $"%{search}%")) || // Search FullName
+                (x.Email != null && EF.Functions.Like(x.Email, $"%{search}%")) || // Search Email
+                (x.Phone != null && EF.Functions.Like(x.Phone, $"%{search}%")) || // Search Phone
+                (x.CitizenIdentificationCard != null && EF.Functions.Like(x.CitizenIdentificationCard, $"%{search}%")) // Search CitizenIdentificationCard
+            );
+        }
+
+        // Handle sorting by dynamic column and direction
+        if (!string.IsNullOrEmpty(orderColumn) && !string.IsNullOrEmpty(orderDir))
+        {
+            var parameter = Expression.Parameter(typeof(User), "x");
+            var property = Expression.Property(parameter, orderColumn);
+            var lambda = Expression.Lambda<Func<User, object>>(Expression.Convert(property, typeof(object)), parameter);
+
+            if (orderDir.ToLower() == "asc")
+            {
+                query = query.OrderBy(lambda);
+            }
+            else if (orderDir.ToLower() == "desc")
+            {
+                query = query.OrderByDescending(lambda);
+            }
+        }
+
+        // Get the total count for pagination
+        var totalCount = await query.CountAsync();
+
+        // Paginate the results
+        var pagedUsers = await query.Skip((page - 1) * pageSize).Take(pageSize).ToListAsync();
+
+        // Return the response in the desired format
+        var result = new
+        {
+            data = pagedUsers.Select(u => new
+            {
+                u.Id,
+                u.FullName,
+                u.Email,
+                u.Phone,
+                u.CitizenIdentificationCard,
+                u.Gender,
+                u.Status,
+                u.CreatedAt,
+                u.UpdatedAt
+            }).ToArray(),
+            recordsTotal = await _context.Users.CountAsync(),
+            recordsFiltered = totalCount,
+            page = page,
+            pageSize = pageSize
+        };
+
+        return Ok(result);
     }
+    catch (Exception e)
+    {
+        Console.WriteLine(e);
+        return StatusCode(500, new { Message = "An error occurred", Error = e.Message });
+    }
+}
+
 
     // ✅ 2. Lấy thông tin người dùng theo ID
     [HttpGet("{id}")]
