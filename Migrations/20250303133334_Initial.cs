@@ -49,7 +49,7 @@ namespace Project_Sem3.Migrations
                     DetailId = table.Column<int>(type: "int", nullable: false),
                     StartDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     EndDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Status = table.Column<int>(type: "int", nullable: false),
+                    Status = table.Column<int>(type: "int", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
                     UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
                     DeleteAt = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -63,11 +63,17 @@ namespace Project_Sem3.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "InsuranceDetails",
+                name: "InsuranceHealthDetails",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
+                    AgeGroup = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    HospitalNetwork = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    PreExistingConditions = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Duration = table.Column<int>(type: "int", nullable: false),
+                    RiskFactor = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Region = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     PlanId = table.Column<int>(type: "int", nullable: false),
                     AnnualPaymentAmount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     Premium = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
@@ -77,35 +83,39 @@ namespace Project_Sem3.Migrations
                     DeleteAt = table.Column<DateTime>(type: "datetime2", nullable: true),
                     CreatedBy = table.Column<int>(type: "int", nullable: true),
                     UpdatedBy = table.Column<int>(type: "int", nullable: true),
-                    DeleteBy = table.Column<int>(type: "int", nullable: true),
-                    Discriminator = table.Column<string>(type: "nvarchar(34)", maxLength: 34, nullable: false),
-                    AgeGroup = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
-                    HospitalNetwork = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    PreExistingConditions = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Duration = table.Column<int>(type: "int", nullable: true),
-                    RiskFactor = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
-                    Region = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
-                    TermYears = table.Column<int>(type: "int", nullable: true),
-                    InsuranceLifeDetail_AgeGroup = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
-                    Beneficiaries = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    InsuranceLifeDetail_Duration = table.Column<int>(type: "int", nullable: true),
-                    InsuranceLifeDetail_RiskFactor = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
-                    InsuranceLifeDetail_Region = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
-                    PropertyType = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true),
-                    Location = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true),
-                    InsurancePropertyDetail_Duration = table.Column<int>(type: "int", nullable: true),
-                    InsurancePropertyDetail_RiskFactor = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
-                    InsurancePropertyDetail_Region = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
-                    VehicleType = table.Column<string>(type: "nvarchar(225)", maxLength: 225, nullable: true),
-                    VehicleModel = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true),
-                    VehicleYear = table.Column<int>(type: "int", nullable: true),
-                    InsuranceVehicleDetail_Duration = table.Column<int>(type: "int", nullable: true),
-                    InsuranceVehicleDetail_RiskFactor = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
-                    InsuranceVehicleDetail_Region = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true)
+                    DeleteBy = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_InsuranceDetails", x => x.Id);
+                    table.PrimaryKey("PK_InsuranceHealthDetails", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "InsuranceLifeDetails",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    TermYears = table.Column<int>(type: "int", nullable: false),
+                    AgeGroup = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    Beneficiaries = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Duration = table.Column<int>(type: "int", nullable: false),
+                    RiskFactor = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Region = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    PlanId = table.Column<int>(type: "int", nullable: false),
+                    AnnualPaymentAmount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Premium = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Deductible = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    DeleteAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    CreatedBy = table.Column<int>(type: "int", nullable: true),
+                    UpdatedBy = table.Column<int>(type: "int", nullable: true),
+                    DeleteBy = table.Column<int>(type: "int", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_InsuranceLifeDetails", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -132,6 +142,73 @@ namespace Project_Sem3.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_InsurancePlans", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "InsurancePropertyDetails",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    PropertyType = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
+                    Location = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
+                    Duration = table.Column<int>(type: "int", nullable: false),
+                    RiskFactor = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Region = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    PlanId = table.Column<int>(type: "int", nullable: false),
+                    AnnualPaymentAmount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Premium = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Deductible = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    DeleteAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    CreatedBy = table.Column<int>(type: "int", nullable: true),
+                    UpdatedBy = table.Column<int>(type: "int", nullable: true),
+                    DeleteBy = table.Column<int>(type: "int", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_InsurancePropertyDetails", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_InsurancePropertyDetails_InsurancePlans_PlanId",
+                        column: x => x.PlanId,
+                        principalTable: "InsurancePlans",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "InsuranceVehicleDetails",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    VehicleType = table.Column<string>(type: "nvarchar(225)", maxLength: 225, nullable: false),
+                    VehicleModel = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
+                    VehicleYear = table.Column<int>(type: "int", nullable: false),
+                    Duration = table.Column<int>(type: "int", nullable: false),
+                    RiskFactor = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Region = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    PlanId = table.Column<int>(type: "int", nullable: false),
+                    AnnualPaymentAmount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Premium = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Deductible = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    DeleteAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    CreatedBy = table.Column<int>(type: "int", nullable: true),
+                    UpdatedBy = table.Column<int>(type: "int", nullable: true),
+                    DeleteBy = table.Column<int>(type: "int", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_InsuranceVehicleDetails", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_InsuranceVehicleDetails_InsurancePlans_PlanId",
+                        column: x => x.PlanId,
+                        principalTable: "InsurancePlans",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -246,11 +323,11 @@ namespace Project_Sem3.Migrations
                     Gender = table.Column<int>(type: "int", nullable: false),
                     CitizenIdentificationCard = table.Column<string>(type: "nvarchar(12)", maxLength: 12, nullable: false),
                     DateOfBirth = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Status = table.Column<int>(type: "int", nullable: false),
+                    Status = table.Column<int>(type: "int", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
                     UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
                     DeleteAt = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    RoleId = table.Column<int>(type: "int", nullable: false)
+                    RoleId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -309,23 +386,43 @@ namespace Project_Sem3.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_InsuranceDetails_CreatedBy",
-                table: "InsuranceDetails",
+                name: "IX_InsuranceHealthDetails_CreatedBy",
+                table: "InsuranceHealthDetails",
                 column: "CreatedBy");
 
             migrationBuilder.CreateIndex(
-                name: "IX_InsuranceDetails_DeleteBy",
-                table: "InsuranceDetails",
+                name: "IX_InsuranceHealthDetails_DeleteBy",
+                table: "InsuranceHealthDetails",
                 column: "DeleteBy");
 
             migrationBuilder.CreateIndex(
-                name: "IX_InsuranceDetails_PlanId",
-                table: "InsuranceDetails",
+                name: "IX_InsuranceHealthDetails_PlanId",
+                table: "InsuranceHealthDetails",
                 column: "PlanId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_InsuranceDetails_UpdatedBy",
-                table: "InsuranceDetails",
+                name: "IX_InsuranceHealthDetails_UpdatedBy",
+                table: "InsuranceHealthDetails",
+                column: "UpdatedBy");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_InsuranceLifeDetails_CreatedBy",
+                table: "InsuranceLifeDetails",
+                column: "CreatedBy");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_InsuranceLifeDetails_DeleteBy",
+                table: "InsuranceLifeDetails",
+                column: "DeleteBy");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_InsuranceLifeDetails_PlanId",
+                table: "InsuranceLifeDetails",
+                column: "PlanId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_InsuranceLifeDetails_UpdatedBy",
+                table: "InsuranceLifeDetails",
                 column: "UpdatedBy");
 
             migrationBuilder.CreateIndex(
@@ -357,6 +454,46 @@ namespace Project_Sem3.Migrations
                 name: "IX_InsurancePlans_UserId2",
                 table: "InsurancePlans",
                 column: "UserId2");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_InsurancePropertyDetails_CreatedBy",
+                table: "InsurancePropertyDetails",
+                column: "CreatedBy");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_InsurancePropertyDetails_DeleteBy",
+                table: "InsurancePropertyDetails",
+                column: "DeleteBy");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_InsurancePropertyDetails_PlanId",
+                table: "InsurancePropertyDetails",
+                column: "PlanId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_InsurancePropertyDetails_UpdatedBy",
+                table: "InsurancePropertyDetails",
+                column: "UpdatedBy");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_InsuranceVehicleDetails_CreatedBy",
+                table: "InsuranceVehicleDetails",
+                column: "CreatedBy");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_InsuranceVehicleDetails_DeleteBy",
+                table: "InsuranceVehicleDetails",
+                column: "DeleteBy");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_InsuranceVehicleDetails_PlanId",
+                table: "InsuranceVehicleDetails",
+                column: "PlanId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_InsuranceVehicleDetails_UpdatedBy",
+                table: "InsuranceVehicleDetails",
+                column: "UpdatedBy");
 
             migrationBuilder.CreateIndex(
                 name: "IX_LoanPayments_BorrowId",
@@ -516,32 +653,64 @@ namespace Project_Sem3.Migrations
                 onDelete: ReferentialAction.Cascade);
 
             migrationBuilder.AddForeignKey(
-                name: "FK_InsuranceDetails_InsurancePlans_PlanId",
-                table: "InsuranceDetails",
+                name: "FK_InsuranceHealthDetails_InsurancePlans_PlanId",
+                table: "InsuranceHealthDetails",
                 column: "PlanId",
                 principalTable: "InsurancePlans",
                 principalColumn: "Id",
                 onDelete: ReferentialAction.Cascade);
 
             migrationBuilder.AddForeignKey(
-                name: "FK_InsuranceDetails_Users_CreatedBy",
-                table: "InsuranceDetails",
+                name: "FK_InsuranceHealthDetails_Users_CreatedBy",
+                table: "InsuranceHealthDetails",
                 column: "CreatedBy",
                 principalTable: "Users",
                 principalColumn: "Id",
                 onDelete: ReferentialAction.Restrict);
 
             migrationBuilder.AddForeignKey(
-                name: "FK_InsuranceDetails_Users_DeleteBy",
-                table: "InsuranceDetails",
+                name: "FK_InsuranceHealthDetails_Users_DeleteBy",
+                table: "InsuranceHealthDetails",
                 column: "DeleteBy",
                 principalTable: "Users",
                 principalColumn: "Id",
                 onDelete: ReferentialAction.Restrict);
 
             migrationBuilder.AddForeignKey(
-                name: "FK_InsuranceDetails_Users_UpdatedBy",
-                table: "InsuranceDetails",
+                name: "FK_InsuranceHealthDetails_Users_UpdatedBy",
+                table: "InsuranceHealthDetails",
+                column: "UpdatedBy",
+                principalTable: "Users",
+                principalColumn: "Id",
+                onDelete: ReferentialAction.Restrict);
+
+            migrationBuilder.AddForeignKey(
+                name: "FK_InsuranceLifeDetails_InsurancePlans_PlanId",
+                table: "InsuranceLifeDetails",
+                column: "PlanId",
+                principalTable: "InsurancePlans",
+                principalColumn: "Id",
+                onDelete: ReferentialAction.Cascade);
+
+            migrationBuilder.AddForeignKey(
+                name: "FK_InsuranceLifeDetails_Users_CreatedBy",
+                table: "InsuranceLifeDetails",
+                column: "CreatedBy",
+                principalTable: "Users",
+                principalColumn: "Id",
+                onDelete: ReferentialAction.Restrict);
+
+            migrationBuilder.AddForeignKey(
+                name: "FK_InsuranceLifeDetails_Users_DeleteBy",
+                table: "InsuranceLifeDetails",
+                column: "DeleteBy",
+                principalTable: "Users",
+                principalColumn: "Id",
+                onDelete: ReferentialAction.Restrict);
+
+            migrationBuilder.AddForeignKey(
+                name: "FK_InsuranceLifeDetails_Users_UpdatedBy",
+                table: "InsuranceLifeDetails",
                 column: "UpdatedBy",
                 principalTable: "Users",
                 principalColumn: "Id",
@@ -591,6 +760,54 @@ namespace Project_Sem3.Migrations
                 column: "UserId2",
                 principalTable: "Users",
                 principalColumn: "Id");
+
+            migrationBuilder.AddForeignKey(
+                name: "FK_InsurancePropertyDetails_Users_CreatedBy",
+                table: "InsurancePropertyDetails",
+                column: "CreatedBy",
+                principalTable: "Users",
+                principalColumn: "Id",
+                onDelete: ReferentialAction.Restrict);
+
+            migrationBuilder.AddForeignKey(
+                name: "FK_InsurancePropertyDetails_Users_DeleteBy",
+                table: "InsurancePropertyDetails",
+                column: "DeleteBy",
+                principalTable: "Users",
+                principalColumn: "Id",
+                onDelete: ReferentialAction.Restrict);
+
+            migrationBuilder.AddForeignKey(
+                name: "FK_InsurancePropertyDetails_Users_UpdatedBy",
+                table: "InsurancePropertyDetails",
+                column: "UpdatedBy",
+                principalTable: "Users",
+                principalColumn: "Id",
+                onDelete: ReferentialAction.Restrict);
+
+            migrationBuilder.AddForeignKey(
+                name: "FK_InsuranceVehicleDetails_Users_CreatedBy",
+                table: "InsuranceVehicleDetails",
+                column: "CreatedBy",
+                principalTable: "Users",
+                principalColumn: "Id",
+                onDelete: ReferentialAction.Restrict);
+
+            migrationBuilder.AddForeignKey(
+                name: "FK_InsuranceVehicleDetails_Users_DeleteBy",
+                table: "InsuranceVehicleDetails",
+                column: "DeleteBy",
+                principalTable: "Users",
+                principalColumn: "Id",
+                onDelete: ReferentialAction.Restrict);
+
+            migrationBuilder.AddForeignKey(
+                name: "FK_InsuranceVehicleDetails_Users_UpdatedBy",
+                table: "InsuranceVehicleDetails",
+                column: "UpdatedBy",
+                principalTable: "Users",
+                principalColumn: "Id",
+                onDelete: ReferentialAction.Restrict);
 
             migrationBuilder.AddForeignKey(
                 name: "FK_LoanPayments_Users_CreatedBy",
@@ -723,7 +940,16 @@ namespace Project_Sem3.Migrations
                 table: "Roles");
 
             migrationBuilder.DropTable(
-                name: "InsuranceDetails");
+                name: "InsuranceHealthDetails");
+
+            migrationBuilder.DropTable(
+                name: "InsuranceLifeDetails");
+
+            migrationBuilder.DropTable(
+                name: "InsurancePropertyDetails");
+
+            migrationBuilder.DropTable(
+                name: "InsuranceVehicleDetails");
 
             migrationBuilder.DropTable(
                 name: "LoanPayments");
