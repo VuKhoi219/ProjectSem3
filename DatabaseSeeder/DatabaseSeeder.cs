@@ -63,7 +63,7 @@ public class DatabaseSeeder
         if (!context.InsurancePlans.Any())
         {
             var insuranceFaker = new Faker<InsurancePlan>()
-                .RuleFor(i => i.Name, f => f.PickRandom("Life","Health","Vehicle","Property"))
+                .RuleFor(i => i.Name, f => f.Name.FullName())
                 .RuleFor(i => i.Description, f => f.Address.City()) // Thành phố ngẫu nhiên
                 .RuleFor(i => i.CoverageAmount, f => f.Random.Decimal(5000000, 50000000)) // Số tiền bảo hiểm
                 .RuleFor(i => i.Type, f => f.PickRandom<InsuranceType>())
