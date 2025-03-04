@@ -1,0 +1,255 @@
+@using Microsoft.AspNetCore.Mvc
+@{
+ViewData["Title"] = "Create Loan Payment";
+Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    margin: 20px;
+    background-color: #f4f4f4;
+  }
+  .container {
+    background: white;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    max-width: 600px;
+  }
+  h1 {
+    color: #2c3e50;
+  }
+  .form-label {
+    font-weight: bold;
+    color: #34495e;
+    margin-bottom: 5px;
+  }
+  .form-control {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 15px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+  }
+  .btn {
+    background-color: #2c3e50;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  .btn:hover {
+    background-color: #34495e;
+  }
+  .error {
+    color: red;
+    margin-top: 10px;
+  }
+  .success {
+    color: green;
+    margin-top: 10px;
+  }
+  #imagePreview, #qrCode {
+    max-width: 200px;
+    height: auto;
+    margin-top: 10px;
+    display: none;
+  }
+  #paymentInfo {
+    margin-bottom: 15px;
+  }
+</style>
+
+<div class="container">
+  <h1>Thêm giao dịch thanh toán</h1>
+  <div id="loading" class="loading">Đang tải dữ liệu...</div>
+  <div id="error" class="error"></div>
+  <div id="paymentInfo">
+    <p><strong>Số tiền phải thanh toán:</strong> <span id="totalPaymentAmount"></span></p>
+    <p><strong>Số ngày quá hạn:</strong> <span id="overdueDays"></span></p>
+  </div>
+  <div id="qrCodeContainer">
+    <p><strong>Mã QR thanh toán:</strong></p>
+    <img id="qrCode" alt="QR Code" />
+  </div>
+  <form id="createLoanPaymentForm">
+    <div>
+      <label class="form-label">Hình ảnh giao dịch</label>
+      <input type="file" class="form-control" id="paymentImage" name="PaymentImage" accept="image/*,.pdf" required />
+      <img id="imagePreview" alt="Image Preview" />
+    </div>
+    <button type="submit" class="btn">Xác nhận giao dịch</button>
+  </form>
+  <div id="success" class="success"></div>
+</div>
+
+@section Scripts {
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+  var userId = @ViewData["UserId"] ?? null
+  $(document).ready(function() {
+    const loanPaymentData = JSON.parse(localStorage.getItem("LoanPaymentData")) || {};
+    const { borrowCapitalId, monthlyPaymentAmount, nowDateTime, loanDateTime } = loanPaymentData;
+
+    if (!borrowCapitalId || !monthlyPaymentAmount || !nowDateTime || !loanDateTime) {
+      $('#loading').hide();
+      $('#error').text('Thiếu thông tin cần thiết để tạo giao dịch.');
+      return;
+    }
+
+    // Tự động tính toán và tạo mã QR khi tải trang
+    const calculateData = {
+      NowDateTime: nowDateTime,
+      LoanDateTime: loanDateTime,
+      LoanAmount: monthlyPaymentAmount * ((new Date(nowDateTime) - new Date(loanDateTime)) / (1000 * 60 * 60 * 24 * 30)), // Giả sử tính lại LoanAmount
+      MonthlyPaymentAmount: monthlyPaymentAmount
+    };
+
+    $.ajax({
+      url: '/api/loan-payment/calculate-payment',
+      method: 'POST',
+      contentType: 'application/json',
+      data: JSON.stringify(calculateData),
+      success: function(calcResponse) {
+        $('#loading').hide();
+        const totalPaymentAmount = calcResponse.paymentAmount + (calcResponse.paymentAmount * calcResponse.penaltyPercentage);
+        const overdueDays = calcResponse.overdueDays;
+
+        // Hiển thị thông tin tính toán
+        $('#totalPaymentAmount').text(totalPaymentAmount.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' }));
+        $('#overdueDays').text(overdueDays);
+        $('#paymentInfo').show();
+
+        // Tạo mã QR
+        const qrData = {
+          Amount: totalPaymentAmount,
+          Value: `Thanh toán khoản vay ${borrowCapitalId} - ${new Date(nowDateTime).toLocaleDateString('vi-VN')}`
+        };
+
+        $.ajax({
+          url: '/api/online-payment/generate-qr-url',
+          method: 'POST',
+          contentType: 'application/json',
+          data: JSON.stringify(qrData),
+          success: function(qrResponse) {
+            $('#qrCode').attr('src', qrResponse).show();
+            $('#qrCodeContainer').show();
+          },
+          error: function(xhr) {
+            $('#error').text('Lỗi khi tạo mã QR: ' + (xhr.responseJSON?.message || 'Không rõ lỗi'));
+          }
+        });
+      },
+      error: function(xhr) {
+        $('#loading').hide();
+        $('#error').text('Lỗi khi tính toán: ' + (xhr.responseJSON?.message || 'Không rõ lỗi'));
+      }
+    });
+
+    // Xem trước hình ảnh
+    $('#paymentImage').on('change', function() {
+      const file = this.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          $('#imagePreview').attr('src', e.target.result).show();
+        };
+        reader.readAsDataURL(file);
+      } else {
+        $('#imagePreview').hide();
+      }
+    });
+
+    $('#createLoanPaymentForm').on('submit', function(e) {
+      e.preventDefault();
+      const paymentImageFile = $('#paymentImage')[0].files[0];
+
+      if (!paymentImageFile) {
+        $('#error').text('Vui lòng chọn hình ảnh giao dịch.');
+        $('#success').text('');
+        return;
+      }
+
+      // Bước 1: Tính toán PaymentAmount và PenaltyPercentage trước
+      const calculateData = {
+        NowDateTime: nowDateTime,
+        LoanDateTime: loanDateTime,
+        LoanAmount: monthlyPaymentAmount * ((new Date(nowDateTime) - new Date(loanDateTime)) / (1000 * 60 * 60 * 24 * 30)), // Giả sử
+        MonthlyPaymentAmount: monthlyPaymentAmount
+      };
+
+      $.ajax({
+        url: '/api/loan-payment/calculate-payment',
+        method: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify(calculateData),
+        success: function(calcResponse) {
+          const totalPaymentAmount = calcResponse.paymentAmount + (calcResponse.paymentAmount * calcResponse.penaltyPercentage);
+          const overdueDays = calcResponse.overdueDays;
+
+          // Bước 2: Tải file lên
+          const uploadFormData = new FormData();
+          uploadFormData.append('file', paymentImageFile);
+
+          $.ajax({
+            url: '/api/upload',
+            method: 'POST',
+            data: uploadFormData,
+            processData: false,
+            contentType: false,
+            success: function(uploadResponse) {
+              console.log("Upload response filePath:", uploadResponse.filePath);
+
+              // Bước 3: Tạo loanPaymentData với calcResponse đã có
+              const loanPaymentData = {
+                BorrowId: borrowCapitalId,
+                CreatedBy : userId,
+                PaymentAmount: totalPaymentAmount,
+                PaymentDate: nowDateTime,
+                PaymentImage: uploadResponse.filePath,
+                OverdueDays: overdueDays,
+                PenaltyInterest: calcResponse.paymentAmount * calcResponse.penaltyPercentage
+              };
+              console.log("Sending to /api/loan-payment:", loanPaymentData);
+
+              // Bước 4: Gửi lên /api/loan-payment
+              $.ajax({
+                url: '/api/loan-payment',
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(loanPaymentData),
+                success: function(createResponse) {
+                  if (createResponse === true) {
+                    $('#success').text('Giao dịch đã được gửi để duyệt!');
+                    $('#error').text('');
+                    $('#createLoanPaymentForm')[0].reset();
+                    $('#imagePreview').hide();
+                    setTimeout(() => {
+                      window.location.href = "/BorrowCapital/Detail";
+                    }, 2000);
+                  }
+                },
+                error: function(xhr) {
+                  console.log("Error from /api/loan-payment:", xhr.responseText);
+                  $('#error').text('Lỗi khi tạo giao dịch: ' + (xhr.responseJSON?.message || 'Không rõ lỗi'));
+                }
+              });
+            },
+            error: function(xhr) {
+              console.log("Error from /api/upload:", xhr.responseText);
+              $('#error').text('Lỗi khi tải hình ảnh: ' + (xhr.responseJSON?.message || 'Không rõ lỗi'));
+            }
+          });
+        },
+        error: function(xhr) {
+          console.log("Error from /api/loan-payment/calculate-payment:", xhr.responseText);
+          $('#error').text('Lỗi khi tính toán: ' + (xhr.responseJSON?.message || 'Không rõ lỗi'));
+        }
+      });
+    });
+  });
+
+</script>
+}

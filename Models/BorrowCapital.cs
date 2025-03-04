@@ -5,35 +5,34 @@ namespace Project_Sem3.Models;
 
 public class BorrowCapital
 {
-    [Key]
-    public int Id { get; set; }
+      [Key]
+      public int Id { get; set; }
 
-    [Required]
-    public int UserId { get; set; }
+      [Required]
+      public int UserId { get; set; }
 
-    [Required]
-    public decimal LoanAmount { get; set; }
+      [Required]
+      public decimal LoanAmount { get; set; }
 
-    [MaxLength(10)]
-    public string Currency { get; set; } = "VND";  // Default value is 'VND'
+      [MaxLength(10)]
+      public string? Currency { get; set; } = "VND";  // Default value is 'VND'
 
-    [Required]
-    public decimal InterestRate { get; set; }
+      [Required]
+      public decimal InterestRate { get; set; }
 
-    [Required]
-    [MaxLength(255)]
-    public string LoanPurpose { get; set; }
+      [Required]
+      [MaxLength(255)]
+      public string LoanPurpose { get; set; }
 
-    public DateTime LoanDate { get; set; } = DateTime.Now;
+      public DateTime LoanDate { get; set; } = DateTime.Now;
 
-    [Required]
-    public decimal RepaymentAmount { get; set; }
+      [Required]
+      public decimal RepaymentAmount { get; set; }
 
-    [Required]
-    public DateTime DueDate { get; set; }
+      [Required]
+      public DateTime DueDate { get; set; }
 
-    [Required]
-    public StatusBorrowCapital Status { get; set; }
+    public StatusBorrowCapital? Status { get; set; }
 
     public DateTime? CreatedAt { get; set; } = DateTime.Now;
 

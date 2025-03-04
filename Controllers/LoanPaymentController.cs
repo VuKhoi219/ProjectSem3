@@ -112,7 +112,7 @@ public class LoanPaymentController : Controller
   }
 
   [HttpGet("borrow/{borrowId}")]
-  public async Task<IActionResult> GetLoanPaymentsByUserId(int borrowId)
+  public async Task<IActionResult> GetLoanPaymentsByBorrowId(int borrowId)
   {
     try
     {
@@ -122,7 +122,7 @@ public class LoanPaymentController : Controller
     catch (Exception e)
     {
       Console.WriteLine(e);
-      throw;
+      return StatusCode(500, new { Message = "An error occurred", Error = e.Message });
     }
   }
 
@@ -137,6 +137,7 @@ public class LoanPaymentController : Controller
         return BadRequest(new { Message = "Invalid BorrowId" });
       }
       rq.Status = false;
+
       _context.LoanPayments.Add(rq);
       await _context.SaveChangesAsync();
       return Ok(true);
@@ -144,7 +145,7 @@ public class LoanPaymentController : Controller
     catch (Exception e)
     {
       Console.WriteLine(e);
-      throw;
+      return StatusCode(500, new { Message = "An error occurred", Error = e.Message });
     }
   }
 
@@ -192,14 +193,20 @@ public class LoanPaymentController : Controller
         request.LoanDateTime,
         request.LoanAmount,
         request.MonthlyPaymentAmount);
-      return Ok(new {PaymentAmount = result.Item1 , PenaltyPercentage = result.Item2});
+      return Ok(new {PaymentAmount = result.Item1 , PenaltyPercentage = result.Item2 , OverdueDays = CalculateOverdueDays(request.NowDateTime, request.LoanDateTime)});
     }
     catch (Exception ex)
     {
       return StatusCode(500, new { Message = "An error occurred", Error = ex.Message });
     }
   }
-
+  private int CalculateOverdueDays(DateTime nowDateTime, DateTime loanDateTime)
+  {
+    var now = nowDateTime;
+    var loanDate = loanDateTime;
+    var daysDiff = (now - loanDate).Days;
+    return Math.Max(0, daysDiff - 30); // Giả sử kỳ hạn 30 ngày
+  }
   [HttpGet("total-loan-payment/{borrowId}")]
   public async Task<IActionResult> GetTotalPaymentByBorrowId(int borrowId)
   {

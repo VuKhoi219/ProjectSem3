@@ -19,12 +19,6 @@ Layout = "~/Views/Shared/_Layout.cshtml";
         <p class="mb-4">Please fill out the form below to send us a message. We'll get back to you as soon as possible.</p>
         <form id="contactForm">
           <div class="row g-3">
-            <div class="col-md-6">
-              <div class="form-floating">
-                <input type="text" class="form-control" id="Id" placeholder="Id" required>
-                <label for="Id">Id</label>
-              </div>
-            </div>
             <div class="col-12">
               <div class="form-floating">
                 <textarea class="form-control" placeholder="Leave a message here" id="message" style="height: 100px" required></textarea>
@@ -56,14 +50,16 @@ Layout = "~/Views/Shared/_Layout.cshtml";
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 <script>
+  let id = @ViewData["UserId"] ?? null;
+
   $(document).ready(function() {
     $('#contactForm').submit(function(e) {
       e.preventDefault();
 
       // Thu thập dữ liệu từ form
       var contactData = {
-        UserId: $('#Id').val(),
-        message: $('#message').val()
+        UserId: id,
+        message: $('#message').val(),
       };
 
       // Disable nút gửi để tránh spam
@@ -98,5 +94,6 @@ Layout = "~/Views/Shared/_Layout.cshtml";
       });
     });
   });
+
 </script>
 }

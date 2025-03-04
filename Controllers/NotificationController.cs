@@ -31,6 +31,7 @@ public class NotificationsController : ControllerBase
 
             // Gán thời gian tạo và trạng thái mặc định
             notification.CreatedAt = DateTime.UtcNow;
+            notification.CreatedBy = notification.UserId;
             notification.IsRead = false; // Mặc định là chưa đọc
 
             _context.Notifications.Add(notification);
