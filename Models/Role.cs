@@ -21,10 +21,10 @@ public class Role
     public int? CreatedBy { get; set; }
     public int? UpdatedBy { get; set; }
     public int? DeleteBy { get; set; }
-    public virtual User Creator { get; set; }
-    public virtual User Updater { get; set; }
-    public virtual User Deleter { get; set; }
+    public virtual User? Creator { get; set; }
+    public virtual User? Updater { get; set; }
+    public virtual User? Deleter { get; set; }
 
     // Relationship
-    public virtual ICollection<User> Users { get; set; }
+    public virtual ICollection<User>? Users { get; set; }
 }

@@ -25,11 +25,10 @@ public class LoanPayment
   [Required]
   public decimal PenaltyInterest { get; set; }
 
-  [Required] public bool Status { get; set; } = false;
+  [Required] public bool? Status { get; set; } = false;
 
   public DateTime? CreatedAt { get; set; } = DateTime.Now;
 
-  [Required]
   public int? CreatedBy { get; set; }
 
   // Navigation properties

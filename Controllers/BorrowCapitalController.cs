@@ -78,6 +78,7 @@ public class BorrowCapitalController : ControllerBase
                     b.Id,
                     b.UserId,
                     b.LoanAmount,
+                    b.RepaymentAmount,
                     b.LoanDate,
                     b.DueDate,
                     b.Status,
@@ -102,32 +103,53 @@ public class BorrowCapitalController : ControllerBase
 
     // 3. Get By UserId - Lấy BorrowCapitals theo UserId, chỉ lấy record chưa xóa mềm
     [HttpGet("user/{userId}")]
-    public async Task<IActionResult> GetBorrowCapitalsByUserId(int userId)
+    public async Task<IActionResult> GetBorrowCapitalsByUserId(int userId, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
     {
-        try
-        {
-            var borrowCapitals = await _context.BorrowCapitals
-                .Where(b => b.UserId == userId && b.DeleteAt == null)
-                .Select(b => new
-                {
-                    b.Id,
-                    b.UserId,
-                    b.LoanAmount,
-                    b.LoanDate,
-                    b.DueDate,
-                    b.Status,
-                    CreatedAt = b.CreatedAt.HasValue ? b.CreatedAt.Value.ToString("yyyy-MM-dd HH:mm:ss") : null,
-                    UpdatedAt = b.UpdatedAt.HasValue ? b.UpdatedAt.Value.ToString("yyyy-MM-dd HH:mm:ss") : null
-                })
-                .ToListAsync();
+          try
+          {
+            // Đảm bảo pageNumber và pageSize hợp lệ
+            if (pageNumber < 1) pageNumber = 1;
+            if (pageSize < 1) pageSize = 10;
 
-            return Ok(borrowCapitals);
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine(e);
-            return StatusCode(500, new { Message = "An error occurred", Error = e.Message });
-        }
+            // Lấy tổng số bản ghi thỏa mãn điều kiện
+            var totalRecords = await _context.InsuranceContracts
+                .CountAsync(c => c.UserId == userId && c.DeleteAt == null);
+
+            // Tính tổng số trang
+            var totalPages = (int)Math.Ceiling(totalRecords / (double)pageSize);
+
+            var borrowCapitals = await _context.BorrowCapitals
+                      .Where(b => b.UserId == userId && b.DeleteAt == null)
+                      .Select(b => new
+                      {
+                          b.Id,
+                          b.UserId,
+                          b.LoanAmount,
+                          b.RepaymentAmount,
+                          b.LoanDate,
+                          b.DueDate,
+                          b.Status,
+                          CreatedAt = b.CreatedAt.HasValue ? b.CreatedAt.Value.ToString("yyyy-MM-dd HH:mm:ss") : null,
+                          UpdatedAt = b.UpdatedAt.HasValue ? b.UpdatedAt.Value.ToString("yyyy-MM-dd HH:mm:ss") : null
+                      })
+                      .ToListAsync();
+
+            // Trả về dữ liệu kèm thông tin phân trang
+            var result = new
+            {
+              TotalRecords = totalRecords,
+              TotalPages = totalPages,
+              CurrentPage = pageNumber,
+              PageSize = pageSize,
+              Data = borrowCapitals
+            };
+            return Ok(result);
+          }
+          catch (Exception e)
+          {
+              Console.WriteLine(e);
+              return StatusCode(500, new { Message = "An error occurred", Error = e.Message });
+          }
     }
 
     // 4. Create - Tạo một BorrowCapital mới
@@ -293,30 +315,34 @@ public class BorrowCapitalController : ControllerBase
     [HttpPost("calculate")]
     public IActionResult CalculateBorrowCapital([FromBody] BorrowCapitalRequest request)
     {
-        try
+      try
+      {
+        if (request.NumberOfPayments > 300)
         {
-            var totalPaymentAmount = _calculateBorrowCapitalServices.totalPaymentAmount(request.LoanAmount);
-            var monthlyPaymentAmount = _calculateBorrowCapitalServices.MonthlyPaymentAmount(
-                request.Salaly, request.PercentageSalary, totalPaymentAmount.Item1, request.NumberOfPayments);
-            var dueDate = request.LoanDate.AddMonths(request.NumberOfPayments);
+          return Ok(null);
+        }
+        var totalPaymentAmount = _calculateBorrowCapitalServices.totalPaymentAmount(request.LoanAmount);
+        var monthlyPaymentAmount = _calculateBorrowCapitalServices.MonthlyPaymentAmount(
+            request.Salaly, request.PercentageSalary, totalPaymentAmount.Item1, request.NumberOfPayments);
+        var dueDate = request.LoanDate.AddMonths(request.NumberOfPayments);
 
-            return Ok(new
-            {
-                TotalAmount = totalPaymentAmount.Item1,
-                TotalInterest = totalPaymentAmount.Item2,
-                MonthlyAmount = monthlyPaymentAmount.Item1,
-                BoolMonthlyAmount = monthlyPaymentAmount.Item2,
-                DueDate = dueDate
-            });
-        }
-        catch (Exception e)
+        return Ok(new
         {
-            Console.WriteLine(e);
-            return StatusCode(500, new { Message = "An error occurred", Error = e.Message });
-        }
+          TotalAmount = totalPaymentAmount.Item1,
+          TotalInterest = totalPaymentAmount.Item2,
+          MonthlyAmount = monthlyPaymentAmount.Item1,
+          BoolMonthlyAmount = monthlyPaymentAmount.Item2,
+          DueDate = dueDate
+        });
+      }
+      catch (Exception e)
+      {
+        Console.WriteLine(e);
+        return StatusCode(500, new { Message = "An error occurred", Error = e.Message });
+      }
     }
 
-    // 10. Get By Date Range - Lấy BorrowCapitals theo khoảng thời gian, chỉ lấy record chưa xóa mềm
+  // 10. Get By Date Range - Lấy BorrowCapitals theo khoảng thời gian, chỉ lấy record chưa xóa mềm
     [HttpPost("by-date")]
     public async Task<IActionResult> GetBorrowCapitalsByDateRange([FromBody] BorrowCapitalDateRangeRequest request)
     {

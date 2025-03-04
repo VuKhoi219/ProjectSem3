@@ -56,6 +56,7 @@ Layout = "~/Views/Shared/_Layout.cshtml";
     <!-- Các trường chi tiết sẽ được thêm dynamically -->
   </div>
 </div>
+@section Scripts{
 
 <!-- Thêm jQuery -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -71,19 +72,13 @@ Layout = "~/Views/Shared/_Layout.cshtml";
       success: function(response) {
         // Ẩn loading khi có dữ liệu
         $('#loading').hide();
-
-        // Giả sử response trả về dạng giống dữ liệu bạn cung cấp
         const data = response.data;
         const insurancePlan = data.insurancePlan;
-
-        // Hiển thị thông tin chung
         $('#plan-name').text(`Gói bảo hiểm: ${insurancePlan.name}`);
         $('#description').text(insurancePlan.description);
         $('#coverage-amount').text(insurancePlan.coverageAmount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
         $('#start-date').text(new Date(data.startDate).toLocaleDateString('vi-VN'));
         $('#end-date').text(new Date(data.endDate).toLocaleDateString('vi-VN'));
-
-        // Hiển thị chi tiết tùy theo loại (life, health, vehicle, property)
         const detailSection = $('#detail-section');
         if (insurancePlan.lifeDetail) {
           $('#detail-title').text('Chi tiết bảo hiểm nhân thọ');
@@ -128,8 +123,6 @@ Layout = "~/Views/Shared/_Layout.cshtml";
           appendDetail(detailSection, 'Phí bảo hiểm', insurancePlan.propertyDetail.premium);
           appendDetail(detailSection, 'Khấu trừ', insurancePlan.propertyDetail.deductible);
         }
-
-        // Hiển thị card khi dữ liệu đã được điền
         $('#insurance-card').show();
       },
       error: function(xhr, status, error) {
@@ -137,11 +130,9 @@ Layout = "~/Views/Shared/_Layout.cshtml";
         $('#error').text('Lỗi khi tải dữ liệu: ' + error);
       }
     });
-
-    // Hàm hỗ trợ để thêm chi tiết
     function appendDetail(section, label, value) {
       section.append(`<p><span class="label">${label}:</span> ${value}</p>`);
     }
   });
-
 </script>
+}

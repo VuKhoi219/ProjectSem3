@@ -1,0 +1,193 @@
+@using Microsoft.AspNetCore.Mvc
+@{
+ViewData["Title"] = "Borrow Capital Details";
+Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    margin: 20px;
+    background-color: #f4f4f4;
+  }
+  .borrow-card {
+    background: white;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    max-width: 600px;
+    display: none;
+  }
+  .borrow-card h2 {
+    color: #2c3e50;
+    margin-top: 0;
+  }
+  .detail-section {
+    margin-top: 15px;
+  }
+  .detail-section p {
+    margin: 5px 0;
+  }
+  .label {
+    font-weight: bold;
+    color: #34495e;
+  }
+  .loading {
+    font-size: 18px;
+    color: #7f8c8d;
+  }
+  .error {
+    color: red;
+  }
+  .loan-payment {
+    background: white;
+    border-radius: 8px;
+    padding: 20px;
+    margin-top: 20px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    max-width: 600px;
+  }
+  .loan-payment h3 {
+    color: #2c3e50;
+  }
+  .loan-payment table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+  }
+  .loan-payment th, .loan-payment td {
+    padding: 8px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+  }
+  .loan-payment th {
+    background-color: #f2f2f2;
+  }
+  .loan-payment img {
+    max-width: 100px;
+    height: auto;
+  }
+</style>
+
+<h1>Loan Details</h1>
+<div id="loading" class="loading">Loading data...</div>
+<div id="error" class="error"></div>
+
+<div id="borrow-card" class="borrow-card">
+  <h2 id="title">Loan Information</h2>
+  <p><span class="label">Loan ID:</span> <span id="id"></span></p>
+  <p><span class="label">Loan Amount:</span> <span id="loanAmount"></span></p>
+  <p><span class="label">Repayment Amount:</span> <span id="repaymentAmount"></span></p>
+  <p><span class="label">Monthly Payment Amount:</span> <span id="monthlyPaymentAmount"></span></p>
+  <p><span class="label">Loan Date:</span> <span id="loanDate"></span></p>
+  <p><span class="label">Due Date:</span> <span id="dueDate"></span></p>
+  <p><span class="label">Status:</span> <span id="status"></span></p>
+</div>
+
+<div id="listLoanPayment" class="loan-payment">
+  <h3>Payment History</h3>
+  <a href="#" id="createPaymentLink">Add Transaction</a>
+  <table id="paymentTable">
+    <thead>
+    <tr>
+      <th>Transaction ID</th>
+      <th>Payment Amount</th>
+      <th>Payment Date</th>
+      <th>Image</th>
+      <th>Overdue Days</th>
+      <th>Penalty Interest</th>
+      <th>Status</th>
+    </tr>
+    </thead>
+    <tbody id="paymentList"></tbody>
+  </table>
+</div>
+
+@section Scripts {
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+  $(document).ready(function() {
+    const borrowCapital = JSON.parse(localStorage.getItem("BorrowCapital")) || {};
+    const borrowCapitalId = borrowCapital.id;
+
+    if (!borrowCapitalId) {
+      $('#loading').hide();
+      $('#error').text('No loan ID found in localStorage.');
+      return;
+    }
+
+    let monthlyPaymentAmount;
+    let loanDate;
+
+    $.ajax({
+      url: `/api/borrow-capital/${borrowCapitalId}`,
+      method: 'GET',
+      success: function(response) {
+        $('#loading').hide();
+        const loanDateObj = new Date(response.loanDate);
+        const dueDate = new Date(response.dueDate);
+        const monthsDiff = (dueDate.getFullYear() - loanDateObj.getFullYear()) * 12 + (dueDate.getMonth() - loanDateObj.getMonth());
+        monthlyPaymentAmount = monthsDiff > 0 ? response.repaymentAmount / monthsDiff : response.repaymentAmount;
+        loanDate = response.loanDate.split('T')[0];
+
+        $('#id').text(response.id);
+        $('#loanAmount').text(response.loanAmount.toLocaleString('en-US', { style: 'currency', currency: 'USD' }));
+        $('#repaymentAmount').text(response.repaymentAmount.toLocaleString('en-US', { style: 'currency', currency: 'USD' }));
+        $('#monthlyPaymentAmount').text(monthlyPaymentAmount.toLocaleString('en-US', { style: 'currency', currency: 'USD' }));
+        $('#loanDate').text(loanDateObj.toLocaleDateString('en-US'));
+        $('#dueDate').text(dueDate.toLocaleDateString('en-US'));
+        const statusMap = { 0: 'Pending', 1: 'Active', 2: 'Overdue', 3: 'Closed' };
+        $('#status').text(statusMap[response.status] || 'N/A');
+        $('#borrow-card').show();
+
+        // When clicking "Add Transaction"
+        $('#createPaymentLink').on('click', function(e) {
+          e.preventDefault();
+          localStorage.setItem("LoanPaymentData", JSON.stringify({
+            borrowCapitalId: borrowCapitalId,
+            monthlyPaymentAmount: monthlyPaymentAmount,
+            nowDateTime: new Date().toISOString().split('T')[0],
+            loanDateTime: loanDate
+          }));
+          window.location.href = "/LoanPayment/Create";
+        });
+      },
+      error: function(xhr) {
+        $('#loading').hide();
+        $('#error').text('Error loading data: ' + (xhr.responseJSON?.message || 'Unknown error'));
+      }
+    });
+
+    $.ajax({
+      url: `/api/loan-payment/borrow/${borrowCapitalId}`,
+      method: 'GET',
+      success: function(response) {
+        const paymentList = $('#paymentList');
+        paymentList.empty();
+        console.log(response.$values)
+        if (response.$values && response.$values.length > 0) {
+          response.$values.forEach(payment => {
+            const row = `
+                                <tr>
+                                    <td>${payment.id}</td>
+                                    <td>${payment.paymentAmount.toLocaleString('en-US', { style: 'currency', currency: 'USD' })}</td>
+                                    <td>${new Date(payment.paymentDate).toLocaleDateString('en-US')}</td>
+                                    <td><img src="${payment.paymentImage}" alt="Payment Proof" onerror="this.src='/images/placeholder.jpg'"></td>
+                                    <td>${payment.overdueDays}</td>
+                                    <td>${payment.penaltyInterest.toLocaleString('en-US', { style: 'currency', currency: 'USD' })}</td>
+                                    <td>${payment.status ? 'Paid' : 'Pending Approval'}</td>
+                                </tr>`;
+            paymentList.append(row);
+          });
+        } else {
+          paymentList.append('<tr><td colspan="6">No payment history available.</td></tr>');
+        }
+      },
+      error: function(xhr) {
+        $('#error').text('Error loading history: ' + (xhr.responseJSON?.message || 'Unknown error'));
+      }
+    });
+  });
+</script>
+}
