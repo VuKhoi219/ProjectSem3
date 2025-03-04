@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 namespace Project_Sem3.Controllers.VỉewController;
 
-public class InsuranceContract : BaseController
+public class InsuranceContractController : BaseController
 {
   public IActionResult Index()
   {
