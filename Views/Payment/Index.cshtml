@@ -79,7 +79,7 @@ Layout = "~/Views/Shared/_Layout.cshtml";
 
     showLoading(); // Hiển thị spinner xoay
     $.ajax({
-      url: `/api/payments/user/${id}?page=${page}&pageSize=${pageSize}`,
+      url: `/api/payments/user/${id}?pageNumber=${page}&pageSize=${pageSize}`,
       method: 'GET',
       success: function(response) {
         const data = (response.data && response.data.$values) || [];

@@ -28,7 +28,7 @@ public class BaseController : Controller
         new NavItem { Text = "Borrow capital", Controller = "BorrowCapital", Action = "Index" },
         new NavItem { Text = "Transaction history", Controller = "Payment", Action = "Index" },
         new NavItem { Text = "List of contracts", Controller = "InsuranceContract", Action = "Index" },
-        new NavItem { Text = "Loan Payment History", Controller = "LoanPayment", Action = "Testimonial" }
+        // new NavItem { Text = "Loan Payment History", Controller = "LoanPayment", Action = "Testimonial" }
       },
       IsLoggedIn = userId.HasValue
     };
