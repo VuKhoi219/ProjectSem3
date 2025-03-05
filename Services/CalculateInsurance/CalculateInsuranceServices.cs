@@ -69,11 +69,11 @@ public class CalculateInsuranceServices
         decimal riskFactor = _riskFactor.CalculateVehicleInsuranceRiskFactor(ageCoefficient, vehicleCoefficient, accidentCoefficient, locationCoefficient);
         if (riskFactor < 0.075m)
         {
-          riskFactor = 0.02m;
+          riskFactor = 0.075m;
         }
         else
         {
-          riskFactor = 0.05m;
+          riskFactor = 0.08m;
         }
         decimal annualPaymentAmount = decimal.Round(baseRateVehicle + (coverageAmount * riskFactor) * 0.9m, 1);
         decimal deductible = decimal.Round((annualPaymentAmount / 0.9m), 1) * 0.1m;
