@@ -20,9 +20,7 @@ public class DatabaseSeeder
                     CreatedAt = DateTime.Now,
                     UpdatedAt = DateTime.Now,
                     DeleteAt = null,
-                    CreatedBy = null,
-                    UpdatedBy = null,
-                    DeleteBy = null
+
                 },
                 new Role
                 {
@@ -30,9 +28,6 @@ public class DatabaseSeeder
                     CreatedAt = DateTime.Now,
                     UpdatedAt = DateTime.Now,
                     DeleteAt = null,
-                    CreatedBy = null,
-                    UpdatedBy = null,
-                    DeleteBy = null
                 }
             };
             context.Roles.AddRange(roles);
@@ -58,8 +53,6 @@ public class DatabaseSeeder
             context.Users.AddRange(users);
             context.SaveChanges();
         }
-
-
         if (!context.InsurancePlans.Any())
         {
             var insuranceFaker = new Faker<InsurancePlan>()

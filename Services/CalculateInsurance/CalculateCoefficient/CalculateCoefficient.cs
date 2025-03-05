@@ -169,11 +169,11 @@ public class CalculateCoefficient
         }
         if (numberOfAccidents == 1)
         {
-            return 0.002m;
+            return 0.005m;
         }
         else if (numberOfAccidents == 2)
         {
-            return 0.005m;
+            return 0.01m;
         }
         else if (numberOfAccidents >= 3)
         {
@@ -189,7 +189,7 @@ public class CalculateCoefficient
 
         if (cityIds == null || cityIds.Length == 0)
         {
-            return 0.01m; // Mặc định
+            return 0.001m; // Mặc định
         }
 
         foreach (var id in cityIds)
@@ -206,10 +206,10 @@ public class CalculateCoefficient
                 case 7: // Huế
                 case 8: // Thuận An
                 case 9: // Thủ Đức
-                    totalCoefficient += 0.05m;
+                    totalCoefficient += 0.005m;
                     break;
                 default:
-                    totalCoefficient += 0.01m;
+                    totalCoefficient += 0.001m;
                     break;
             }
         }
@@ -224,7 +224,7 @@ public class CalculateCoefficient
 
         if (cityIds == null || cityIds.Length == 0)
         {
-            return 0.001m; // Mặc định
+            return 0.01m; // Mặc định
         }
 
         foreach (var id in cityIds)
@@ -242,10 +242,10 @@ public class CalculateCoefficient
                 case 8: // Hoà Bình
                 case 9: // Ninh Bình
                 case 10: // Thanh Hoá
-                    totalCoefficient += 0.005m;
+                    totalCoefficient += 0.05m;
                     break;
                 default:
-                    totalCoefficient += 0.001m;
+                    totalCoefficient += 0.01m;
                     break;
             }
         }
@@ -278,7 +278,7 @@ public class CalculateCoefficient
 
         if (careerIds == null || careerIds.Length == 0)
         {
-            return 0.001m; // Mặc định
+            return 0.01m; // Mặc định
         }
 
         foreach (var id in careerIds)
@@ -300,7 +300,7 @@ public class CalculateCoefficient
                 case 12: // Sĩ quan cảnh sát
                 case 13: // Tài xế xe tải
                 case 14: // Diễn viên đóng thế
-                    totalCoefficient += 0.05m;
+                    totalCoefficient += 0.03m;
                     break;
                 default:
                     totalCoefficient += 0.01m;
@@ -318,7 +318,7 @@ public class CalculateCoefficient
 
         if (materialIds == null || materialIds.Length == 0)
         {
-            return 0.001m; // Mặc định
+            return 0.01m; // Mặc định
         }
 
         foreach (var id in materialIds)
@@ -326,10 +326,10 @@ public class CalculateCoefficient
             switch (id)
             {
                 case 0: // Gỗ
-                    totalCoefficient += 0.003m;
+                    totalCoefficient += 0.03m;
                     break;
                 default:
-                    totalCoefficient += 0.001m;
+                    totalCoefficient += 0.01m;
                     break;
             }
         }
@@ -344,7 +344,7 @@ public class CalculateCoefficient
 
         if (cityIds == null || cityIds.Length == 0)
         {
-            return 0.001m; // Mặc định
+            return 0.01m; // Mặc định
         }
 
         foreach (var id in cityIds)
@@ -352,10 +352,10 @@ public class CalculateCoefficient
             switch (id)
             {
                 case 0: // Buôn Ma Thuột
-                    totalCoefficient += 0.002m;
+                    totalCoefficient += 0.02m;
                     break;
                 default:
-                    totalCoefficient += 0.001m;
+                    totalCoefficient += 0.01m;
                     break;
             }
         }

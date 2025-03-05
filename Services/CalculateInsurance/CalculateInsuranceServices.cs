@@ -24,8 +24,8 @@ public class CalculateInsuranceServices
         decimal healthCoefficient = _calculateCoefficient.HealthCoefficient(healthStatusIds);
         decimal careerCoefficient = _calculateCoefficient.CareerCoefficient(careerIds);
         decimal riskFactor = _riskFactor.CalculateLifeInsuranceRiskFactor(ageCoefficient, healthCoefficient, careerCoefficient);
-        if (riskFactor > 0.1m) riskFactor = 0.1m;
-        decimal baseRateLife = _baseRate.BaseRateLife(age);
+        if (riskFactor > 0.2m) riskFactor = 0.2m;
+        decimal baseRateLife = _baseRate.BaseRateLife();
         decimal annualPaymentAmount = baseRateLife + (riskFactor * coverageAmount);
         decimal deductible = annualPaymentAmount * 0.01m;
         decimal premium = annualPaymentAmount * contractDuration;
@@ -46,7 +46,7 @@ public class CalculateInsuranceServices
         decimal careerCoefficient = _calculateCoefficient.CareerCoefficient(careerIds);
         decimal lifestyleCoefficient = _calculateCoefficient.LifestyleCoefficient(lifestyleIds);
         decimal riskFactor = _riskFactor.CalculateHealthInsuranceRiskFactor(ageCoefficient, healthCoefficient, careerCoefficient, lifestyleCoefficient);
-        if (riskFactor > 0.1m) riskFactor = 0.1m; // Đặt mức tối đa cho rủi ro cao
+        if (riskFactor > 0.2m) riskFactor = 0.2m; // Đặt mức tối đa cho rủi ro cao
         decimal annualPaymentAmount = baseRateHealth + ((riskFactor + healthCoefficient) * coverageAmount);
         decimal deductible = annualPaymentAmount * 0.01m;
         decimal premium = annualPaymentAmount * contractDuration;
@@ -61,7 +61,7 @@ public class CalculateInsuranceServices
             return (0m, 0m, 0m, 0m, 0m);
         }
 
-        decimal baseRateVehicle = _baseRate.BaseRateVehicle();
+        decimal baseRateVehicle = _baseRate.BaseRateVehicle(coverageAmount);
         decimal ageCoefficient = _calculateCoefficient.AgeCoefficient(age);
         decimal vehicleCoefficient = _calculateCoefficient.VehicleCoefficient(vehicleInfo); // vehicleInfo chứa [vehicleType, brandId]
         decimal locationCoefficient = _calculateCoefficient.LocationCoefficient(cityIds);
@@ -69,11 +69,11 @@ public class CalculateInsuranceServices
         decimal riskFactor = _riskFactor.CalculateVehicleInsuranceRiskFactor(ageCoefficient, vehicleCoefficient, accidentCoefficient, locationCoefficient);
         if (riskFactor < 0.075m)
         {
-          riskFactor = 0.075m;
+          riskFactor = 0.02m;
         }
         else
         {
-          riskFactor = 0.08m;
+          riskFactor = 0.05m;
         }
         decimal annualPaymentAmount = decimal.Round(baseRateVehicle + (coverageAmount * riskFactor) * 0.9m, 1);
         decimal deductible = decimal.Round((annualPaymentAmount / 0.9m), 1) * 0.1m;

@@ -37,7 +37,6 @@ namespace Project_Sem3.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Currency")
-                        .IsRequired()
                         .HasMaxLength(10)
                         .HasColumnType("nvarchar(10)");
 
@@ -67,7 +66,7 @@ namespace Project_Sem3.Migrations
                     b.Property<decimal>("RepaymentAmount")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<int>("Status")
+                    b.Property<int?>("Status")
                         .HasColumnType("int");
 
                     b.Property<DateTime?>("UpdatedAt")
@@ -532,7 +531,7 @@ namespace Project_Sem3.Migrations
                     b.Property<DateTime?>("CreatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("CreatedBy")
+                    b.Property<int?>("CreatedBy")
                         .HasColumnType("int");
 
                     b.Property<int>("OverdueDays")
@@ -689,14 +688,8 @@ namespace Project_Sem3.Migrations
                     b.Property<DateTime?>("CreatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<int?>("CreatedBy")
-                        .HasColumnType("int");
-
                     b.Property<DateTime?>("DeleteAt")
                         .HasColumnType("datetime2");
-
-                    b.Property<int?>("DeleteBy")
-                        .HasColumnType("int");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -706,19 +699,10 @@ namespace Project_Sem3.Migrations
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<int?>("UpdatedBy")
-                        .HasColumnType("int");
-
                     b.Property<int?>("UserId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("CreatedBy");
-
-                    b.HasIndex("DeleteBy");
-
-                    b.HasIndex("UpdatedBy");
 
                     b.HasIndex("UserId");
 
@@ -1033,8 +1017,7 @@ namespace Project_Sem3.Migrations
                     b.HasOne("Project_Sem3.Models.User", "Creator")
                         .WithMany()
                         .HasForeignKey("CreatedBy")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("BorrowCapital");
 
@@ -1119,38 +1102,16 @@ namespace Project_Sem3.Migrations
 
             modelBuilder.Entity("Project_Sem3.Models.Role", b =>
                 {
-                    b.HasOne("Project_Sem3.Models.User", "Creator")
-                        .WithMany()
-                        .HasForeignKey("CreatedBy")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.HasOne("Project_Sem3.Models.User", "Deleter")
-                        .WithMany()
-                        .HasForeignKey("DeleteBy")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.HasOne("Project_Sem3.Models.User", "Updater")
-                        .WithMany()
-                        .HasForeignKey("UpdatedBy")
-                        .OnDelete(DeleteBehavior.Restrict);
-
                     b.HasOne("Project_Sem3.Models.User", null)
                         .WithMany("Roles")
                         .HasForeignKey("UserId");
-
-                    b.Navigation("Creator");
-
-                    b.Navigation("Deleter");
-
-                    b.Navigation("Updater");
                 });
 
             modelBuilder.Entity("Project_Sem3.Models.User", b =>
                 {
                     b.HasOne("Project_Sem3.Models.Role", "Role")
-                        .WithMany("Users")
-                        .HasForeignKey("RoleId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .WithMany()
+                        .HasForeignKey("RoleId");
 
                     b.Navigation("Role");
                 });
@@ -1176,11 +1137,6 @@ namespace Project_Sem3.Migrations
                     b.Navigation("PropertyDetails");
 
                     b.Navigation("VehicleDetails");
-                });
-
-            modelBuilder.Entity("Project_Sem3.Models.Role", b =>
-                {
-                    b.Navigation("Users");
                 });
 
             modelBuilder.Entity("Project_Sem3.Models.User", b =>
