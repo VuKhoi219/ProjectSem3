@@ -19,13 +19,13 @@ namespace Project_Sem3.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     UserId = table.Column<int>(type: "int", nullable: false),
                     LoanAmount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    Currency = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: false),
+                    Currency = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: true),
                     InterestRate = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     LoanPurpose = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
                     LoanDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     RepaymentAmount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     DueDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Status = table.Column<int>(type: "int", nullable: false),
+                    Status = table.Column<int>(type: "int", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
                     UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
                     DeleteAt = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -225,7 +225,7 @@ namespace Project_Sem3.Migrations
                     PenaltyInterest = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     Status = table.Column<bool>(type: "bit", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    CreatedBy = table.Column<int>(type: "int", nullable: false)
+                    CreatedBy = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -300,9 +300,6 @@ namespace Project_Sem3.Migrations
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
                     UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
                     DeleteAt = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    CreatedBy = table.Column<int>(type: "int", nullable: true),
-                    UpdatedBy = table.Column<int>(type: "int", nullable: true),
-                    DeleteBy = table.Column<int>(type: "int", nullable: true),
                     UserId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
@@ -336,8 +333,7 @@ namespace Project_Sem3.Migrations
                         name: "FK_Users_Roles_RoleId",
                         column: x => x.RoleId,
                         principalTable: "Roles",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateIndex(
@@ -554,21 +550,6 @@ namespace Project_Sem3.Migrations
                 name: "IX_Payments_UserId1",
                 table: "Payments",
                 column: "UserId1");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Roles_CreatedBy",
-                table: "Roles",
-                column: "CreatedBy");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Roles_DeleteBy",
-                table: "Roles",
-                column: "DeleteBy");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Roles_UpdatedBy",
-                table: "Roles",
-                column: "UpdatedBy");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Roles_UserId",
@@ -889,30 +870,6 @@ namespace Project_Sem3.Migrations
                 principalColumn: "Id");
 
             migrationBuilder.AddForeignKey(
-                name: "FK_Roles_Users_CreatedBy",
-                table: "Roles",
-                column: "CreatedBy",
-                principalTable: "Users",
-                principalColumn: "Id",
-                onDelete: ReferentialAction.Restrict);
-
-            migrationBuilder.AddForeignKey(
-                name: "FK_Roles_Users_DeleteBy",
-                table: "Roles",
-                column: "DeleteBy",
-                principalTable: "Users",
-                principalColumn: "Id",
-                onDelete: ReferentialAction.Restrict);
-
-            migrationBuilder.AddForeignKey(
-                name: "FK_Roles_Users_UpdatedBy",
-                table: "Roles",
-                column: "UpdatedBy",
-                principalTable: "Users",
-                principalColumn: "Id",
-                onDelete: ReferentialAction.Restrict);
-
-            migrationBuilder.AddForeignKey(
                 name: "FK_Roles_Users_UserId",
                 table: "Roles",
                 column: "UserId",
@@ -923,18 +880,6 @@ namespace Project_Sem3.Migrations
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropForeignKey(
-                name: "FK_Roles_Users_CreatedBy",
-                table: "Roles");
-
-            migrationBuilder.DropForeignKey(
-                name: "FK_Roles_Users_DeleteBy",
-                table: "Roles");
-
-            migrationBuilder.DropForeignKey(
-                name: "FK_Roles_Users_UpdatedBy",
-                table: "Roles");
-
             migrationBuilder.DropForeignKey(
                 name: "FK_Roles_Users_UserId",
                 table: "Roles");

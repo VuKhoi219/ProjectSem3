@@ -48,7 +48,7 @@ Layout = "~/Views/Shared/_Layout.cshtml";
 <div id="insurance-card" class="insurance-card">
   <h2 id="plan-name"></h2>
   <p><span class="label">Mô tả:</span> <span id="description"></span></p>
-  <p><span class="label">Số tiền bảo hiểm:</span> <span id="coverage-amount"></span></p>
+  <p><span class="label">Số tiền bảo hiểm chi trả hằng năm :</span> <span id="coverage-amount"></span></p>
   <p><span class="label">Ngày bắt đầu:</span> <span id="start-date"></span></p>
   <p><span class="label">Ngày kết thúc:</span> <span id="end-date"></span></p>
   <div id="detail-section" class="detail-section">
@@ -88,7 +88,7 @@ Layout = "~/Views/Shared/_Layout.cshtml";
           appendDetail(detailSection, 'Hệ số rủi ro', insurancePlan.lifeDetail.riskFactor);
           appendDetail(detailSection, 'Khu vực', insurancePlan.lifeDetail.region);
           appendDetail(detailSection, 'Thanh toán hàng năm', insurancePlan.lifeDetail.annualPaymentAmount);
-          appendDetail(detailSection, 'Phí bảo hiểm', insurancePlan.lifeDetail.premium);
+          appendDetail(detailSection, 'Tổng phí bảo hiểm', insurancePlan.lifeDetail.premium);
           appendDetail(detailSection, 'Khấu trừ', insurancePlan.lifeDetail.deductible);
         } else if (insurancePlan.healthDetail) {
           $('#detail-title').text('Chi tiết bảo hiểm sức khỏe');
@@ -99,7 +99,7 @@ Layout = "~/Views/Shared/_Layout.cshtml";
           appendDetail(detailSection, 'Hệ số rủi ro', insurancePlan.healthDetail.riskFactor);
           appendDetail(detailSection, 'Khu vực', insurancePlan.healthDetail.region);
           appendDetail(detailSection, 'Thanh toán hàng năm', insurancePlan.healthDetail.annualPaymentAmount);
-          appendDetail(detailSection, 'Phí bảo hiểm', insurancePlan.healthDetail.premium);
+          appendDetail(detailSection, 'Tổng phí bảo hiểm', insurancePlan.healthDetail.premium);
           appendDetail(detailSection, 'Khấu trừ', insurancePlan.healthDetail.deductible);
         } else if (insurancePlan.vehicleDetail) {
           $('#detail-title').text('Chi tiết bảo hiểm xe cộ');
@@ -110,7 +110,7 @@ Layout = "~/Views/Shared/_Layout.cshtml";
           appendDetail(detailSection, 'Hệ số rủi ro', insurancePlan.vehicleDetail.riskFactor);
           appendDetail(detailSection, 'Khu vực', insurancePlan.vehicleDetail.region);
           appendDetail(detailSection, 'Thanh toán hàng năm', insurancePlan.vehicleDetail.annualPaymentAmount);
-          appendDetail(detailSection, 'Phí bảo hiểm', insurancePlan.vehicleDetail.premium);
+          appendDetail(detailSection, 'Tổng phí bảo hiểm', insurancePlan.vehicleDetail.premium);
           appendDetail(detailSection, 'Khấu trừ', insurancePlan.vehicleDetail.deductible);
         } else if (insurancePlan.propertyDetail) {
           $('#detail-title').text('Chi tiết bảo hiểm tài sản');
@@ -120,7 +120,7 @@ Layout = "~/Views/Shared/_Layout.cshtml";
           appendDetail(detailSection, 'Hệ số rủi ro', insurancePlan.propertyDetail.riskFactor);
           appendDetail(detailSection, 'Khu vực', insurancePlan.propertyDetail.region);
           appendDetail(detailSection, 'Thanh toán hàng năm', insurancePlan.propertyDetail.annualPaymentAmount);
-          appendDetail(detailSection, 'Phí bảo hiểm', insurancePlan.propertyDetail.premium);
+          appendDetail(detailSection, 'Tổng phí bảo hiểm', insurancePlan.propertyDetail.premium);
           appendDetail(detailSection, 'Khấu trừ', insurancePlan.propertyDetail.deductible);
         }
         $('#insurance-card').show();

@@ -23,11 +23,6 @@ public class MyDbContext : DbContext
     {
         base.OnModelCreating(modelBuilder);
 
-        modelBuilder.Entity<User>()
-            .HasMany(u => u.Roles)
-            .WithOne()
-            .HasForeignKey(r => r.CreatedBy);
-
         modelBuilder.Entity<InsuranceContract>()
             .HasOne(c => c.User)
             .WithMany(u => u.InsuranceContracts)
@@ -246,31 +241,6 @@ public class MyDbContext : DbContext
             .HasOne(n => n.Deleter)
             .WithMany()
             .HasForeignKey(n => n.DeleteBy)
-            .OnDelete(DeleteBehavior.Restrict);
-        // Cấu hình quan hệ giữa Role và User
-        modelBuilder.Entity<Role>()
-            .HasMany(r => r.Users)
-            .WithOne(u => u.Role)  // Giả sử User có thuộc tính 'Role' để liên kết
-            .HasForeignKey(u => u.RoleId)  // Khóa ngoại trong bảng User
-            .OnDelete(DeleteBehavior.Restrict);
-
-        // Cấu hình các mối quan hệ Creator, Updater, Deleter trong Role
-        modelBuilder.Entity<Role>()
-            .HasOne(r => r.Creator)
-            .WithMany()
-            .HasForeignKey(r => r.CreatedBy)
-            .OnDelete(DeleteBehavior.Restrict);
-
-        modelBuilder.Entity<Role>()
-            .HasOne(r => r.Updater)
-            .WithMany()
-            .HasForeignKey(r => r.UpdatedBy)
-            .OnDelete(DeleteBehavior.Restrict);
-
-        modelBuilder.Entity<Role>()
-            .HasOne(r => r.Deleter)
-            .WithMany()
-            .HasForeignKey(r => r.DeleteBy)
             .OnDelete(DeleteBehavior.Restrict);
         modelBuilder.Entity<LoanPayment>()
           .HasOne(l => l.BorrowCapital)
