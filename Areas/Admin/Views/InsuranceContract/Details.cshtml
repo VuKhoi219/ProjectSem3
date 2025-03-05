@@ -1,79 +1,58 @@
 @model Project_Sem3.Models.InsuranceContract
 
 @{
-ViewData["Title"] = "Insurance Contract Details";
+ViewData["Title"] = "Details";
 }
-
-@section VendorStyles {
-<!-- Add any vendor stylesheets you might need -->
-<link rel="stylesheet" href="~/vendor/libs/datatables-bs5/datatables.bootstrap5.css">
-<link rel="stylesheet" href="~/vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.css">
-}
-
-@section VendorScripts {
-<!-- Add any scripts you need for this page -->
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-<script>
-  $(document).ready(function() {
-    // When the "View Insurance Contract Details" button is clicked
-    $('#viewInsuranceContractDetailsButton').on('click', function(e) {
-      e.preventDefault(); // Prevent default action
-
-      const insuranceContractId = $(this).data('insurance-contract-id'); // Get the ID of the insurance contract
-
-      // Send an AJAX request to fetch the insurance contract details
-      $.ajax({
-        url: '/api/insurance-contracts/' + insuranceContractId,  // API route to fetch insurance contract details
-        method: 'GET',
-        success: function(response) {
-          // Insert the insurance contract details into the HTML
-          $('#insuranceContractDetails').html(`
-                            <h4>Insurance Contract Details</h4>
-                            <hr />
-                            <dl class="row">
-                                <dt class="col-sm-2">Insurance Contract ID</dt>
-                                <dd class="col-sm-10">${response.id}</dd>
-                                <dt class="col-sm-2">User ID</dt>
-                                <dd class="col-sm-10">${response.userId}</dd>
-                                <dt class="col-sm-2">Plan ID</dt>
-                                <dd class="col-sm-10">${response.planId}</dd>
-                                <dt class="col-sm-2">Detail ID</dt>
-                                <dd class="col-sm-10">${response.detailId}</dd>
-                                <dt class="col-sm-2">Start Date</dt>
-                                <dd class="col-sm-10">${new Date(response.startDate).toLocaleDateString()}</dd>
-                                <dt class="col-sm-2">End Date</dt>
-                                <dd class="col-sm-10">${new Date(response.endDate).toLocaleDateString()}</dd>
-                                <dt class="col-sm-2">Created By</dt>
-                                <dd class="col-sm-10">${response.createdBy}</dd>
-                                <dt class="col-sm-2">Agreement Terms</dt>
-                                <dd class="col-sm-10">${response.agreeToTerms ? 'Agreed' : 'Not Agreed'}</dd>
-                            </dl>
-                        `);
-        },
-        error: function(xhr, status, error) {
-          // Show an error message if something goes wrong
-          alert("Error fetching insurance contract details: " + error);
-        }
-      });
-    });
-  });
-</script>
-}
-
-<h1>Insurance Contract Details</h1>
-
-<!-- Button to view insurance contract details -->
-<div>
-  <button id="viewInsuranceContractDetailsButton" data-insurance-contract-id="@Model?.Id" class="btn btn-primary">View Insurance Contract Details</button>
-</div>
-
-<!-- Div to display the details dynamically -->
-<div id="insuranceContractDetails">
-  <!-- Insurance contract details will be loaded here dynamically -->
-</div>
 
 <div>
-  <a asp-action="Edit" class="col-md-6" asp-route-id="@Model?.Id">Edit</a> |
-  <a asp-action="Index" class="col-md-6">Back to List</a>
+  <h4>Insurance Contract Detail</h4>
+  <hr />
+  <dl class="row">
+    <dt class="col-sm-2">
+      @Html.DisplayNameFor(model => model.Id)
+    </dt>
+    <dd class="col-sm-10">
+      @Html.DisplayFor(model => model.Id)
+    </dd>
+    <dt class="col-sm-2">
+      @Html.DisplayNameFor(model => model.User.FullName)
+    </dt>
+    <dd class="col-sm-10">
+      @Html.DisplayFor(model => model.User.FullName)
+    </dd>
+    <dt class="col-sm-2">
+      @Html.DisplayNameFor(model => model.Plan.Name)
+    </dt>
+    <dd class="col-sm-10">
+      @Html.DisplayFor(model => model.Plan.Name)
+    </dd>
+    <dt class="col-sm-2">
+      @Html.DisplayNameFor(model => model.DetailId)
+    </dt>
+    <dd class="col-sm-10">
+      @Html.DisplayFor(model => model.DetailId)
+    </dd>
+    <dt class="col-sm-2">
+      @Html.DisplayNameFor(model => model.StartDate)
+    </dt>
+    <dd class="col-sm-10">
+      @Html.DisplayFor(model => model.StartDate)
+    </dd>
+    <dt class="col-sm-2">
+      @Html.DisplayNameFor(model => model.EndDate)
+    </dt>
+    <dd class="col-sm-10">
+      @Html.DisplayFor(model => model.EndDate)
+    </dd>
+    <dt class="col-sm-2">
+      @Html.DisplayNameFor(model => model.Status)
+    </dt>
+    <dd class="col-sm-10">
+      @Html.DisplayFor(model => model.Status)
+    </dd>
+  </dl>
+</div>
+<div>
+  <a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a> |
+  <a asp-action="Index">Back to List</a>
 </div>

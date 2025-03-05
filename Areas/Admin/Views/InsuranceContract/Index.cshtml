@@ -37,9 +37,11 @@ ViewData["Title"] = "Insurance Contracts List";
     },
     columns: [
       { data: 'id' },
-      { data: 'userId' },
-      { data: 'planId' },
-      { data: 'status' },
+      { data: 'fullName' },
+      { data: 'planName' },
+      { data: 'status', render: function (data) {
+          return data == 1 ? 'Active' : (data == 0 ? 'Inactive' : 'Expired');
+        }},
       { data: 'startDate' },
       { data: 'endDate' },
       {
