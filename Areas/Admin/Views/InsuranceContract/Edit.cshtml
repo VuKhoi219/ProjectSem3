@@ -77,6 +77,15 @@
             <select asp-for="CreatedBy" id="createdBy" class="form-control" asp-items="ViewBag.CreatedBy"></select>
             <span asp-validation-for="CreatedBy" class="text-danger"></span>
           </div>
+          <div class="col-md-6">
+            <label asp-for="Status" class="form-label">Status</label>
+            <select asp-for="Status" id="status" class="form-control">
+              <option value="Pending">Waiting</option>
+              <option value="Active">Approved</option>
+              <option value="Cancelled">Rejected</option>
+              <option value="Expired">Expired</option>
+            </select>
+          </div>
           <div class="col-12">
             <div class="form-check">
               <input type="checkbox" class="form-check-input" id="formValidationCheckbox" name="formValidationCheckbox"/>
@@ -114,6 +123,7 @@
         startDate: $('#startDate').val(),  // Get the StartDate
         endDate: $('#endDate').val(),  // Get the EndDate
         createdBy: $('#createdBy').val(),  // Get the CreatedBy
+        status: $('#status').val(),
         agreeToTerms: $('#formValidationCheckbox').prop('checked')  // Terms and conditions checkbox value
       };
 
