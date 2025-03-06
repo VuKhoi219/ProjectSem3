@@ -21,14 +21,16 @@ public class CalculateBorrowCapitalServices
     {
       throw new InvalidOperationException("Interest rate settings are not initialized.");
     }
-    return (loanAmount * (1m + _interestRateSetting.InterestRate / 100),_interestRateSetting.InterestRate);
+
+    decimal total = decimal.Round(loanAmount * (1m + _interestRateSetting.InterestRate / 100));
+    return (total,_interestRateSetting.InterestRate);
   }
-  public (decimal, bool) MonthlyPaymentAmount(decimal salaly, decimal percentageOfSalary, decimal totalPaymentAmount,
+  public (decimal, bool) MonthlyPaymentAmount(decimal salary, decimal percentageOfSalary, decimal totalPaymentAmount,
     int NumberOfPayments)
   {
     decimal fixedPaymentAmount =
       _monthlyPaymentAmount.CalculateMonthlyPaymentAmount(totalPaymentAmount, NumberOfPayments);
-    decimal userProposedAmount = salaly * (percentageOfSalary / 100);
+    decimal userProposedAmount = decimal.Round( salary * (percentageOfSalary / 100),1);
     if (fixedPaymentAmount > userProposedAmount)
     {
       return (fixedPaymentAmount, false);

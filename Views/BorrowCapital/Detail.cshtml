@@ -132,9 +132,9 @@ Layout = "~/Views/Shared/_Layout.cshtml";
         loanDate = response.loanDate.split('T')[0];
 
         $('#id').text(response.id);
-        $('#loanAmount').text(response.loanAmount.toLocaleString('en-US', { style: 'currency', currency: 'USD' }));
-        $('#repaymentAmount').text(response.repaymentAmount.toLocaleString('en-US', { style: 'currency', currency: 'USD' }));
-        $('#monthlyPaymentAmount').text(monthlyPaymentAmount.toLocaleString('en-US', { style: 'currency', currency: 'USD' }));
+        $('#loanAmount').text(response.loanAmount.toLocaleString('en-US', { style: 'currency', currency: 'VND' }));
+        $('#repaymentAmount').text(response.repaymentAmount.toLocaleString('en-US', { style: 'currency', currency: 'VND' }));
+        $('#monthlyPaymentAmount').text(monthlyPaymentAmount.toLocaleString('en-US', { style: 'currency', currency: 'VND' }));
         $('#loanDate').text(loanDateObj.toLocaleDateString('en-US'));
         $('#dueDate').text(dueDate.toLocaleDateString('en-US'));
         const statusMap = { 0: 'Pending', 1: 'Active', 2: 'Overdue', 3: 'Closed' };

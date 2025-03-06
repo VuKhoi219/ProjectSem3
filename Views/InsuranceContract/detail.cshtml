@@ -17,7 +17,7 @@ Layout = "~/Views/Shared/_Layout.cshtml";
     margin-bottom: 20px;
     box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     max-width: 600px;
-    display: none; /* Ẩn ban đầu cho đến khi dữ liệu được tải */
+    display: none; /* Hidden initially until data is loaded */
   }
   .insurance-card h2 {
     color: #2c3e50;
@@ -41,93 +41,93 @@ Layout = "~/Views/Shared/_Layout.cshtml";
     color: red;
   }
 </style>
-<h1>Chi tiết hợp đồng bảo hiểm</h1>
-<div id="loading" class="loading">Đang tải dữ liệu...</div>
+<h1>Insurance Contract Details</h1>
+<div id="loading" class="loading">Loading data...</div>
 <div id="error" class="error"></div>
 
 <div id="insurance-card" class="insurance-card">
   <h2 id="plan-name"></h2>
-  <p><span class="label">Mô tả:</span> <span id="description"></span></p>
-  <p><span class="label">Số tiền bảo hiểm chi trả hằng năm :</span> <span id="coverage-amount"></span></p>
-  <p><span class="label">Ngày bắt đầu:</span> <span id="start-date"></span></p>
-  <p><span class="label">Ngày kết thúc:</span> <span id="end-date"></span></p>
+  <p><span class="label">Description:</span> <span id="description"></span></p>
+  <p><span class="label">Annual Coverage Amount:</span> <span id="coverage-amount"></span></p>
+  <p><span class="label">Start Date:</span> <span id="start-date"></span></p>
+  <p><span class="label">End Date:</span> <span id="end-date"></span></p>
   <div id="detail-section" class="detail-section">
     <h3 id="detail-title"></h3>
-    <!-- Các trường chi tiết sẽ được thêm dynamically -->
+    <!-- Detail fields will be added dynamically -->
   </div>
 </div>
-@section Scripts{
 
-<!-- Thêm jQuery -->
+@section Scripts {
+<!-- Add jQuery -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
   const contract = JSON.parse(localStorage.getItem("contract")) || {};
   const contractId = contract.id;
   const planId = contract.planId;
   $(document).ready(function() {
-    // Gọi API khi trang được tải
+    // Call API when the page loads
     $.ajax({
-      url: '/api/insurance-contracts/contract-detail/'+contractId+'/'+planId,
+      url: '/api/insurance-contracts/contract-detail/' + contractId + '/' + planId,
       method: 'GET',
       success: function(response) {
-        // Ẩn loading khi có dữ liệu
+        // Hide loading when data is received
         $('#loading').hide();
         const data = response.data;
         const insurancePlan = data.insurancePlan;
-        $('#plan-name').text(`Gói bảo hiểm: ${insurancePlan.name}`);
+        $('#plan-name').text(`Insurance Plan: ${insurancePlan.name}`);
         $('#description').text(insurancePlan.description);
         $('#coverage-amount').text(insurancePlan.coverageAmount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
-        $('#start-date').text(new Date(data.startDate).toLocaleDateString('vi-VN'));
-        $('#end-date').text(new Date(data.endDate).toLocaleDateString('vi-VN'));
+        $('#start-date').text(new Date(data.startDate).toLocaleDateString('en-US'));
+        $('#end-date').text(new Date(data.endDate).toLocaleDateString('en-US'));
         const detailSection = $('#detail-section');
         if (insurancePlan.lifeDetail) {
-          $('#detail-title').text('Chi tiết bảo hiểm nhân thọ');
-          appendDetail(detailSection, 'Thời hạn (năm)', insurancePlan.lifeDetail.termYears);
-          appendDetail(detailSection, 'Nhóm tuổi', insurancePlan.lifeDetail.ageGroup);
-          appendDetail(detailSection, 'Thời gian (tháng)', insurancePlan.lifeDetail.duration);
-          appendDetail(detailSection, 'Hệ số rủi ro', insurancePlan.lifeDetail.riskFactor);
-          appendDetail(detailSection, 'Khu vực', insurancePlan.lifeDetail.region);
-          appendDetail(detailSection, 'Thanh toán hàng năm', insurancePlan.lifeDetail.annualPaymentAmount);
-          appendDetail(detailSection, 'Tổng phí bảo hiểm', insurancePlan.lifeDetail.premium);
-          appendDetail(detailSection, 'Khấu trừ', insurancePlan.lifeDetail.deductible);
+          $('#detail-title').text('Life Insurance Details');
+          appendDetail(detailSection, 'Term (years)', insurancePlan.lifeDetail.termYears);
+          appendDetail(detailSection, 'Age Group', insurancePlan.lifeDetail.ageGroup);
+          appendDetail(detailSection, 'Duration (months)', insurancePlan.lifeDetail.duration);
+          appendDetail(detailSection, 'Risk Factor', insurancePlan.lifeDetail.riskFactor);
+          appendDetail(detailSection, 'Region', insurancePlan.lifeDetail.region);
+          appendDetail(detailSection, 'Annual Payment', insurancePlan.lifeDetail.annualPaymentAmount);
+          appendDetail(detailSection, 'Total Premium', insurancePlan.lifeDetail.premium);
+          appendDetail(detailSection, 'Deductible', insurancePlan.lifeDetail.deductible);
         } else if (insurancePlan.healthDetail) {
-          $('#detail-title').text('Chi tiết bảo hiểm sức khỏe');
-          appendDetail(detailSection, 'Nhóm tuổi', insurancePlan.healthDetail.ageGroup);
-          appendDetail(detailSection, 'Mạng lưới bệnh viện', insurancePlan.healthDetail.hospitalNetwork);
-          appendDetail(detailSection, 'Bệnh có sẵn', insurancePlan.healthDetail.preExistingConditions);
-          appendDetail(detailSection, 'Thời gian (tháng)', insurancePlan.healthDetail.duration);
-          appendDetail(detailSection, 'Hệ số rủi ro', insurancePlan.healthDetail.riskFactor);
-          appendDetail(detailSection, 'Khu vực', insurancePlan.healthDetail.region);
-          appendDetail(detailSection, 'Thanh toán hàng năm', insurancePlan.healthDetail.annualPaymentAmount);
-          appendDetail(detailSection, 'Tổng phí bảo hiểm', insurancePlan.healthDetail.premium);
-          appendDetail(detailSection, 'Khấu trừ', insurancePlan.healthDetail.deductible);
+          $('#detail-title').text('Health Insurance Details');
+          appendDetail(detailSection, 'Age Group', insurancePlan.healthDetail.ageGroup);
+          appendDetail(detailSection, 'Hospital Network', insurancePlan.healthDetail.hospitalNetwork);
+          appendDetail(detailSection, 'Pre-existing Conditions', insurancePlan.healthDetail.preExistingConditions);
+          appendDetail(detailSection, 'Duration (months)', insurancePlan.healthDetail.duration);
+          appendDetail(detailSection, 'Risk Factor', insurancePlan.healthDetail.riskFactor);
+          appendDetail(detailSection, 'Region', insurancePlan.healthDetail.region);
+          appendDetail(detailSection, 'Annual Payment', insurancePlan.healthDetail.annualPaymentAmount);
+          appendDetail(detailSection, 'Total Premium', insurancePlan.healthDetail.premium);
+          appendDetail(detailSection, 'Deductible', insurancePlan.healthDetail.deductible);
         } else if (insurancePlan.vehicleDetail) {
-          $('#detail-title').text('Chi tiết bảo hiểm xe cộ');
-          appendDetail(detailSection, 'Loại xe', insurancePlan.vehicleDetail.vehicleType);
-          appendDetail(detailSection, 'Model xe', insurancePlan.vehicleDetail.vehicleModel);
-          appendDetail(detailSection, 'Năm sản xuất', insurancePlan.vehicleDetail.vehicleYear);
-          appendDetail(detailSection, 'Thời gian (tháng)', insurancePlan.vehicleDetail.duration);
-          appendDetail(detailSection, 'Hệ số rủi ro', insurancePlan.vehicleDetail.riskFactor);
-          appendDetail(detailSection, 'Khu vực', insurancePlan.vehicleDetail.region);
-          appendDetail(detailSection, 'Thanh toán hàng năm', insurancePlan.vehicleDetail.annualPaymentAmount);
-          appendDetail(detailSection, 'Tổng phí bảo hiểm', insurancePlan.vehicleDetail.premium);
-          appendDetail(detailSection, 'Khấu trừ', insurancePlan.vehicleDetail.deductible);
+          $('#detail-title').text('Vehicle Insurance Details');
+          appendDetail(detailSection, 'Vehicle Type', insurancePlan.vehicleDetail.vehicleType);
+          appendDetail(detailSection, 'Vehicle Model', insurancePlan.vehicleDetail.vehicleModel);
+          appendDetail(detailSection, 'Manufacturing Year', insurancePlan.vehicleDetail.vehicleYear);
+          appendDetail(detailSection, 'Duration (months)', insurancePlan.vehicleDetail.duration);
+          appendDetail(detailSection, 'Risk Factor', insurancePlan.vehicleDetail.riskFactor);
+          appendDetail(detailSection, 'Region', insurancePlan.vehicleDetail.region);
+          appendDetail(detailSection, 'Annual Payment', insurancePlan.vehicleDetail.annualPaymentAmount);
+          appendDetail(detailSection, 'Total Premium', insurancePlan.vehicleDetail.premium);
+          appendDetail(detailSection, 'Deductible', insurancePlan.vehicleDetail.deductible);
         } else if (insurancePlan.propertyDetail) {
-          $('#detail-title').text('Chi tiết bảo hiểm tài sản');
-          appendDetail(detailSection, 'Loại tài sản', insurancePlan.propertyDetail.propertyType);
-          appendDetail(detailSection, 'Vị trí', insurancePlan.propertyDetail.location);
-          appendDetail(detailSection, 'Thời gian (tháng)', insurancePlan.propertyDetail.duration);
-          appendDetail(detailSection, 'Hệ số rủi ro', insurancePlan.propertyDetail.riskFactor);
-          appendDetail(detailSection, 'Khu vực', insurancePlan.propertyDetail.region);
-          appendDetail(detailSection, 'Thanh toán hàng năm', insurancePlan.propertyDetail.annualPaymentAmount);
-          appendDetail(detailSection, 'Tổng phí bảo hiểm', insurancePlan.propertyDetail.premium);
-          appendDetail(detailSection, 'Khấu trừ', insurancePlan.propertyDetail.deductible);
+          $('#detail-title').text('Property Insurance Details');
+          appendDetail(detailSection, 'Property Type', insurancePlan.propertyDetail.propertyType);
+          appendDetail(detailSection, 'Location', insurancePlan.propertyDetail.location);
+          appendDetail(detailSection, 'Duration (months)', insurancePlan.propertyDetail.duration);
+          appendDetail(detailSection, 'Risk Factor', insurancePlan.propertyDetail.riskFactor);
+          appendDetail(detailSection, 'Region', insurancePlan.propertyDetail.region);
+          appendDetail(detailSection, 'Annual Payment', insurancePlan.propertyDetail.annualPaymentAmount);
+          appendDetail(detailSection, 'Total Premium', insurancePlan.propertyDetail.premium);
+          appendDetail(detailSection, 'Deductible', insurancePlan.propertyDetail.deductible);
         }
         $('#insurance-card').show();
       },
       error: function(xhr, status, error) {
         $('#loading').hide();
-        $('#error').text('Lỗi khi tải dữ liệu: ' + error);
+        $('#error').text('Error loading data: ' + error);
       }
     });
     function appendDetail(section, label, value) {
