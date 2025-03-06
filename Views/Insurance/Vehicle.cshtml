@@ -20,7 +20,7 @@ Layout = "~/Views/Shared/_Layout.cshtml";
     <h4>Eligible Participants</h4>
     <p>Owners of legally registered cars or motorcycles.</p>
     <h4 class="mt-4">Available Motor Vehicle Insurance Plans</h4>
-    <div id="insuranceCards" class="owl-carousel owl-theme"></div>
+    <div id="insuranceCards" class="owl-carousel owl-theme row" style="display:flex"></div>
   </div>
 </div>
 
@@ -60,7 +60,7 @@ Layout = "~/Views/Shared/_Layout.cshtml";
     let cardsHtml = "";
     plans.forEach(plan => {
       cardsHtml += `
-          <div class="item">
+          <div class="item col-md-4" sytle="margin-bottom:10px">
             <div class="card border-danger"> <!-- Thay border-primary bằng border-danger -->
               <div class="card-body">
                 <h5 class="card-title text-danger">${plan.name}</h5> <!-- Thay text-primary bằng text-danger -->

@@ -18,7 +18,7 @@ ViewData["Title"] = "Insurance Contracts List";
 }
 
 @section Scripts {
-<script>
+  <script>
   var dataTable = $('#dataTable').DataTable({
     processing: true,
     serverSide: true,
@@ -69,6 +69,30 @@ ViewData["Title"] = "Insurance Contracts List";
 
   dataTable.on('click', '.btn-detail', function () {
     var contractId = $(this).data('id');
+    var rowData = dataTable.row($(this).parents('tr')).data();
+
+    // Lấy planId và userId từ rowData
+    var planId = rowData.planId;
+    var userId = rowData.userId;
+
+    // Kiểm tra dữ liệu (tùy chọn)
+    if (!contractId || !planId || !userId) {
+      console.error('Missing required data:', { contractId, planId, userId });
+      alert('Không thể tải chi tiết hợp đồng do thiếu dữ liệu.');
+      return;
+    }
+
+    // Log để kiểm tra
+    console.log('Contract ID:', contractId);
+    console.log('Plan ID:', planId);
+    console.log('User ID:', userId);
+
+    // Lưu vào sessionStorage
+    sessionStorage.setItem('contractId', contractId);
+    sessionStorage.setItem('planId', planId);
+    sessionStorage.setItem('userId', userId);
+
+    // Chuyển hướng
     window.location.href = '/Admin/InsuranceContract/Details/' + contractId;
   });
 </script>

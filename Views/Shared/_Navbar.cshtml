@@ -95,7 +95,7 @@
     <!-- Kiểm tra trạng thái đăng nhập -->
     @if (!Model.IsLoggedIn)
     {
-        <a href="@Url.Action("Login", "loginAndRegister")" class="btn btn-primary px-3 d-none d-lg-block">Login</a>
+        <a href="@Url.Action("Login", "loginAndRegister")" class="btn btn-primary px-3 d-none d-lg-block" style="margin-right:10px">Login</a>
         <a href="@Url.Action("Register", "loginAndRegister")" class="btn btn-primary px-3 d-none d-lg-block">Register</a>
     }
 </nav>

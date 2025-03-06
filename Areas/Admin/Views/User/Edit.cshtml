@@ -113,9 +113,10 @@ ViewData["Title"] = "Edit";
       e.preventDefault();
 
       var formData = $(this).serialize();  // Serialize the form data
-
-      $.ajax({
-        url: '/api/users',  // Make sure to include the user ID in the URL
+      console.log(formData)
+      alert("miss")
+      /*$.ajax({
+        url: '/api/users/',  // Make sure to include the user ID in the URL
         type: 'POST',
         data: formData,
         success: function (response) {
@@ -130,7 +131,7 @@ ViewData["Title"] = "Edit";
         error: function () {
           alert('An error occurred while updating the user. Please try again later.');
         }
-      });
+      });*/
     });
   });
 </script>

@@ -19,7 +19,7 @@ Layout = "~/Views/Shared/_Layout.cshtml";
     <h4>Eligible Participants</h4>
     <!-- ... Nội dung khác giữ nguyên ... -->
     <h4 class="mt-4">Available Life Insurance Plans</h4>
-    <div id="insuranceCards" class="owl-carousel owl-theme"></div>
+    <div id="insuranceCards" class="owl-carousel owl-theme row"></div>
   </div>
 </div>
 
@@ -59,7 +59,7 @@ Layout = "~/Views/Shared/_Layout.cshtml";
     plans.forEach(plan => {
 
       cardsHtml += `
-                    <div class="item">
+                    <div class="item col-md-4" style="margin-bottom: 10px;">
                         <div class="card border-primary">
                             <div class="card-body">
                                 <h5 class="card-title text-primary">${plan.name}</h5>

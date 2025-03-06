@@ -18,7 +18,7 @@ ViewData["Title"] = "Insurance Plan List";
 }
 
 @section Scripts {
-<script>
+  <script>
   var dataTable = $('#dataTable').DataTable({
     processing: true,
     serverSide: true,
@@ -39,9 +39,7 @@ ViewData["Title"] = "Insurance Plan List";
       { data: 'id' },
       { data: 'name' },
       { data: 'description' },
-      { data: 'type', render: function (data) {
-          return data === 0 ? 'Life' : (data === 1 ? 'Health' : (data === 2 ? 'Vehicle' : 'Property'));
-        }},
+      { data: 'type'},
       { data: 'coverageAmount' },
       {
         data: null,
@@ -67,7 +65,8 @@ ViewData["Title"] = "Insurance Plan List";
   });
 
   dataTable.on('click', '.btn-detail', function () {
-    var planId = $(this).data('id');
+    var rowData = dataTable.row($(this).parents('tr')).data();
+    var planId = rowData.planId;
     window.location.href = '/Admin/InsurancePlan/Details/' + planId;  // Adjust to the view URL
   });
 </script>

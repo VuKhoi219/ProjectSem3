@@ -54,13 +54,33 @@ Layout = "~/Views/Shared/_Layout.cshtml";
     margin-top: 20px;
     text-align: center;
   }
+  .btn-like {
+    display: inline-block;
+    padding: 8px 20px;
+    background-color: #007bff;
+    color: white;
+    border-radius: 5px;
+    text-align: center;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+
+  .btn-like a {
+    color: white;
+    text-decoration: none;
+  }
+
+  .btn-like:hover {
+    background-color: #0056b3;
+  }
+
 </style>
 
 <div>
   <h2 class="page-title text-center">List of BorrowCapitals</h2>
-  <h1>
+  <div class="btn-like">
     <a href="/BorrowCapital/Create">Create</a>
-  </h1>
+  </div>
   <div id="BorrowCapitalTable" class="table-wrapper">
     <!-- Data will be loaded here -->
   </div>
