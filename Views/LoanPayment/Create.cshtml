@@ -63,24 +63,24 @@ Layout = "~/Views/Shared/_Layout.cshtml";
 </style>
 
 <div class="container">
-  <h1>Thêm giao dịch thanh toán</h1>
-  <div id="loading" class="loading">Đang tải dữ liệu...</div>
+  <h1>Add Payment Transaction</h1>
+  <div id="loading" class="loading">Loading data...</div>
   <div id="error" class="error"></div>
   <div id="paymentInfo">
-    <p><strong>Số tiền phải thanh toán:</strong> <span id="totalPaymentAmount"></span></p>
-    <p><strong>Số ngày quá hạn:</strong> <span id="overdueDays"></span></p>
+    <p><strong>Amount to be paid:</strong> <span id="totalPaymentAmount"></span></p>
+    <p><strong>Number of overdue days:</strong> <span id="overdueDays"></span></p>
   </div>
   <div id="qrCodeContainer">
-    <p><strong>Mã QR thanh toán:</strong></p>
+    <p><strong>Payment QR Code:</strong></p>
     <img id="qrCode" alt="QR Code" />
   </div>
   <form id="createLoanPaymentForm">
     <div>
-      <label class="form-label">Hình ảnh giao dịch</label>
+      <label class="form-label">Transaction Image</label>
       <input type="file" class="form-control" id="paymentImage" name="PaymentImage" accept="image/*,.pdf" required />
       <img id="imagePreview" alt="Image Preview" />
     </div>
-    <button type="submit" class="btn">Xác nhận giao dịch</button>
+    <button type="submit" class="btn">Confirm Transaction</button>
   </form>
   <div id="success" class="success"></div>
 </div>

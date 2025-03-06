@@ -117,6 +117,7 @@ public class LoanPaymentController : Controller
     try
     {
       var borrowCapital = await _context.LoanPayments.Where(b => b.BorrowId == borrowId).ToListAsync();
+
       return Ok(borrowCapital);
     }
     catch (Exception e)

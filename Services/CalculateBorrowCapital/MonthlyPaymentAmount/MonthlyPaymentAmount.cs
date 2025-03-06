@@ -4,6 +4,6 @@ public class MonthlyPaymentAmount
 {
   public decimal CalculateMonthlyPaymentAmount(decimal totalAmount, int NumberOfPayments)
   {
-    return totalAmount / NumberOfPayments;
+    return decimal.Round( totalAmount / NumberOfPayments , 1);
   }
 }
