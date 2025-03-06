@@ -5,125 +5,127 @@
 ViewData["Title"] = "Life Insurance";
 Layout = "~/Views/Shared/_Layout.cshtml";
 }
+<div class="container">
+  <!-- Thông tin gói bảo hiểm đã chọn -->
+  <div class="mb-3">
+    <label class="form-label">Selected Insurance Plan</label>
+    <input type="text" class="form-control" id="planName" disabled />
+    <small class="form-text text-muted">Plan ID: <span id="planId"></span></small>
+  </div>
 
-<!-- Thông tin gói bảo hiểm đã chọn -->
-<div class="mb-3">
-  <label class="form-label">Selected Insurance Plan</label>
-  <input type="text" class="form-control" id="planName" disabled />
-  <small class="form-text text-muted">Plan ID: <span id="planId"></span></small>
+  <!-- Form nhập liệu -->
+  <form id="insuranceForm">
+    <div class="mb-3">
+
+      <label for="age" class="form-label">Age</label>
+      <input type="number" class="form-control" id="age" min="0" placeholder="Enter your age" required/>
+    </div>
+    <div class="mb-3">
+      <label for="beneficiaries" class="form-label">Beneficiaries</label>
+      <input type="text" id="beneficiaries" class="form-control" placeholder="Enter your beneficiaries" required/>
+    </div>
+    <!-- Health Status với Checkboxes -->
+    <div class="mb-3">
+      <label class="form-label">Health Status (Select all that apply)</label>
+      <div class="form-check">
+        <input class="form-check-input" type="checkbox" id="healthStatus0" name="healthStatus" value="0">
+        <label class="form-check-label" for="healthStatus0">Healthy</label>
+      </div>
+      <div class="form-check">
+        <input class="form-check-input" type="checkbox" id="healthStatus1" name="healthStatus" value="1">
+        <label class="form-check-label" for="healthStatus1">Obesity</label>
+      </div>
+      <div class="form-check">
+        <input class="form-check-input" type="checkbox" id="healthStatus2" name="healthStatus" value="2">
+        <label class="form-check-label" for="healthStatus2">Mild diabetes</label>
+      </div>
+      <div class="form-check">
+        <input class="form-check-input" type="checkbox" id="healthStatus3" name="healthStatus" value="3">
+        <label class="form-check-label" for="healthStatus3">Severe diabetes</label>
+      </div>
+      <div class="form-check">
+        <input class="form-check-input" type="checkbox" id="healthStatus4" name="healthStatus" value="4">
+        <label class="form-check-label" for="healthStatus4">Hypertension</label>
+      </div>
+      <div class="form-check">
+        <input class="form-check-input" type="checkbox" id="healthStatus5" name="healthStatus" value="5">
+        <label class="form-check-label" for="healthStatus5">Cardiovascular</label>
+      </div>
+      <div class="form-check">
+        <input class="form-check-input" type="checkbox" id="healthStatus6" name="healthStatus" value="6">
+        <label class="form-check-label" for="healthStatus6">Smoke</label>
+      </div>
+      <div class="form-check">
+        <input class="form-check-input" type="checkbox" id="healthStatus7" name="healthStatus" value="7">
+        <label class="form-check-label" for="healthStatus7">Other</label>
+      </div>
+    </div>
+
+    <!-- Career với Select -->
+    <div class="mb-3">
+      <label for="career" class="form-label">Career</label>
+      <select class="form-select" id="career" name="career" aria-label="Career select">
+        <option value="" selected>Open this select menu</option>
+        <option value="0">Firefighter</option>
+        <option value="1">Pilot</option>
+        <option value="2">Lumberjack</option>
+        <option value="3">Waste Collector & Recycler</option>
+        <option value="4">Underwater Welder</option>
+        <option value="5">Oil Rig Worker</option>
+        <option value="6">Construction Worker</option>
+        <option value="7">Deep Sea Fisherman</option>
+        <option value="8">Steelworker</option>
+        <option value="9">Bullfighter</option>
+        <option value="10">Miner</option>
+        <option value="11">Farmer</option>
+        <option value="12">Police Officer</option>
+        <option value="13">Truck Driver</option>
+        <option value="14">Stunt Performer</option>
+        <option value="15">Other</option>
+      </select>
+    </div>
+
+    <!-- Coverage Amount thay bằng input readonly -->
+    <div class="mb-3">
+      <label for="coverageAmount" class="form-label">Coverage Amount (VND) (one year)</label>
+      <input type="text" class="form-control" id="coverageAmount" disabled />
+    </div>
+
+    <!-- Thêm StartDate -->
+    <div class="mb-3">
+      <label for="startDate" class="form-label">Start Date</label>
+      <input type="date" class="form-control" id="startDate" name="startDate" required min="@DateTime.Now.ToString("yyyy-MM-dd")"/>
+    </div>
+
+    <!-- Contract Duration -->
+    <div class="mb-3">
+      <label for="contractDuration" class="form-label">Contract Duration (Years)</label>
+      <input type="number" class="form-control" id="contractDuration" min="1" placeholder="Enter duration" required/>
+    </div>
+
+    <!-- EndDate (readonly) -->
+    <div class="mb-3">
+      <label for="endDate" class="form-label">End Date</label>
+      <input type="date" class="form-control" id="endDate" name="endDate" readonly/>
+    </div>
+
+    <div>
+      <label for="region" class="form-label">Region</label>
+      <select class="form-control" id="region" required>
+        <option value="" disabled selected>Region</option>
+        <option value="North">North</option>
+        <option value="West">West</option>
+        <option value="East">East</option>
+        <option value="South">South</option>
+      </select>
+    </div>
+  </form>
+
+  <h4 class="mt-4">Insurance Details</h4>
+  @Html.Partial("~/Views/Shared/Components/_Readonly.cshtml")
+  <div><button class="btn btn-primary" onclick="sendInsuranceLifeDetail()">Contract Requirements</button></div>
 </div>
 
-<!-- Form nhập liệu -->
-<form id="insuranceForm">
-  <div class="mb-3">
-
-    <label for="age" class="form-label">Age</label>
-    <input type="number" class="form-control" id="age" min="0" placeholder="Enter your age" required/>
-  </div>
-  <div class="mb-3">
-    <label for="beneficiaries" class="form-label">Beneficiaries</label>
-    <input type="text" id="beneficiaries" class="form-control" placeholder="Enter your beneficiaries" required/>
-  </div>
-  <!-- Health Status với Checkboxes -->
-  <div class="mb-3">
-    <label class="form-label">Health Status (Select all that apply)</label>
-    <div class="form-check">
-      <input class="form-check-input" type="checkbox" id="healthStatus0" name="healthStatus" value="0">
-      <label class="form-check-label" for="healthStatus0">Healthy</label>
-    </div>
-    <div class="form-check">
-      <input class="form-check-input" type="checkbox" id="healthStatus1" name="healthStatus" value="1">
-      <label class="form-check-label" for="healthStatus1">Obesity</label>
-    </div>
-    <div class="form-check">
-      <input class="form-check-input" type="checkbox" id="healthStatus2" name="healthStatus" value="2">
-      <label class="form-check-label" for="healthStatus2">Mild diabetes</label>
-    </div>
-    <div class="form-check">
-      <input class="form-check-input" type="checkbox" id="healthStatus3" name="healthStatus" value="3">
-      <label class="form-check-label" for="healthStatus3">Severe diabetes</label>
-    </div>
-    <div class="form-check">
-      <input class="form-check-input" type="checkbox" id="healthStatus4" name="healthStatus" value="4">
-      <label class="form-check-label" for="healthStatus4">Hypertension</label>
-    </div>
-    <div class="form-check">
-      <input class="form-check-input" type="checkbox" id="healthStatus5" name="healthStatus" value="5">
-      <label class="form-check-label" for="healthStatus5">Cardiovascular</label>
-    </div>
-    <div class="form-check">
-      <input class="form-check-input" type="checkbox" id="healthStatus6" name="healthStatus" value="6">
-      <label class="form-check-label" for="healthStatus6">Smoke</label>
-    </div>
-    <div class="form-check">
-      <input class="form-check-input" type="checkbox" id="healthStatus7" name="healthStatus" value="7">
-      <label class="form-check-label" for="healthStatus7">Other</label>
-    </div>
-  </div>
-
-  <!-- Career với Select -->
-  <div class="mb-3">
-    <label for="career" class="form-label">Career</label>
-    <select class="form-select" id="career" name="career" aria-label="Career select">
-      <option value="" selected>Open this select menu</option>
-      <option value="0">Firefighter</option>
-      <option value="1">Pilot</option>
-      <option value="2">Lumberjack</option>
-      <option value="3">Waste Collector & Recycler</option>
-      <option value="4">Underwater Welder</option>
-      <option value="5">Oil Rig Worker</option>
-      <option value="6">Construction Worker</option>
-      <option value="7">Deep Sea Fisherman</option>
-      <option value="8">Steelworker</option>
-      <option value="9">Bullfighter</option>
-      <option value="10">Miner</option>
-      <option value="11">Farmer</option>
-      <option value="12">Police Officer</option>
-      <option value="13">Truck Driver</option>
-      <option value="14">Stunt Performer</option>
-      <option value="15">Other</option>
-    </select>
-  </div>
-
-  <!-- Coverage Amount thay bằng input readonly -->
-  <div class="mb-3">
-    <label for="coverageAmount" class="form-label">Coverage Amount (VND) (one year)</label>
-    <input type="text" class="form-control" id="coverageAmount" disabled />
-  </div>
-
-  <!-- Thêm StartDate -->
-  <div class="mb-3">
-    <label for="startDate" class="form-label">Start Date</label>
-    <input type="date" class="form-control" id="startDate" name="startDate" required min="@DateTime.Now.ToString("yyyy-MM-dd")"/>
-  </div>
-
-  <!-- Contract Duration -->
-  <div class="mb-3">
-    <label for="contractDuration" class="form-label">Contract Duration (Years)</label>
-    <input type="number" class="form-control" id="contractDuration" min="1" placeholder="Enter duration" required/>
-  </div>
-
-  <!-- EndDate (readonly) -->
-  <div class="mb-3">
-    <label for="endDate" class="form-label">End Date</label>
-    <input type="date" class="form-control" id="endDate" name="endDate" readonly/>
-  </div>
-
-  <div>
-    <label for="region" class="form-label">Region</label>
-    <select class="form-control" id="region" required>
-      <option value="" disabled selected>Region</option>
-      <option value="North">North</option>
-      <option value="West">West</option>
-      <option value="East">East</option>
-      <option value="South">South</option>
-    </select>
-  </div>
-</form>
-
-<h4 class="mt-4">Insurance Details</h4>
-@Html.Partial("~/Views/Shared/Components/_Readonly.cshtml")
-<div><button class="btn btn-primary" onclick="sendInsuranceLifeDetail()">Contract Requirements</button></div>
 
 @section Scripts {
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>

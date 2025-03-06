@@ -53,8 +53,10 @@ ViewData["Title"] = "Edit";
           <div class="form-group">
             <label asp-for="Type" class="control-label"></label>
             <select asp-for="Type" class="form-control" id="insurancePlanType">
-              <option value="Type1">Type 1</option>
-              <option value="Type2">Type 2</option>
+              <option value="Life">Life</option>
+              <option value="Health">Health</option>
+              <option value="Vehicle">Vehicle</option>
+              <option value="Property">Property</option>
             </select>
             <span asp-validation-for="Type" class="text-danger"></span>
           </div>
@@ -64,9 +66,12 @@ ViewData["Title"] = "Edit";
             <span asp-validation-for="CoverageAmount" class="text-danger"></span>
           </div>
           <div class="form-group">
-            <label asp-for="CreatedBy" class="control-label"></label>
-            <select asp-for="CreatedBy" class="form-control" asp-items="ViewBag.CreatedBy" id="insurancePlanCreatedBy"></select>
-            <span asp-validation-for="CreatedBy" class="text-danger"></span>
+            <label asp-for="Status" class="control-label"></label>
+            <select asp-for="Status" class="form-control" id="insurancePlanStatus">
+              <option value="Active">Active</option>
+              <option value="Inactive">Inactive</option>
+            </select>
+            <span asp-validation-for="Type" class="text-danger"></span>
           </div>
           <div class="col-12">
             <div class="form-check">
@@ -102,8 +107,8 @@ ViewData["Title"] = "Edit";
         name: $('#insurancePlanName').val(),  // Get the insurance plan Name
         description: $('#insurancePlanDescription').val(),  // Get the description
         type: $('#insurancePlanType').val(),  // Get the type
+        status : $('#insurancePlanStatus').val()
         coverageAmount: $('#insurancePlanCoverageAmount').val(),  // Get the coverage amount
-        createdBy: $('#insurancePlanCreatedBy').val(),  // Get the created by
         termsAgreed: $('#insurancePlanTerms').prop('checked')  // Check if the terms are agreed
       };
 

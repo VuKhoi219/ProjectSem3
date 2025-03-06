@@ -44,15 +44,38 @@ Layout = "~/Views/Shared/_Layout.cshtml";
       margin-top: 20px;
       text-align: center;
     }
+    .btn-like {
+      display: inline-block;
+      padding: 8px 20px;
+      background-color: #007bff;
+      color: white;
+      border-radius: 5px;
+      text-align: center;
+      cursor: pointer;
+      transition: background-color 0.3s;
+      margin-bottom: 10px;
+    }
+
+    .btn-like a {
+      color: white;
+      text-decoration: none;
+    }
+
+    .btn-like:hover {
+      background-color: #0056b3;
+    }
+
   </style>
-<>
-<div >
+
+<div class="container">
   <h2 class="page-title text-center">Payments</h2>
 
   <!-- Table to display payments -->
-  <div>
+  <div class="btn-like">
     <a href="@Url.Action("Create", "Payment")">Create</a>
   </div>
+
+
   <div id="paymentTable" class="table-wrapper">
     <!-- Dữ liệu sẽ được load vào đây -->
   </div>

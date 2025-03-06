@@ -20,7 +20,7 @@
     <h4>Eligible Participants</h4>
     <p>Owners of houses, apartments, or legally constructed buildings.</p>
     <h4 class="mt-4">Available Property Insurance Plans</h4>
-    <div id="insuranceCards" class="owl-carousel owl-theme"></div>
+    <div id="insuranceCards" class="owl-carousel owl-theme row" style="display: flex;"></div>
   </div>
 </div>
 
@@ -60,7 +60,7 @@
       let cardsHtml = "";
       plans.forEach(plan => {
         cardsHtml += `
-          <div class="item">
+          <div class="item col-md-4" style="margin-bottom:10px;">
             <div class="card border-warning"> <!-- Thay border-primary bằng border-warning -->
               <div class="card-body">
                 <h5 class="card-title text-warning">${plan.name}</h5> <!-- Thay text-primary bằng text-warning -->

@@ -5,146 +5,150 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<!-- Thông tin gói bảo hiểm đã chọn -->
-<div class="mb-3">
-  <label class="form-label">Selected Insurance Plan</label>
-  <input type="text" class="form-control" id="planName" disabled />
-  <small class="form-text text-muted">Plan ID: <span id="planId"></span></small>
+<div class="container">
+  <!-- Thông tin gói bảo hiểm đã chọn -->
+  <div class="mb-3">
+    <label class="form-label">Selected Insurance Plan</label>
+    <input type="text" class="form-control" id="planName" disabled />
+    <small class="form-text text-muted">Plan ID: <span id="planId"></span></small>
+  </div>
+
+  <!-- Form nhập liệu -->
+  <form id="insuranceForm">
+    <!-- Driver Age -->
+    <div class="mb-3">
+      <label for="age" class="form-label">Driver Age</label>
+      <input type="number" class="form-control" id="age" min="18" placeholder="Enter your age" required />
+    </div>
+
+    <!-- Vehicle Type -->
+    <div class="mb-3">
+      <label for="vehicleType" class="form-label">Vehicle Type</label>
+      <select class="form-select" id="vehicleType" required>
+        <option value="" disabled selected>Select vehicle type</option>
+        <option value="0">Car</option>
+        <option value="1">Motorcycle</option>
+      </select>
+    </div>
+
+    <!-- Vehicle Brand -->
+    <div class="mb-3">
+      <label for="vehicleBrand" class="form-label">Vehicle Brand</label>
+      <select class="form-select" id="vehicleBrand" required>
+        <option value="" disabled selected>Select vehicle brand</option>
+        <!-- Car Brands -->
+        <optgroup label="Car Brands">
+          <option value="0">Ferrari</option>
+          <option value="1">Lamborghini</option>
+          <option value="2">Porsche</option>
+          <option value="3">Toyota</option>
+          <option value="4">Honda</option>
+          <option value="5">BMW</option>
+          <option value="6">Mercedes</option>
+          <option value="7">Tesla</option>
+          <option value="8">Rivian</option>
+        </optgroup>
+        <!-- Motorcycle Brands -->
+        <optgroup label="Motorcycle Brands">
+          <option value="0">Yamaha</option>
+          <option value="1">Kawasaki</option>
+          <option value="2">Ducati</option>
+          <option value="3">Harley-Davidson</option>
+          <option value="4">Indian</option>
+          <option value="5">Honda</option>
+          <option value="6">Vespa</option>
+          <option value="7">Piaggio</option>
+          <option value="8">Zero Motorcycles</option>
+          <option value="9">Harley-Davidson LiveWire</option>
+        </optgroup>
+      </select>
+    </div>
+
+    <!-- Vehicle Model -->
+    <div class="mb-3">
+      <label for="vehicleModel" class="form-label">Vehicle Model</label>
+      <input type="text" class="form-control" id="vehicleModel" placeholder="Enter vehicle model" required />
+    </div>
+
+    <!-- Vehicle Year -->
+    <div class="mb-3">
+      <label for="vehicleYear" class="form-label">Vehicle Year</label>
+      <input type="number" class="form-control" id="vehicleYear" min="1900" max="@DateTime.Now.Year" placeholder="Enter vehicle year" required />
+    </div>
+
+    <!-- Number of Accidents -->
+    <div class="mb-3">
+      <label for="numberOfAccidents" class="form-label">Number of Accidents</label>
+      <input type="number" class="form-control" id="numberOfAccidents" min="0" placeholder="Enter number of accidents" required />
+    </div>
+
+    <!-- Years Without Accident -->
+    <div class="mb-3">
+      <label for="yearsWithoutAccident" class="form-label">Years Without Accident</label>
+      <input type="number" class="form-control" id="yearsWithoutAccident" min="0" placeholder="Enter years without accident" required />
+    </div>
+
+    <!-- City (Location) -->
+    <div class="mb-3">
+      <label for="cityIds" class="form-label">City (Select all that apply)</label>
+      <div class="form-check">
+        <input class="form-check-input" type="checkbox" id="city0" name="city" value="0">
+        <label class="form-check-label" for="city0">Hà Nội</label>
+      </div>
+      <div class="form-check">
+        <input class="form-check-input" type="checkbox" id="city1" name="city" value="1">
+        <label class="form-check-label" for="city1">Hồ Chí Minh</label>
+      </div>
+      <div class="form-check">
+        <input class="form-check-input" type="checkbox" id="city2" name="city" value="2">
+        <label class="form-check-label" for="city2">Hải Phòng</label>
+      </div>
+    </div>
+
+    <!-- Coverage Amount -->
+    <div class="mb-3">
+      <label for="coverageAmount" class="form-label">Coverage Amount (VND) (one year)</label>
+      <input type="text" class="form-control" id="coverageAmount" disabled />
+    </div>
+
+    <!-- Thêm StartDate -->
+    <div class="mb-3">
+      <label for="startDate" class="form-label">Start Date</label>
+      <input type="date" class="form-control" id="startDate" name="startDate" required min="@DateTime.Now.ToString("yyyy-MM-dd")"/>
+    </div>
+
+    <!-- Contract Duration -->
+    <div class="mb-3">
+      <label for="contractDuration" class="form-label">Contract Duration (Years)</label>
+      <input type="number" class="form-control" id="contractDuration" min="1" placeholder="Enter duration" required />
+    </div>
+
+    <!-- EndDate (readonly) -->
+    <div class="mb-3">
+      <label for="endDate" class="form-label">End Date</label>
+      <input type="date" class="form-control" id="endDate" name="endDate" readonly/>
+    </div>
+
+    <!-- Region -->
+    <div class="mb-3">
+      <label for="region" class="form-label">Region</label>
+      <select class="form-control" id="region" required>
+        <option value="" disabled selected>Region</option>
+        <option value="North">North</option>
+        <option value="West">West</option>
+        <option value="East">East</option>
+        <option value="South">South</option>
+      </select>
+    </div>
+  </form>
+
+  <!-- Nhúng component hiển thị kết quả -->
+  <h4 class="mt-4">Insurance Details</h4>
+  @Html.Partial("~/Views/Shared/Components/_Readonly.cshtml")
+  <div><button class="btn btn-danger" onclick="sendInsuranceVehicleDetail()">Contract Requirements</button></div>
 </div>
 
-<!-- Form nhập liệu -->
-<form id="insuranceForm">
-  <!-- Driver Age -->
-  <div class="mb-3">
-    <label for="age" class="form-label">Driver Age</label>
-    <input type="number" class="form-control" id="age" min="18" placeholder="Enter your age" required />
-  </div>
 
-  <!-- Vehicle Type -->
-  <div class="mb-3">
-    <label for="vehicleType" class="form-label">Vehicle Type</label>
-    <select class="form-select" id="vehicleType" required>
-      <option value="" disabled selected>Select vehicle type</option>
-      <option value="0">Car</option>
-      <option value="1">Motorcycle</option>
-    </select>
-  </div>
-
-  <!-- Vehicle Brand -->
-  <div class="mb-3">
-    <label for="vehicleBrand" class="form-label">Vehicle Brand</label>
-    <select class="form-select" id="vehicleBrand" required>
-      <option value="" disabled selected>Select vehicle brand</option>
-      <!-- Car Brands -->
-      <optgroup label="Car Brands">
-        <option value="0">Ferrari</option>
-        <option value="1">Lamborghini</option>
-        <option value="2">Porsche</option>
-        <option value="3">Toyota</option>
-        <option value="4">Honda</option>
-        <option value="5">BMW</option>
-        <option value="6">Mercedes</option>
-        <option value="7">Tesla</option>
-        <option value="8">Rivian</option>
-      </optgroup>
-      <!-- Motorcycle Brands -->
-      <optgroup label="Motorcycle Brands">
-        <option value="0">Yamaha</option>
-        <option value="1">Kawasaki</option>
-        <option value="2">Ducati</option>
-        <option value="3">Harley-Davidson</option>
-        <option value="4">Indian</option>
-        <option value="5">Honda</option>
-        <option value="6">Vespa</option>
-        <option value="7">Piaggio</option>
-        <option value="8">Zero Motorcycles</option>
-        <option value="9">Harley-Davidson LiveWire</option>
-      </optgroup>
-    </select>
-  </div>
-
-  <!-- Vehicle Model -->
-  <div class="mb-3">
-    <label for="vehicleModel" class="form-label">Vehicle Model</label>
-    <input type="text" class="form-control" id="vehicleModel" placeholder="Enter vehicle model" required />
-  </div>
-
-  <!-- Vehicle Year -->
-  <div class="mb-3">
-    <label for="vehicleYear" class="form-label">Vehicle Year</label>
-    <input type="number" class="form-control" id="vehicleYear" min="1900" max="@DateTime.Now.Year" placeholder="Enter vehicle year" required />
-  </div>
-
-  <!-- Number of Accidents -->
-  <div class="mb-3">
-    <label for="numberOfAccidents" class="form-label">Number of Accidents</label>
-    <input type="number" class="form-control" id="numberOfAccidents" min="0" placeholder="Enter number of accidents" required />
-  </div>
-
-  <!-- Years Without Accident -->
-  <div class="mb-3">
-    <label for="yearsWithoutAccident" class="form-label">Years Without Accident</label>
-    <input type="number" class="form-control" id="yearsWithoutAccident" min="0" placeholder="Enter years without accident" required />
-  </div>
-
-  <!-- City (Location) -->
-  <div class="mb-3">
-    <label for="cityIds" class="form-label">City (Select all that apply)</label>
-    <div class="form-check">
-      <input class="form-check-input" type="checkbox" id="city0" name="city" value="0">
-      <label class="form-check-label" for="city0">Hà Nội</label>
-    </div>
-    <div class="form-check">
-      <input class="form-check-input" type="checkbox" id="city1" name="city" value="1">
-      <label class="form-check-label" for="city1">Hồ Chí Minh</label>
-    </div>
-    <div class="form-check">
-      <input class="form-check-input" type="checkbox" id="city2" name="city" value="2">
-      <label class="form-check-label" for="city2">Hải Phòng</label>
-    </div>
-  </div>
-
-  <!-- Coverage Amount -->
-  <div class="mb-3">
-    <label for="coverageAmount" class="form-label">Coverage Amount (VND) (one year)</label>
-    <input type="text" class="form-control" id="coverageAmount" disabled />
-  </div>
-
-  <!-- Thêm StartDate -->
-  <div class="mb-3">
-    <label for="startDate" class="form-label">Start Date</label>
-    <input type="date" class="form-control" id="startDate" name="startDate" required min="@DateTime.Now.ToString("yyyy-MM-dd")"/>
-  </div>
-
-  <!-- Contract Duration -->
-  <div class="mb-3">
-    <label for="contractDuration" class="form-label">Contract Duration (Years)</label>
-    <input type="number" class="form-control" id="contractDuration" min="1" placeholder="Enter duration" required />
-  </div>
-
-  <!-- EndDate (readonly) -->
-  <div class="mb-3">
-    <label for="endDate" class="form-label">End Date</label>
-    <input type="date" class="form-control" id="endDate" name="endDate" readonly/>
-  </div>
-
-  <!-- Region -->
-  <div class="mb-3">
-    <label for="region" class="form-label">Region</label>
-    <select class="form-control" id="region" required>
-      <option value="" disabled selected>Region</option>
-      <option value="North">North</option>
-      <option value="West">West</option>
-      <option value="East">East</option>
-      <option value="South">South</option>
-    </select>
-  </div>
-</form>
-
-<!-- Nhúng component hiển thị kết quả -->
-<h4 class="mt-4">Insurance Details</h4>
-@Html.Partial("~/Views/Shared/Components/_Readonly.cshtml")
-<div><button class="btn btn-danger" onclick="sendInsuranceVehicleDetail()">Contract Requirements</button></div>
 
 @section Scripts {
   <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>

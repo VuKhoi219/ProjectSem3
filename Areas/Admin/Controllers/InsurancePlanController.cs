@@ -29,22 +29,22 @@ namespace Project_Sem3.Areas.Admin.Controllers
         // GET: Admin/InsurancePlan/Details/5
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var insurancePlan = await _context.InsurancePlans
-                .Include(i => i.Creator)
-                .Include(i => i.Deleter)
-                .Include(i => i.Updater)
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (insurancePlan == null)
-            {
-                return NotFound();
-            }
-
-            return View(insurancePlan);
+            // if (id == null)
+            // {
+            //     return NotFound();
+            // }
+            //
+            // var insurancePlan = await _context.InsurancePlans
+            //     .Include(i => i.Creator)
+            //     .Include(i => i.Deleter)
+            //     .Include(i => i.Updater)
+            //     .FirstOrDefaultAsync(m => m.Id == id);
+            // if (insurancePlan == null)
+            // {
+            //     return NotFound();
+            // }
+            //
+            return View();
         }
 
         // GET: Admin/InsurancePlan/Create

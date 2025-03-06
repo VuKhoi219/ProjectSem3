@@ -17,37 +17,34 @@ ViewData["Title"] = "Insurance Plan Details";
 <script>
   $(document).ready(function() {
     // When the "View Insurance Plan Details" button is clicked
-    $('#viewInsurancePlanDetailsButton').on('click', function(e) {
-      e.preventDefault(); // Prevent default action
 
-      const insurancePlanId = $(this).data('insurance-plan-id'); // Get the ID of the insurance plan
-
+      var planId = sessionStorage.getItem('planId');
+    // Get the ID of the insurance plan
+      console.log(planId)
       // Send an AJAX request to fetch the insurance plan details
       $.ajax({
-        url: '/api/insurance-plans/' + insurancePlanId,  // API route to fetch insurance plan details
+        url: '/api/insurance-plans/' + planId,  // API route to fetch insurance plan details
         method: 'GET',
         success: function(response) {
           // Check if the response contains the expected data
-          if (response && response.id) {
+          if (response && response.data) {
             // Insert the insurance plan details into the HTML
             $('#insurancePlanDetails').html(`
                   <h4>Insurance Plan Details</h4>
                   <hr />
                   <dl class="row">
                     <dt class="col-sm-2">Insurance Plan ID</dt>
-                    <dd class="col-sm-10">${response?.id}</dd>
+                    <dd class="col-sm-10">${response?.data.id}</dd>
                     <dt class="col-sm-2">Name</dt>
-                    <dd class="col-sm-10">${response?.name}</dd>
+                    <dd class="col-sm-10">${response?.data.name}</dd>
                     <dt class="col-sm-2">Description</dt>
-                    <dd class="col-sm-10">${response?.description}</dd>
+                    <dd class="col-sm-10">${response?.data.description}</dd>
                     <dt class="col-sm-2">Type</dt>
-                    <dd class="col-sm-10">${response?.type}</dd>
+                    <dd class="col-sm-10">${response?.data.type}</dd>
                     <dt class="col-sm-2">Coverage Amount</dt>
-                    <dd class="col-sm-10">${response?.coverageAmount}</dd>
-                    <dt class="col-sm-2">Created By</dt>
-                    <dd class="col-sm-10">${response?.createdBy}</dd>
+                    <dd class="col-sm-10">${response?.data.coverageAmount}</dd>
                     <dt class="col-sm-2">Terms Agreement</dt>
-                    <dd class="col-sm-10">${response?.termsAgreed ? 'Agreed' : 'Not Agreed'}</dd>
+                    <dd class="col-sm-10">${response?.data.termsAgreed ? 'Agreed' : 'Not Agreed'}</dd>
                   </dl>
                 `);
           } else {
@@ -62,17 +59,11 @@ ViewData["Title"] = "Insurance Plan Details";
           alert('An error occurred while fetching insurance plan details.');
         }
       });
-    });
   });
 </script>
 }
 
 <h1>Insurance Plan Details</h1>
-
-<!-- Button to view insurance plan details -->
-<div>
-  <button id="viewInsurancePlanDetailsButton" data-insurance-plan-id="@Model?.Id" class="btn btn-primary">View Insurance Plan Details</button>
-</div>
 
 <!-- Div to display the details dynamically -->
 <div id="insurancePlanDetails">

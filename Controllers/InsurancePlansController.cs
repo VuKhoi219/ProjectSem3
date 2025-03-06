@@ -307,7 +307,6 @@ public class InsurancePlansController : ControllerBase
             p.CoverageAmount
           })
           .ToListAsync();
-
         if (!plans.Any())
           return NotFound(new { Message = $"No active insurance plans found for type {type}" });
         return Ok(new { Data = plans });

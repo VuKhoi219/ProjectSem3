@@ -4,132 +4,138 @@
 ViewData["Title"] = "Property (Home) Insurance";
 Layout = "~/Views/Shared/_Layout.cshtml";
 }
+<div class="container">
+  <!-- Thông tin gói bảo hiểm đã chọn -->
+  <div class="mb-3">
+    <label class="form-label">Selected Insurance Plan</label>
+    <input type="text" class="form-control" id="planName" disabled />
+    <small class="form-text text-muted">Plan ID: <span id="planId"></span></small>
+  </div>
 
-<!-- Thông tin gói bảo hiểm đã chọn -->
-<div class="mb-3">
-  <label class="form-label">Selected Insurance Plan</label>
-  <input type="text" class="form-control" id="planName" disabled />
-  <small class="form-text text-muted">Plan ID: <span id="planId"></span></small>
+  <div class="container">
+
+  </div>
+
+  <!-- Form nhập liệu -->
+  <form id="insuranceForm">
+    <!-- Property Type -->
+    <div class="mb-3">
+      <label for="propertyType" class="form-label">Property Type</label>
+      <select class="form-select" id="propertyType" required>
+        <option value="" disabled selected>Select property type</option>
+        <option value="House">House</option>
+        <option value="Apartment">Apartment</option>
+        <option value="Condominium">Condominium</option>
+        <option value="Other">Other</option>
+      </select>
+    </div>
+
+    <!-- House Type (HouseTypeIds) -->
+    <div class="mb-3">
+      <label class="form-label">House Type (Select all that apply)</label>
+      <div class="form-check">
+        <input class="form-check-input" type="radio" id="houseType0" name="houseType" value="0">
+        <label class="form-check-label" for="houseType0">Single-family house</label>
+      </div>
+      <div class="form-check">
+        <input class="form-check-input" type="radio" id="houseType1" name="houseType" value="1">
+        <label class="form-check-label" for="houseType1">Multi-family house</label>
+      </div>
+      <div class="form-check">
+        <input class="form-check-input" type="radio" id="houseType2" name="houseType" value="2">
+        <label class="form-check-label" for="houseType2">Townhouse</label>
+      </div>
+      <div class="form-check">
+        <input class="form-check-input" type="radio" id="houseType3" name="houseType" value="3">
+        <label class="form-check-label" for="houseType3">Villa</label>
+      </div>
+    </div>
+
+    <!-- Location (City) -->
+    <div class="mb-3">
+      <label for="cityIds" class="form-label">City (Select all that apply)</label>
+      <div class="form-check">
+        <input class="form-check-input" type="radio" id="city0" name="city" value="0">
+        <label class="form-check-label" for="city0">Buôn Ma Thuột</label>
+      </div>
+      <div class="form-check">
+        <input class="form-check-input" type="radio" id="city1" name="city" value="1">
+        <label class="form-check-label" for="city1">Hồ Chí Minh</label>
+      </div>
+      <div class="form-check">
+        <input class="form-check-input" type="radio" id="city2" name="city" value="2">
+        <label class="form-check-label" for="city2">Hà Nội</label>
+      </div>
+    </div>
+
+    <!-- Asset Age -->
+    <div class="mb-3">
+      <label for="assetAge" class="form-label">Asset Age (Years)</label>
+      <input type="number" class="form-control" id="assetAge" min="0" placeholder="Enter asset age" required />
+    </div>
+
+    <!-- Construction Material -->
+    <div class="mb-3">
+      <label for="materialIds" class="form-label">Construction Material (Select all that apply)</label>
+      <div class="form-check">
+        <input class="form-check-input" type="radio" id="material0" name="material" value="0">
+        <label class="form-check-label" for="material0">Wood</label>
+      </div>
+      <div class="form-check">
+        <input class="form-check-input" type="radio" id="material1" name="material" value="1">
+        <label class="form-check-label" for="material1">Concrete</label>
+      </div>
+    </div>
+
+    <!-- Detail -->
+    <div class="mb-3">
+      <label for="detail" class="form-label">Detail</label>
+      <textarea class="form-control" id="detail" rows="3" placeholder="Enter additional details about the property" required></textarea>
+    </div>
+
+    <!-- Coverage Amount -->
+    <div class="mb-3">
+      <label for="coverageAmount" class="form-label">Coverage Amount (VND) (one year)</label>
+      <input type="text" class="form-control" id="coverageAmount" disabled />
+    </div>
+
+    <!-- Thêm StartDate -->
+    <div class="mb-3">
+      <label for="startDate" class="form-label">Start Date</label>
+      <input type="date" class="form-control" id="startDate" name="startDate" required min="@DateTime.Now.ToString("yyyy-MM-dd")"/>
+    </div>
+
+    <!-- Contract Duration -->
+    <div class="mb-3">
+      <label for="contractDuration" class="form-label">Contract Duration (Years)</label>
+      <input type="number" class="form-control" id="contractDuration" min="1" placeholder="Enter duration" required />
+    </div>
+
+    <!-- EndDate (readonly) -->
+    <div class="mb-3">
+      <label for="endDate" class="form-label">End Date</label>
+      <input type="date" class="form-control" id="endDate" name="endDate" readonly/>
+    </div>
+
+    <!-- Region -->
+    <div class="mb-3">
+      <label for="region" class="form-label">Region</label>
+      <select class="form-control" id="region" required>
+        <option value="" disabled selected>Region</option>
+        <option value="North">North</option>
+        <option value="West">West</option>
+        <option value="East">East</option>
+        <option value="South">South</option>
+      </select>
+    </div>
+  </form>
+
+  <!-- Nhúng component hiển thị kết quả -->
+  <h4 class="mt-4">Insurance Details</h4>
+  @Html.Partial("~/Views/Shared/Components/_Readonly.cshtml")
+  <div><button class="btn btn-warning" onclick="sendInsurancePropertyDetail()">Contract Requirements</button></div>
 </div>
 
-<!-- Form nhập liệu -->
-<form id="insuranceForm">
-  <!-- Property Type -->
-  <div class="mb-3">
-    <label for="propertyType" class="form-label">Property Type</label>
-    <select class="form-select" id="propertyType" required>
-      <option value="" disabled selected>Select property type</option>
-      <option value="House">House</option>
-      <option value="Apartment">Apartment</option>
-      <option value="Condominium">Condominium</option>
-      <option value="Other">Other</option>
-    </select>
-  </div>
-
-  <!-- House Type (HouseTypeIds) -->
-  <div class="mb-3">
-    <label class="form-label">House Type (Select all that apply)</label>
-    <div class="form-check">
-      <input class="form-check-input" type="checkbox" id="houseType0" name="houseType" value="0">
-      <label class="form-check-label" for="houseType0">Single-family house</label>
-    </div>
-    <div class="form-check">
-      <input class="form-check-input" type="checkbox" id="houseType1" name="houseType" value="1">
-      <label class="form-check-label" for="houseType1">Multi-family house</label>
-    </div>
-    <div class="form-check">
-      <input class="form-check-input" type="checkbox" id="houseType2" name="houseType" value="2">
-      <label class="form-check-label" for="houseType2">Townhouse</label>
-    </div>
-    <div class="form-check">
-      <input class="form-check-input" type="checkbox" id="houseType3" name="houseType" value="3">
-      <label class="form-check-label" for="houseType3">Villa</label>
-    </div>
-  </div>
-
-  <!-- Location (City) -->
-  <div class="mb-3">
-    <label for="cityIds" class="form-label">City (Select all that apply)</label>
-    <div class="form-check">
-      <input class="form-check-input" type="checkbox" id="city0" name="city" value="0">
-      <label class="form-check-label" for="city0">Buôn Ma Thuột</label>
-    </div>
-    <div class="form-check">
-      <input class="form-check-input" type="checkbox" id="city1" name="city" value="1">
-      <label class="form-check-label" for="city1">Hồ Chí Minh</label>
-    </div>
-    <div class="form-check">
-      <input class="form-check-input" type="checkbox" id="city2" name="city" value="2">
-      <label class="form-check-label" for="city2">Hà Nội</label>
-    </div>
-  </div>
-
-  <!-- Asset Age -->
-  <div class="mb-3">
-    <label for="assetAge" class="form-label">Asset Age (Years)</label>
-    <input type="number" class="form-control" id="assetAge" min="0" placeholder="Enter asset age" required />
-  </div>
-
-  <!-- Construction Material -->
-  <div class="mb-3">
-    <label for="materialIds" class="form-label">Construction Material (Select all that apply)</label>
-    <div class="form-check">
-      <input class="form-check-input" type="checkbox" id="material0" name="material" value="0">
-      <label class="form-check-label" for="material0">Wood</label>
-    </div>
-    <div class="form-check">
-      <input class="form-check-input" type="checkbox" id="material1" name="material" value="1">
-      <label class="form-check-label" for="material1">Concrete</label>
-    </div>
-  </div>
-
-  <!-- Detail -->
-  <div class="mb-3">
-    <label for="detail" class="form-label">Detail</label>
-    <textarea class="form-control" id="detail" rows="3" placeholder="Enter additional details about the property" required></textarea>
-  </div>
-
-  <!-- Coverage Amount -->
-  <div class="mb-3">
-    <label for="coverageAmount" class="form-label">Coverage Amount (VND) (one year)</label>
-    <input type="text" class="form-control" id="coverageAmount" disabled />
-  </div>
-
-  <!-- Thêm StartDate -->
-  <div class="mb-3">
-    <label for="startDate" class="form-label">Start Date</label>
-    <input type="date" class="form-control" id="startDate" name="startDate" required min="@DateTime.Now.ToString("yyyy-MM-dd")"/>
-  </div>
-
-  <!-- Contract Duration -->
-  <div class="mb-3">
-    <label for="contractDuration" class="form-label">Contract Duration (Years)</label>
-    <input type="number" class="form-control" id="contractDuration" min="1" placeholder="Enter duration" required />
-  </div>
-
-  <!-- EndDate (readonly) -->
-  <div class="mb-3">
-    <label for="endDate" class="form-label">End Date</label>
-    <input type="date" class="form-control" id="endDate" name="endDate" readonly/>
-  </div>
-
-  <!-- Region -->
-  <div class="mb-3">
-    <label for="region" class="form-label">Region</label>
-    <select class="form-control" id="region" required>
-      <option value="" disabled selected>Region</option>
-      <option value="North">North</option>
-      <option value="West">West</option>
-      <option value="East">East</option>
-      <option value="South">South</option>
-    </select>
-  </div>
-</form>
-
-<!-- Nhúng component hiển thị kết quả -->
-<h4 class="mt-4">Insurance Details</h4>
-@Html.Partial("~/Views/Shared/Components/_Readonly.cshtml")
-<div><button class="btn btn-warning" onclick="sendInsurancePropertyDetail()">Contract Requirements</button></div>
 
 @section Scripts {
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
