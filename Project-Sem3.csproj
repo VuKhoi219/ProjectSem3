@@ -12,6 +12,7 @@
       <PackageReference Include="Bogus" Version="35.6.1" />
       <PackageReference Include="DotNetEnv" Version="3.1.1" />
       <PackageReference Include="MailKit" Version="4.10.0" />
+      <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.0" />
       <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="8.0.12" />
       <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.0" />
       <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.0">
@@ -114,6 +115,19 @@
       <_ContentIncludedByDefault Remove="Areas\Admin\Views\VehicleDetail\Edit.cshtml" />
       <_ContentIncludedByDefault Remove="Areas\Admin\Views\VehicleDetail\Index.cshtml" />
       <_ContentIncludedByDefault Remove="Views\insuranceTye\Life.cshtml" />
+      <_ContentIncludedByDefault Remove="Views\Auth\ForgotPasswordBasic.cshtml" />
+      <_ContentIncludedByDefault Remove="Views\Auth\ForgotPasswordCover.cshtml" />
+      <_ContentIncludedByDefault Remove="Views\Auth\Login.cshtml" />
+      <_ContentIncludedByDefault Remove="Views\Auth\LoginCover.cshtml" />
+      <_ContentIncludedByDefault Remove="Views\Auth\RegisterBasic.cshtml" />
+      <_ContentIncludedByDefault Remove="Views\Auth\RegisterCover.cshtml" />
+      <_ContentIncludedByDefault Remove="Views\Auth\RegisterMultiSteps.cshtml" />
+      <_ContentIncludedByDefault Remove="Views\Auth\ResetPasswordBasic.cshtml" />
+      <_ContentIncludedByDefault Remove="Views\Auth\ResetPasswordCover.cshtml" />
+      <_ContentIncludedByDefault Remove="Views\Auth\TwoStepsBasic.cshtml" />
+      <_ContentIncludedByDefault Remove="Views\Auth\TwoStepsCover.cshtml" />
+      <_ContentIncludedByDefault Remove="Views\Auth\VerifyEmailBasic.cshtml" />
+      <_ContentIncludedByDefault Remove="Views\Auth\VerifyEmailCover.cshtml" />
     </ItemGroup>
 
     <ItemGroup>
@@ -151,6 +165,22 @@
     <ItemGroup>
       <Folder Include="wwwroot\uploads\" />
       <Folder Include="wwwroot\user\scss\" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <AdditionalFiles Include="Views\Auth\ForgotPasswordBasic.cshtml" />
+      <AdditionalFiles Include="Views\Auth\ForgotPasswordCover.cshtml" />
+      <AdditionalFiles Include="Views\Auth\Login.cshtml" />
+      <AdditionalFiles Include="Views\Auth\LoginCover.cshtml" />
+      <AdditionalFiles Include="Views\Auth\RegisterBasic.cshtml" />
+      <AdditionalFiles Include="Views\Auth\RegisterCover.cshtml" />
+      <AdditionalFiles Include="Views\Auth\RegisterMultiSteps.cshtml" />
+      <AdditionalFiles Include="Views\Auth\ResetPasswordBasic.cshtml" />
+      <AdditionalFiles Include="Views\Auth\ResetPasswordCover.cshtml" />
+      <AdditionalFiles Include="Views\Auth\TwoStepsBasic.cshtml" />
+      <AdditionalFiles Include="Views\Auth\TwoStepsCover.cshtml" />
+      <AdditionalFiles Include="Views\Auth\VerifyEmailBasic.cshtml" />
+      <AdditionalFiles Include="Views\Auth\VerifyEmailCover.cshtml" />
     </ItemGroup>
 
 </Project>

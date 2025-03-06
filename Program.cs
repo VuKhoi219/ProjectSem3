@@ -1,9 +1,10 @@
-
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Project_Sem3.Data;
 using Project_Sem3.Helper;
 using Project_Sem3.Helper.BaseRate;
 using Project_Sem3.Helper.RiskFactor;
+using Project_Sem3.Models;
 using Project_Sem3.Models.InterestRate;
 using Project_Sem3.Models.MailContent;
 using Project_Sem3.Models.MyBank;
@@ -48,8 +49,46 @@ builder.Services.AddSession(options =>
   options.Cookie.HttpOnly = true;
   options.Cookie.IsEssential = true;
 });
+builder.Services.AddIdentity<IdentityUser, IdentityRole>()
+  .AddEntityFrameworkStores<MyDbContext>()
+  .AddDefaultTokenProviders();
+
+builder.Services.ConfigureApplicationCookie(options =>
+{
+  options.LoginPath = "/Auth/Login"; // redirect to login if not authenticated
+  options.AccessDeniedPath = "/Auth/AccessDenied"; // access denied for non-admin users
+  options.ExpireTimeSpan = TimeSpan.FromMinutes(30);
+});
+
 
 var app = builder.Build();
+
+var scopeAuth = app.Services.CreateScope();
+// tạo mới role
+var roleManager = scopeAuth.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+// tạo mới user
+var userManager = scopeAuth.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
+
+if (!await roleManager.RoleExistsAsync("Admin"))
+{
+  await roleManager.CreateAsync(new IdentityRole("Admin"));
+}
+
+var adminUser = new IdentityUser
+{
+  UserName = "admin@example.com",
+  Email = "admin@example.com",
+  EmailConfirmed = true
+};
+
+if (await userManager.FindByEmailAsync(adminUser.Email) == null)
+{
+  var result = await userManager.CreateAsync(adminUser, "Admin@123");
+  if (result.Succeeded)
+  {
+    await userManager.AddToRoleAsync(adminUser, "Admin");
+  }
+}
 
 // Configure the HTTP request pipelin
 if (!app.Environment.IsDevelopment())

@@ -57,33 +57,16 @@ namespace Project_Sem3.Areas.Admin.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,FullName,Email,Password,Phone,Gender,CitizenIdentificationCard,DateOfBirth,Status,CreatedAt,UpdatedAt,DeleteAt,RoleId")] User user)
+        public async Task<IActionResult> Create(
+          [Bind(
+            "Id,FullName,Email,Password,Phone,Gender,CitizenIdentificationCard,DateOfBirth,Status,CreatedAt,UpdatedAt,DeleteAt,RoleId")]
+          User user)
         {
-            if (ModelState.IsValid)
-            {
-                _context.Add(user);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-            ViewData["RoleId"] = new SelectList(_context.Roles, "Id", "Name", user.RoleId);
-            return View(user);
-        }
+          user.Status = Status.Active;
 
-        // GET: Admin/User/Edit/5
-        public async Task<IActionResult> Edit(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var user = await _context.Users.FindAsync(id);
-            if (user == null)
-            {
-                return NotFound();
-            }
-            ViewData["RoleId"] = new SelectList(_context.Roles, "Id", "Name", user.RoleId);
-            return View(user);
+          _context.Users.Add(user);
+          await _context.SaveChangesAsync();
+          return View(user);
         }
 
         // POST: Admin/User/Edit/5

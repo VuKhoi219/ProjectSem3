@@ -1,76 +1,52 @@
 @model Project_Sem3.Models.InsurancePlan
 
 @{
-ViewData["Title"] = "Insurance Plan Details";
+ViewData["Title"] = "Details";
 }
-
-@section VendorStyles {
-<!-- Add any vendor stylesheets you might still need -->
-<link rel="stylesheet" href="~/vendor/libs/datatables-bs5/datatables.bootstrap5.css">
-<link rel="stylesheet" href="~/vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.css">
-}
-
-@section VendorScripts {
-<!-- Add any scripts you need for this page -->
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-<script>
-  $(document).ready(function() {
-    // When the "View Insurance Plan Details" button is clicked
-
-      var planId = sessionStorage.getItem('planId');
-    // Get the ID of the insurance plan
-      console.log(planId)
-      // Send an AJAX request to fetch the insurance plan details
-      $.ajax({
-        url: '/api/insurance-plans/' + planId,  // API route to fetch insurance plan details
-        method: 'GET',
-        success: function(response) {
-          // Check if the response contains the expected data
-          if (response && response.data) {
-            // Insert the insurance plan details into the HTML
-            $('#insurancePlanDetails').html(`
-                  <h4>Insurance Plan Details</h4>
-                  <hr />
-                  <dl class="row">
-                    <dt class="col-sm-2">Insurance Plan ID</dt>
-                    <dd class="col-sm-10">${response?.data.id}</dd>
-                    <dt class="col-sm-2">Name</dt>
-                    <dd class="col-sm-10">${response?.data.name}</dd>
-                    <dt class="col-sm-2">Description</dt>
-                    <dd class="col-sm-10">${response?.data.description}</dd>
-                    <dt class="col-sm-2">Type</dt>
-                    <dd class="col-sm-10">${response?.data.type}</dd>
-                    <dt class="col-sm-2">Coverage Amount</dt>
-                    <dd class="col-sm-10">${response?.data.coverageAmount}</dd>
-                    <dt class="col-sm-2">Terms Agreement</dt>
-                    <dd class="col-sm-10">${response?.data.termsAgreed ? 'Agreed' : 'Not Agreed'}</dd>
-                  </dl>
-                `);
-          } else {
-            // Handle the case where the response does not contain the expected data
-            console.error('Invalid response data:', response);
-            alert('Failed to load insurance plan details.');
-          }
-        },
-        error: function(xhr, status, error) {
-          // Handle any errors that occur during the AJAX request
-          console.error('AJAX request error:', error);
-          alert('An error occurred while fetching insurance plan details.');
-        }
-      });
-  });
-</script>
-}
-
-<h1>Insurance Plan Details</h1>
-
-<!-- Div to display the details dynamically -->
-<div id="insurancePlanDetails">
-  <!-- Insurance plan details will be loaded here dynamically -->
-</div>
 
 <div>
-  <a asp-action="Edit" class="col-md-6" asp-route-id="@Model?.Id">Edit</a> |
-  <a asp-action="Index" class="col-md-6">Back to List</a>
+  <h4>Insurance Plan Detail</h4>
+  <hr />
+  <dl class="row">
+    <dt class="col-sm-2">
+      @Html.DisplayNameFor(model => model.Id)
+    </dt>
+    <dd class="col-sm-10">
+      @Html.DisplayFor(model => model.Id)
+    </dd>
+    <dt class="col-sm-2">
+      @Html.DisplayNameFor(model => model.Name)
+    </dt>
+    <dd class="col-sm-10">
+      @Html.DisplayFor(model => model.Name)
+    </dd>
+    <dt class="col-sm-2">
+      @Html.DisplayNameFor(model => model.Description)
+    </dt>
+    <dd class="col-sm-10">
+      @Html.DisplayFor(model => model.Description)
+    </dd>
+    <dt class="col-sm-2">
+      @Html.DisplayNameFor(model => model.Type)
+    </dt>
+    <dd class="col-sm-10">
+      @Html.DisplayFor(model => model.Type)
+    </dd>
+    <dt class="col-sm-2">
+      @Html.DisplayNameFor(model => model.Status)
+    </dt>
+    <dd class="col-sm-10">
+      @Html.DisplayFor(model => model.Status)
+    </dd>
+    <dt class="col-sm-2">
+      @Html.DisplayNameFor(model => model.CoverageAmount)
+    </dt>
+    <dd class="col-sm-10">
+      @Html.DisplayFor(model => model.CoverageAmount)
+    </dd>
+  </dl>
+</div>
+<div>
+  <a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a> |
+  <a asp-action="Index">Back to List</a>
 </div>

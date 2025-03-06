@@ -38,8 +38,8 @@ public class InsuranceContractsController : ControllerBase
             if (!string.IsNullOrEmpty(search))
             {
                 query = query.Where(x =>
-                    (x.UserId != null && EF.Functions.Like(x.UserId.ToString(), $"%{search}%")) || // Search User Name
-                    (x.PlanId != null && EF.Functions.Like(x.PlanId.ToString(), $"%{search}%")) || // Search Plan Name
+                    (x.UserId != null && EF.Functions.Like(x.User.FullName.ToString(), $"%{search}%")) || // Search User Name
+                    (x.PlanId != null && EF.Functions.Like(x.Plan.Name.ToString(), $"%{search}%")) || // Search Plan Name
                     (x.Status.ToString() != null && EF.Functions.Like(x.Status.ToString(), $"%{search}%")) // Search Status
                 );
             }
@@ -73,8 +73,8 @@ public class InsuranceContractsController : ControllerBase
                 data = pagedInsuranceContracts.Select(ic => new
                 {
                     ic.Id,
-                    ic.UserId,
-                    ic.PlanId,
+                    FullName = ic.User.FullName,
+                    PlanName = ic.Plan.Name,
                     ic.Status,
                     ic.StartDate,
                     ic.EndDate
