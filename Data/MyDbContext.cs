@@ -1,9 +1,12 @@
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.General;
 using Project_Sem3.Models;
 
 namespace Project_Sem3.Data;
 
-public class MyDbContext : DbContext
+public class MyDbContext : IdentityDbContext<IdentityUser, IdentityRole, string>
 {
     public MyDbContext(DbContextOptions<MyDbContext> options) : base(options) { }
 

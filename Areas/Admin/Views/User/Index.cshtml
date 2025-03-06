@@ -42,7 +42,7 @@ ViewData["Title"] = "User List";
       { data: 'email' },
       { data: 'phone' },
       { data: 'status', render: function (data) {
-          return data === 1 ? 'Active' : (data === 0 ? 'Inactive' : 'Deleted');
+          return data == 1 ? 'Active' : (data == 0 ? 'Inactive' : 'Deleted');
         }},
       {
         data: null,
