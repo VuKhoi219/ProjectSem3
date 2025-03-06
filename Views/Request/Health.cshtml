@@ -370,7 +370,6 @@ Layout = "~/Views/Shared/_Layout.cshtml";
         detailId = response.detailId;
         console.log("detailId:", detailId);
         const dataContract = getContractValue(detailId);
-        alert("miss")
         saveContract(dataContract);
       },
       error: function (xhr) {
