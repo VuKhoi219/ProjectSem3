@@ -1,63 +1,70 @@
 @model Project_Sem3.Models.LoanPayment
+
+
 @{
-ViewData["Title"] = "Details";
+ViewData["Title"] = "Loan Payment Details";
 }
 
-<div>
-  <h4>Insurance Contract Detail</h4>
-  <hr />
-  <dl class="row">
-    <dt class="col-sm-2">
-      @Html.DisplayNameFor(model => model.Id)
-    </dt>
-    <dd class="col-sm-10">
-      @Html.DisplayFor(model => model.Id)
-    </dd>
-    <dt class="col-sm-2">
-      @Html.DisplayNameFor(model => model.BorrowId)
-    </dt>
-    <dd class="col-sm-10">
-      @Html.DisplayFor(model => model.BorrowId)
-    </dd>
-    <dt class="col-sm-2">
-      @Html.DisplayNameFor(model => model.PaymentAmount)
-    </dt>
-    <dd class="col-sm-10">
-      @Html.DisplayFor(model => model.PaymentAmount)
-    </dd>
-    <dt class="col-sm-2">
-      @Html.DisplayNameFor(model => model.PaymentDate)
-    </dt>
-    <dd class="col-sm-10">
-      @Html.DisplayFor(model => model.PaymentDate)
-    </dd>
-    <dt class="col-sm-2">
-      @Html.DisplayNameFor(model => model.PaymentImage)
-    </dt>
-    <dd class="col-sm-10">
-      @Html.DisplayFor(model => model.PaymentImage)
-    </dd>
-    <dt class="col-sm-2">
-      @Html.DisplayNameFor(model => model.OverdueDays)
-    </dt>
-    <dd class="col-sm-10">
-      @Html.DisplayFor(model => model.OverdueDays)
-    </dd>
-    <dt class="col-sm-2">
-      @Html.DisplayNameFor(model => model.PenaltyInterest)
-    </dt>
-    <dd class="col-sm-10">
-      @Html.DisplayFor(model => model.PenaltyInterest)
-    </dd>
-    <dt class="col-sm-2">
-      @Html.DisplayNameFor(model => model.Status)
-    </dt>
-    <dd class="col-sm-10">
-      @Html.DisplayFor(model => model.Status)
-    </dd>
-  </dl>
+@section VendorStyles {
+<!-- Add any vendor stylesheets you might still need -->
+<link rel="stylesheet" href="~/vendor/libs/datatables-bs5/datatables.bootstrap5.css">
+<link rel="stylesheet" href="~/vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.css">
+}
+
+@section VendorScripts {
+<!-- Add any scripts you need for this page -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script>
+  $(document).ready(function() {
+      const loanPaymentId = sessionStorage.getItem('loanPaymentId');
+
+      // Send an AJAX request to fetch the loan payment details
+      $.ajax({
+        url: '/api/loan-payment/' + loanPaymentId,  // API route to fetch loan payment details
+        method: 'GET',
+        success: function(response) {
+          // Insert the loan payment details into the HTML
+          $('#loanPaymentDetails').html(`
+                            <h4>Loan Payment Details</h4>
+                            <hr />
+                            <dl class="row">
+                                <dt class="col-sm-2">Loan Payment ID</dt>
+                                <dd class="col-sm-10">${response.id}</dd>
+                                <dt class="col-sm-2">Borrower ID</dt>
+                                <dd class="col-sm-10">${response.borrowId}</dd>
+                                <dt class="col-sm-2">Payment Amount</dt>
+                                <dd class="col-sm-10">${response.paymentAmount}</dd>
+                                <dt class="col-sm-2">Payment Date</dt>
+                                <dd class="col-sm-10">${new Date(response.paymentDate).toLocaleDateString()}</dd>
+                                <dt class="col-sm-2">Payment Image</dt>
+                                <dd class="col-sm-10"><img src="${response.paymentImage}" alt="Payment Image" class="img-fluid" /></dd>
+                                <dt class="col-sm-2">Overdue Days</dt>
+                                <dd class="col-sm-10">${response.overdueDays}</dd>
+                                <dt class="col-sm-2">Penalty Interest</dt>
+                                <dd class="col-sm-10">${response.penaltyInterest}</dd>
+                                <dt class="col-sm-2">Terms Agreement</dt>
+                                <dd class="col-sm-10">${response.agreeToTerms ? 'Agreed' : 'Not Agreed'}</dd>
+                            </dl>
+                        `);
+        },
+        error: function(xhr, status, error) {
+          // Show an error message if something goes wrong
+          alert("Error fetching loan payment details: " + error);
+        }
+      });
+  });
+</script>
+}
+
+<h1>Loan Payment Details</h1>
+
+<!-- Div to display the details dynamically -->
+<div id="loanPaymentDetails">
+  <!-- Payment details will be loaded here dynamically -->
 </div>
+
 <div>
-  <a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a> |
-  <a asp-action="Index">Back to List</a>
+  <a asp-action="Edit" class="col-md-6" asp-route-id="@Model?.Id">Edit</a> |
+  <a asp-action="Index" class="col-md-6">Back to List</a>
 </div>

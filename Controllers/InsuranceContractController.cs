@@ -77,7 +77,9 @@ public class InsuranceContractsController : ControllerBase
                     PlanName = ic.Plan.Name,
                     ic.Status,
                     ic.StartDate,
-                    ic.EndDate
+                    ic.EndDate,
+                    planId = ic.PlanId,          // Đảm bảo thêm PlanId
+                    userId = ic.UserId           // Đảm bảo thêm UserId
                 }).ToArray(),
                 recordsTotal = await _context.InsuranceContracts.CountAsync(),
                 recordsFiltered = totalCount,
