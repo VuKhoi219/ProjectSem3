@@ -10,49 +10,101 @@ public class DatabaseSeeder
 {
     public static void Seed(MyDbContext context)
     {
-        if (!context.Roles.Any())
-        {
-            var roles = new List<Role>
-            {
-                new Role
-                {
-                    Name = "Admin",
-                    CreatedAt = DateTime.Now,
-                    UpdatedAt = DateTime.Now,
-                    DeleteAt = null,
+// Tạo Roles trước
+      if (!context.Roles.Any())
+      {
+          var roles = new List<Role>
+          {
+              new Role
+              {
+                  Name = "Admin",
+                  CreatedAt = DateTime.Now,
+                  UpdatedAt = DateTime.Now,
+                  DeleteAt = null
+              },
+              new Role
+              {
+                  Name = "User",
+                  CreatedAt = DateTime.Now,
+                  UpdatedAt = DateTime.Now,
+                  DeleteAt = null
+              }
+          };
+          context.Roles.AddRange(roles);
+          context.SaveChanges();
+          Console.WriteLine("Roles 'Admin' and 'User' have been created.");
+      }
 
-                },
-                new Role
-                {
-                    Name = "User",
-                    CreatedAt = DateTime.Now,
-                    UpdatedAt = DateTime.Now,
-                    DeleteAt = null,
-                }
-            };
-            context.Roles.AddRange(roles);
-            context.SaveChanges();
-        }
-        if (!context.Users.Any())
-        {
-            var userFaker = new Faker<User>()
-                .RuleFor(u => u.FullName, f => f.Name.FullName())
-                .RuleFor(u => u.Email, f => f.Internet.Email())
-                .RuleFor(u => u.Password, f => BCrypt.Net.BCrypt.HashPassword("User@123")) // Hash mật khẩu mặc định
-                .RuleFor(u => u.Phone, f => f.Phone.PhoneNumber("0#########")) // Số điện thoại Việt Nam
-                .RuleFor(u => u.Gender, f => f.PickRandom<Gender>()) // Chọn giới tính ngẫu nhiên
-                .RuleFor(u => u.CitizenIdentificationCard, f => f.Random.ReplaceNumbers("##########"))
-                .RuleFor(u => u.DateOfBirth, f => f.Date.Past(30, DateTime.Now.AddYears(-18))) // Tuổi từ 18 đến 48
-                .RuleFor(u => u.Status, f => Status.Active)
-                .RuleFor(u => u.CreatedAt, f => f.Date.Past(1))
-                .RuleFor(u => u.UpdatedAt, f => f.Date.Past(1))
-                .RuleFor(u => u.DeleteAt, f => f.Random.Bool(0.1f) ? f.Date.Past(1) : null) // 10% bị xóa
-                .RuleFor(u => u.RoleId, f => f.Random.Int(1,2)); // Admin = 1, User = 2
+      // Tạo Users
+      if (!context.Users.Any())
+      {
+          try
+          {
+              // Lấy RoleId của Admin và User từ cơ sở dữ liệu
+              var adminRole = context.Roles.FirstOrDefault(r => r.Name == "Admin");
+              var userRole = context.Roles.FirstOrDefault(r => r.Name == "User");
 
-            var users = userFaker.Generate(10); // Sinh 10 user
-            context.Users.AddRange(users);
-            context.SaveChanges();
-        }
+              if (adminRole == null || userRole == null)
+              {
+                  Console.WriteLine("Error: Roles 'Admin' or 'User' not found in database.");
+                  return;
+              }
+
+              // Tạo tài khoản Admin
+              string adminEmail = "admin@gmail.com";
+              string adminPassword = "Admin@123";
+
+              if (!context.Users.Any(u => u.Email == adminEmail))
+              {
+                  var adminUser = new User
+                  {
+                      FullName = "Administrator",
+                      Email = adminEmail,
+                      Password = BCrypt.Net.BCrypt.HashPassword(adminPassword),
+                      Phone = "0901234567",
+                      Gender = Gender.Male,
+                      CitizenIdentificationCard = "1234567890",
+                      DateOfBirth = DateTime.Now.AddYears(-30),
+                      Status = Status.Active,
+                      CreatedAt = DateTime.Now,
+                      UpdatedAt = DateTime.Now,
+                      DeleteAt = null,
+                      RoleId = adminRole.Id // Sử dụng Id thực tế từ bảng Roles
+                  };
+                  context.Users.Add(adminUser);
+              }
+
+              // Tạo 10 người dùng ngẫu nhiên
+              var userFaker = new Faker<User>()
+                  .RuleFor(u => u.FullName, f => f.Name.FullName())
+                  .RuleFor(u => u.Email, f => f.Internet.Email())
+                  .RuleFor(u => u.Password, f => BCrypt.Net.BCrypt.HashPassword("User@123"))
+                  .RuleFor(u => u.Phone, f => f.Phone.PhoneNumber("0#########"))
+                  .RuleFor(u => u.Gender, f => f.PickRandom<Gender>())
+                  .RuleFor(u => u.CitizenIdentificationCard, f => f.Random.ReplaceNumbers("##########"))
+                  .RuleFor(u => u.DateOfBirth, f => f.Date.Past(30, DateTime.Now.AddYears(-18)))
+                  .RuleFor(u => u.Status, f => Status.Active)
+                  .RuleFor(u => u.CreatedAt, f => f.Date.Past(1))
+                  .RuleFor(u => u.UpdatedAt, f => f.Date.Past(1))
+                  .RuleFor(u => u.DeleteAt, f => f.Random.Bool(0.1f) ? f.Date.Past(1) : null)
+                  .RuleFor(u => u.RoleId, f => f.Random.Bool() ? adminRole.Id : userRole.Id); // Ngẫu nhiên giữa Admin và User
+
+              var users = userFaker.Generate(10);
+              context.Users.AddRange(users);
+
+              // Lưu tất cả thay đổi một lần
+              context.SaveChanges();
+
+              Console.WriteLine("Admin account and 10 random users created successfully!");
+              Console.WriteLine($"Admin Email: {adminEmail}");
+              Console.WriteLine($"Admin Password (unhashed): {adminPassword}");
+          }
+          catch (DbUpdateException ex)
+          {
+              Console.WriteLine("Error saving changes: " + ex.InnerException?.Message);
+              throw;
+          }
+      }
         if (!context.InsurancePlans.Any())
         {
             var insuranceFaker = new Faker<InsurancePlan>()

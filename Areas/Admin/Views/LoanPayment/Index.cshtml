@@ -67,6 +67,7 @@ ViewData["Title"] = "Loan Payment List";
 
   dataTable.on('click', '.btn-detail', function () {
     var loanPaymentId = $(this).data('id');
+    sessionStorage.setItem('loanPaymentId', loanPaymentId);
     window.location.href = '/Admin/LoanPayment/Details/' + loanPaymentId;  // Adjust to the view URL
   });
 </script>

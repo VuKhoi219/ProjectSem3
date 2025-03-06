@@ -66,7 +66,8 @@ ViewData["Title"] = "Insurance Plan List";
 
   dataTable.on('click', '.btn-detail', function () {
     var rowData = dataTable.row($(this).parents('tr')).data();
-    var planId = rowData.planId;
+    var planId = rowData.id;
+    sessionStorage.setItem('planId', planId);
     window.location.href = '/Admin/InsurancePlan/Details/' + planId;  // Adjust to the view URL
   });
 </script>
