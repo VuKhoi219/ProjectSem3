@@ -10,7 +10,7 @@ Layout = "~/Views/Shared/_Layout.cshtml";
   <div class="mb-3">
     <label class="form-label">Selected Insurance Plan</label>
     <input type="text" class="form-control" id="planName" disabled />
-    <small class="form-text text-muted">Plan ID: <span id="planId"></span></small>
+    <small class="form-text text-muted"><span id="planId"></span></small>
   </div>
 
   <!-- Form nhập liệu -->
@@ -369,6 +369,7 @@ Layout = "~/Views/Shared/_Layout.cshtml";
         console.log("Response:", response);
         detailId = response.detailId;
         console.log("detailId:", detailId);
+        showSuccess();
         const dataContract = getContractValue(detailId);
         saveContract(dataContract);
       },
