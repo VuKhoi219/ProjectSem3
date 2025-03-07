@@ -1,138 +1,57 @@
 @model Project_Sem3.Models.Payment
 @{
-ViewData["Title"] = "Payment Details";
+  ViewData["Title"] = "Details";
 }
 
-<!-- Thêm CSS tùy chỉnh -->
-<style>
-  .payment-detail-card {
-    max-width: 800px;
-    margin: 20px auto;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    background-color: #fff;
-  }
-
-  .payment-detail-card h4 {
-    color: #333;
-    font-weight: 600;
-    margin-bottom: 20px;
-    text-align: center;
-  }
-
-  .payment-detail-card dl {
-    display: grid;
-    grid-template-columns: 1fr 2fr;
-    gap: 10px;
-  }
-
-  .payment-detail-card dt {
-    font-weight: 500;
-    color: #555;
-    padding: 10px 0;
-  }
-
-  .payment-detail-card dd {
-    padding: 10px 0;
-    color: #333;
-  }
-
-  .payment-image {
-    width: 300px;
-    height: 200px;
-    object-fit: cover;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    transition: transform 0.3s ease;
-  }
-
-  .payment-image:hover {
-    transform: scale(1.05);
-  }
-
-  .action-buttons {
-    margin-top: 20px;
-    text-align: center;
-  }
-
-  .action-buttons a {
-    padding: 8px 16px;
-    margin: 0 10px;
-    border-radius: 5px;
-    text-decoration: none;
-    font-weight: 500;
-    transition: background-color 0.3s ease;
-  }
-
-  .action-buttons .btn-edit {
-    background-color: #007bff;
-    color: white;
-  }
-
-  .action-buttons .btn-edit:hover {
-    background-color: #0056b3;
-  }
-
-  .action-buttons .btn-back {
-    background-color: #6c757d;
-    color: white;
-  }
-
-  .action-buttons .btn-back:hover {
-    background-color: #5a6268;
-  }
-</style>
-
-<div class="payment-detail-card">
-  <h4>Payment Details</h4>
+<div>
+  <h4>Insurance Contract Detail</h4>
   <hr />
-  <dl>
-    <dt>
+  <dl class="row">
+    <dt class="col-sm-2">
       @Html.DisplayNameFor(model => model.Id)
     </dt>
-    <dd>
+    <dd class="col-sm-10">
       @Html.DisplayFor(model => model.Id)
     </dd>
-    <dt>
+    <dt class="col-sm-2">
       @Html.DisplayNameFor(model => model.User.FullName)
     </dt>
-    <dd>
+    <dd class="col-sm-10">
       @Html.DisplayFor(model => model.User.FullName)
     </dd>
-    <dt>
+    <dt class="col-sm-2">
       @Html.DisplayNameFor(model => model.ContractId)
     </dt>
-    <dd>
+    <dd class="col-sm-10">
       @Html.DisplayFor(model => model.ContractId)
     </dd>
-    <dt>
+    <dt class="col-sm-2">
       @Html.DisplayNameFor(model => model.PaymentDate)
     </dt>
-    <dd>
+    <dd class="col-sm-10">
       @Html.DisplayFor(model => model.PaymentDate)
     </dd>
-    <dt>
+    <dt class="col-sm-2">
       @Html.DisplayNameFor(model => model.Amount)
     </dt>
-    <dd>
+    <dd class="col-sm-10">
       @Html.DisplayFor(model => model.Amount)
     </dd>
-    <dt>
+    <dt class="col-sm-2">
       @Html.DisplayNameFor(model => model.ImageUrl)
     </dt>
-    <dd>
-      <img src="@Model.ImageUrl" alt="Payment Image" class="payment-image" />
+    <dd class="col-sm-10">
+      @Html.DisplayFor(model => model.ImageUrl)
     </dd>
-    <dt>
+    <dt class="col-sm-2">
       @Html.DisplayNameFor(model => model.Status)
     </dt>
-    <dd>
+    <dd class="col-sm-10">
       @Html.DisplayFor(model => model.Status)
     </dd>
   </dl>
-  <div class="action-buttons">
-    <a asp-action="Edit" asp-route-id="@Model?.Id" class="btn-edit">Edit</a>
-    <a asp-action="Index" class="btn-back">Back to List</a>
-  </div>
+</div>
+<div>
+  <a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a> |
+  <a asp-action="Index">Back to List</a>
 </div>
