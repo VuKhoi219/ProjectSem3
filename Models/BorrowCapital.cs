@@ -15,7 +15,7 @@ public class BorrowCapital
       public decimal LoanAmount { get; set; }
 
       [MaxLength(10)]
-      public string? Currency { get; set; } = "VND";  // Default value is 'VND'
+      public string? Currency { get; set; } = "USD";  // Default value is 'VND'
 
       [Required]
       public decimal InterestRate { get; set; }

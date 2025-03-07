@@ -104,7 +104,7 @@ Layout = "~/Views/Shared/_Layout.cshtml";
 
     <!-- Coverage Amount thay bằng input readonly -->
     <div class="mb-3">
-      <label for="coverageAmount" class="form-label">Coverage Amount (VND) (one year)</label>
+      <label for="coverageAmount" class="form-label">Coverage Amount (USD) (one year)</label>
       <input type="text" class="form-control" id="coverageAmount" disabled />
     </div>
 
@@ -170,7 +170,7 @@ Layout = "~/Views/Shared/_Layout.cshtml";
     healthStatus: [0], // Healthy
     lifestyle: [3],    // None
     career: [1],       // Pilot
-    coverageAmount: 1000000000,
+    coverageAmount: 1000000000, // Giả sử đây là số tiền gốc, có thể điều chỉnh nếu cần
     contractDuration: 10,
     region: "North"
   };
@@ -181,12 +181,12 @@ Layout = "~/Views/Shared/_Layout.cshtml";
       planId = selectedPlan.id;
       $("#planName").val(selectedPlan.name);
       $("#planId").text(selectedPlan.id);
-      $("#coverageAmount").val(formatVND(selectedPlan.coverageAmount));
+      $("#coverageAmount").val(formatUSD(selectedPlan.coverageAmount));
     } else {
       console.log("No valid insurance plan data found in localStorage.");
       $("#planName").val("No Plan Selected");
       $("#planId").text("N/A");
-      $("#coverageAmount").val(formatVND(defaultData.coverageAmount));
+      $("#coverageAmount").val(formatUSD(defaultData.coverageAmount));
     }
 
     // Tự động tính EndDate khi StartDate hoặc ContractDuration thay đổi
@@ -196,12 +196,14 @@ Layout = "~/Views/Shared/_Layout.cshtml";
     setupEventListeners();
   });
 
-  function formatVND(number) {
-    return number.toLocaleString("vi-VN", { style: "currency", currency: "VND" }).replace("₫", "").trim();
+  // Hàm định dạng số tiền sang USD
+  function formatUSD(number) {
+    return number.toLocaleString("en-US", { style: "currency", currency: "USD" });
   }
-  function parseVNDToNumber(vndString) {
-    // Loại bỏ tất cả dấu chấm và thay bằng "" để đảm bảo chỉ còn số nguyên
-    return parseFloat(vndString.replace(/\./g, ""));
+
+  // Hàm chuyển chuỗi USD về số
+  function parseUSDToNumber(usdString) {
+    return parseFloat(usdString.replace(/[$,]/g, ""));
   }
 
   function calculateEndDate() {
@@ -272,10 +274,10 @@ Layout = "~/Views/Shared/_Layout.cshtml";
   }
 
   function updateResult(response) {
-    $("#annualPaymentAmount").val(formatVND(response.annualPaymentAmount));
-    $("#premium").val(formatVND(response.premium));
-    $("#deductible").val(formatVND(response.deductible));
-    $("#resultCoverageAmount").val(formatVND(response.coverageAmount));
+    $("#annualPaymentAmount").val(formatUSD(response.annualPaymentAmount));
+    $("#premium").val(formatUSD(response.premium));
+    $("#deductible").val(formatUSD(response.deductible));
+    $("#resultCoverageAmount").val(formatUSD(response.coverageAmount));
     $("#riskFactor").val(response.riskFactor.toFixed(3));
     $("#errorAlert").addClass("d-none");
   }
@@ -301,9 +303,9 @@ Layout = "~/Views/Shared/_Layout.cshtml";
     const career = $("#career").val() ? [parseInt($("#career").val())] : [];
     const coverageAmount = selectedPlan.coverageAmount || defaultData.coverageAmount;
     const contractDuration = parseInt($("#contractDuration").val()) || 0;
-    const annualPaymentAmount = $("#annualPaymentAmount").val() ? parseVNDToNumber($("#annualPaymentAmount").val()) : 0;
-    const premium = $("#premium").val() ? parseVNDToNumber($("#premium").val()) : 0;
-    const deductible = $("#deductible").val() ? parseVNDToNumber($("#deductible").val()) : 0;
+    const annualPaymentAmount = $("#annualPaymentAmount").val() ? parseUSDToNumber($("#annualPaymentAmount").val()) : 0;
+    const premium = $("#premium").val() ? parseUSDToNumber($("#premium").val()) : 0;
+    const deductible = $("#deductible").val() ? parseUSDToNumber($("#deductible").val()) : 0;
     const riskFactor = $("#riskFactor").val() ? parseFloat($("#riskFactor").val()) : 0;
     const region = $("#region").val() || null;
     const hospitalNetwork = $("#hospitalNetwork").val() || null;
@@ -369,7 +371,6 @@ Layout = "~/Views/Shared/_Layout.cshtml";
         console.log("Response:", response);
         detailId = response.detailId;
         console.log("detailId:", detailId);
-        showSuccess();
         const dataContract = getContractValue(detailId);
         saveContract(dataContract);
       },
@@ -402,6 +403,7 @@ Layout = "~/Views/Shared/_Layout.cshtml";
       }
     });
   }
+
   function selectPlan(planId, planName, coverageAmount) {
     localStorage.setItem("selectedPlan", JSON.stringify({
       id: planId,

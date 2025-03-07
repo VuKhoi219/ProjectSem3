@@ -99,6 +99,11 @@ Layout = "~/Views/Shared/_Layout.cshtml";
 
   console.log("Transaction ID:", transactionId);
 
+  // Hàm định dạng số tiền sang USD
+  function formatUSD(number) {
+    return number.toLocaleString("en-US", { style: "currency", currency: "USD" });
+  }
+
   $(document).ready(function() {
     $.ajax({
       url: `/api/payments/${transactionId}`,
@@ -112,37 +117,37 @@ Layout = "~/Views/Shared/_Layout.cshtml";
         const statusText = statusMap[data.status] || 'N/A';
 
         const detailHtml = `
-                        <div class="detail-row">
-                            <span class="detail-label">Transaction ID:</span>
-                            <span class="detail-value">${data.id}</span>
-                        </div>
-                        <div class="detail-row">
-                            <span class="detail-label">Contract ID:</span>
-                            <span class="detail-value">${data.contractId}</span>
-                        </div>
-                        <div class="detail-row">
-                            <span class="detail-label">Amount:</span>
-                            <span class="detail-value">${data.amount} VND</span>
-                        </div>
-                        <div class="detail-row">
-                            <span class="detail-label">Payment Date:</span>
-                            <span class="detail-value">${new Date(data.paymentDate).toLocaleDateString('en-US')}</span>
-                        </div>
-                        <div class="detail-row">
-                            <span class="detail-label">Status:</span>
-                            <span class="detail-value">${statusText}</span>
-                        </div>
-                        <div class="detail-row">
-                            <span class="detail-label">Image:</span>
-                            <span class="detail-value">
-                                <img src="${data.imageUrl}" alt="Payment Image" class="detail-image" style="width: 200px; height: 200px;">
-                            </span>
-                        </div>
-                        <div class="detail-row">
-                            <span class="detail-label">Created At:</span>
-                            <span class="detail-value">${new Date(data.createdAt).toLocaleDateString('en-US')}</span>
-                        </div>
-                    `;
+                    <div class="detail-row">
+                        <span class="detail-label">Transaction ID:</span>
+                        <span class="detail-value">${data.id}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Contract ID:</span>
+                        <span class="detail-value">${data.contractId}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Amount:</span>
+                        <span class="detail-value">${formatUSD(data.amount)}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Payment Date:</span>
+                        <span class="detail-value">${new Date(data.paymentDate).toLocaleDateString('en-US')}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Status:</span>
+                        <span class="detail-value">${statusText}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Image:</span>
+                        <span class="detail-value">
+                            <img src="${data.imageUrl}" alt="Payment Image" class="detail-image" style="width: 200px; height: 200px;">
+                        </span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Created At:</span>
+                        <span class="detail-value">${new Date(data.createdAt).toLocaleDateString('en-US')}</span>
+                    </div>
+                `;
         $('#transaction-details').html(detailHtml);
       },
       error: function(error) {

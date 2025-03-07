@@ -415,6 +415,12 @@ public class InsuranceContractsController : ControllerBase
                     StartDate = c.StartDate,
                     EndDate = c.EndDate,
                     Status = c.Status.ToString(),
+                    Payments = c.Payments.Select(p => new
+                    {
+                      dueDate = p.PaymentDate,
+                      amount = p.Amount,
+                      status = p.Status.ToString() // Chuyển enum thành string
+                    }),
                     User = new // Thêm thông tin từ bảng Users
                     {
                       Id = c.User.Id,
