@@ -1,8 +1,8 @@
 @using Microsoft.AspNetCore.Mvc.Rendering
 @using Microsoft.AspNetCore.Mvc.TagHelpers
 @{
-    ViewData["Title"] = "Motor Vehicle Insurance";
-    Layout = "~/Views/Shared/_Layout.cshtml";
+ViewData["Title"] = "Motor Vehicle Insurance";
+Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
 <div class="container">
@@ -107,7 +107,7 @@
 
     <!-- Coverage Amount -->
     <div class="mb-3">
-      <label for="coverageAmount" class="form-label">Coverage Amount (VND) (one year)</label>
+      <label for="coverageAmount" class="form-label">Coverage Amount (USD) (one year)</label>
       <input type="text" class="form-control" id="coverageAmount" disabled />
     </div>
 
@@ -148,263 +148,264 @@
   <div><button class="btn btn-danger" onclick="sendInsuranceVehicleDetail()">Contract Requirements</button></div>
 </div>
 
-
-
 @section Scripts {
-  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js"></script>
-  <script>
-    const currentUserId = @ViewData["UserId"] ?? null; // Lấy UserId từ ViewData
-    let detailId; // Biến lưu detailId từ response
-    let planId;   // Biến lưu planId toàn cục
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js"></script>
+<script>
+  const currentUserId = @ViewData["UserId"] ?? null; // Lấy UserId từ ViewData
+  let detailId; // Biến lưu detailId từ response
+  let planId;   // Biến lưu planId toàn cục
 
-    const defaultData = {
-      age: 30,
-      vehicleType: "0", // Car
-      vehicleBrand: "3", // Toyota
-      vehicleModel: "Camry",
-      vehicleYear: 2020,
-      numberOfAccidents: 0,
-      yearsWithoutAccident: 5,
-      cityIds: [0], // Hà Nội
-      coverageAmount: 1000000000,
-      contractDuration: 1,
-      region: "North"
+  const defaultData = {
+    age: 30,
+    vehicleType: "0", // Car
+    vehicleBrand: "3", // Toyota
+    vehicleModel: "Camry",
+    vehicleYear: 2020,
+    numberOfAccidents: 0,
+    yearsWithoutAccident: 5,
+    cityIds: [0], // Hà Nội
+    coverageAmount: 1000000000, // Giả sử đây là số tiền gốc, có thể điều chỉnh nếu cần
+    contractDuration: 1,
+    region: "North"
+  };
+
+  $(document).ready(function () {
+    const selectedPlan = JSON.parse(localStorage.getItem("selectedPlan"));
+    if (selectedPlan && selectedPlan.id && selectedPlan.name) {
+      planId = selectedPlan.id;
+      $("#planName").val(selectedPlan.name);
+      $("#planId").text(selectedPlan.id);
+      $("#coverageAmount").val(formatUSD(selectedPlan.coverageAmount));
+    } else {
+      console.log("No valid insurance plan data found in localStorage.");
+      $("#planName").val("No Plan Selected");
+      $("#planId").text("N/A");
+      $("#coverageAmount").val(formatUSD(defaultData.coverageAmount));
+    }
+
+    // Tự động tính EndDate khi StartDate hoặc ContractDuration thay đổi
+    $('#startDate, #contractDuration').on('change', calculateEndDate);
+
+    calculateInsurance();
+    setupEventListeners();
+  });
+
+  // Hàm định dạng số tiền sang USD
+  function formatUSD(number) {
+    return number.toLocaleString("en-US", { style: "currency", currency: "USD" });
+  }
+
+  // Hàm chuyển chuỗi USD về số
+  function parseUSDToNumber(usdString) {
+    return parseFloat(usdString.replace(/[$,]/g, ""));
+  }
+
+  function calculateEndDate() {
+    const startDate = $('#startDate').val();
+    const contractDuration = parseInt($('#contractDuration').val()) || 0;
+    if (startDate && contractDuration > 0) {
+      const start = new Date(startDate);
+      const end = new Date(start);
+      end.setFullYear(start.getFullYear() + contractDuration);
+      $('#endDate').val(end.toISOString().split('T')[0]);
+    } else {
+      $('#endDate').val('');
+    }
+  }
+
+  function setupEventListeners() {
+    const debounce = (func, delay) => {
+      let timeoutId;
+      return (...args) => {
+        clearTimeout(timeoutId);
+        timeoutId = setTimeout(() => func.apply(null, args), delay);
+      };
     };
+    $("#age, #contractDuration, #vehicleYear, #numberOfAccidents, #yearsWithoutAccident").on("input", debounce(calculateInsurance, 500));
+    $("#vehicleType, #vehicleBrand, #region").on("change", calculateInsurance);
+    $('input[name="city"]').on("change", calculateInsurance);
+  }
 
-    $(document).ready(function () {
-      const selectedPlan = JSON.parse(localStorage.getItem("selectedPlan"));
-      if (selectedPlan && selectedPlan.id && selectedPlan.name) {
-        planId = selectedPlan.id;
-        $("#planName").val(selectedPlan.name);
-        $("#planId").text(selectedPlan.id);
-        $("#coverageAmount").val(formatVND(selectedPlan.coverageAmount));
-      } else {
-        console.log("No valid insurance plan data found in localStorage.");
-        $("#planName").val("No Plan Selected");
-        $("#planId").text("N/A");
-        $("#coverageAmount").val(formatVND(defaultData.coverageAmount));
+  function calculateInsurance() {
+    const selectedPlan = JSON.parse(localStorage.getItem("selectedPlan")) || {};
+    const age = parseInt($("#age").val()) || 0;
+    const vehicleType = parseInt($("#vehicleType").val()) || 0; // Giữ nguyên logic cũ
+    const vehicleBrand = parseInt($("#vehicleBrand").val()) || 0; // Giữ nguyên logic cũ
+    const vehicleInfo = [vehicleType, vehicleBrand]; // Giữ nguyên logic cũ
+    const cityIds = $('input[name="city"]:checked').map(function() { return parseInt(this.value); }).get();
+    const numberOfAccidents = parseInt($("#numberOfAccidents").val()) || 0;
+    const yearsWithoutAccident = parseInt($("#yearsWithoutAccident").val()) || 0;
+    const coverageAmount = selectedPlan.coverageAmount || defaultData.coverageAmount;
+    const contractDuration = parseInt($("#contractDuration").val()) || 0;
+
+    // Validation cơ bản để giữ logic cũ
+    if (age < 18 || vehicleType === "" || vehicleBrand === "" || cityIds.length === 0 ||
+      numberOfAccidents < 0 || yearsWithoutAccident < 0 || !coverageAmount || contractDuration <= 0) {
+      return showError("Please fill in all required fields correctly.");
+    }
+
+    const requestData = {
+      age: age,
+      vehicleInfo: vehicleInfo,
+      cityIds: cityIds,
+      numberOfAccidents: numberOfAccidents,
+      yearsWithoutAccident: yearsWithoutAccident,
+      coverageAmount: coverageAmount,
+      contractDuration: contractDuration
+    };
+    console.log("Calculate data:", requestData);
+
+    $.ajax({
+      url: "/api/insurance/calculate/vehicle",
+      method: "POST",
+      contentType: "application/json",
+      data: JSON.stringify(requestData),
+      success: function (response) {
+        console.log("Calculate response:", response);
+        updateResult(response);
+      },
+      error: function (xhr) {
+        console.log("Calculate error:", xhr.responseText);
+        showError(`Error: ${xhr.responseText || "Something went wrong."}`);
       }
-
-      // Tự động tính EndDate khi StartDate hoặc ContractDuration thay đổi
-      $('#startDate, #contractDuration').on('change', calculateEndDate);
-
-      calculateInsurance();
-      setupEventListeners();
     });
-    function formatVND(number) {
-      return number.toLocaleString("vi-VN", { style: "currency", currency: "VND" }).replace("₫", "").trim();
-    }
-    function parseVNDToNumber(vndString) {
-      // Loại bỏ tất cả dấu chấm và thay bằng "" để đảm bảo chỉ còn số nguyên
-      return parseFloat(vndString.replace(/\./g, ""));
-    }
+  }
 
-    function calculateEndDate() {
-      const startDate = $('#startDate').val();
-      const contractDuration = parseInt($('#contractDuration').val()) || 0;
-      if (startDate && contractDuration > 0) {
-        const start = new Date(startDate);
-        const end = new Date(start);
-        end.setFullYear(start.getFullYear() + contractDuration);
-        $('#endDate').val(end.toISOString().split('T')[0]);
-      } else {
-        $('#endDate').val('');
+  function updateResult(response) {
+    $("#annualPaymentAmount").val(formatUSD(response.annualPaymentAmount));
+    $("#premium").val(formatUSD(response.premium));
+    $("#deductible").val(formatUSD(response.deductible));
+    $("#resultCoverageAmount").val(formatUSD(response.coverageAmount));
+    $("#riskFactor").val(response.riskFactor.toFixed(3));
+    $("#errorAlert").addClass("d-none");
+  }
+
+  function showError(message) {
+    $("#errorAlert").text(message).removeClass("d-none");
+    $("#annualPaymentAmount").val("");
+    $("#premium").val("");
+    $("#deductible").val("");
+    $("#resultCoverageAmount").val("");
+    $("#riskFactor").val("");
+  }
+
+  function getAllValues() {
+    const selectedPlan = JSON.parse(localStorage.getItem("selectedPlan")) || {};
+    const age = parseInt($("#age").val()) || 0;
+    const vehicleType = $("#vehicleType").val() === "0" ? "Car" : "Motorcycle";
+    const vehicleBrandText = $("#vehicleBrand option:selected").text();
+    const vehicleModel = $("#vehicleModel").val() || "";
+    const vehicleYear = parseInt($("#vehicleYear").val()) || 0;
+    const numberOfAccidents = parseInt($("#numberOfAccidents").val()) || 0;
+    const yearsWithoutAccident = parseInt($("#yearsWithoutAccident").val()) || 0;
+    const cityIds = $('input[name="city"]:checked').map(function() { return parseInt(this.value); }).get();
+    const contractDuration = parseInt($("#contractDuration").val()) || 0;
+    const annualPaymentAmount = $("#annualPaymentAmount").val() ? parseUSDToNumber($("#annualPaymentAmount").val()) : 0;
+    const premium = $("#premium").val() ? parseUSDToNumber($("#premium").val()) : 0;
+    const deductible = $("#deductible").val() ? parseUSDToNumber($("#deductible").val()) : 0;
+    const riskFactor = $("#riskFactor").val() ? parseFloat($("#riskFactor").val()) : 0;
+    const region = $("#region").val() || null;
+
+    return {
+      planId: planId || 0,
+      age: age,
+      vehicleType: vehicleType,
+      vehicleBrand: vehicleBrandText,
+      vehicleModel: vehicleModel,
+      vehicleYear: vehicleYear,
+      numberOfAccidents: numberOfAccidents,
+      yearsWithoutAccident: yearsWithoutAccident,
+      cityIds: cityIds,
+      duration: contractDuration * 12,
+      annualPaymentAmount: annualPaymentAmount,
+      premium: premium,
+      deductible: deductible,
+      riskFactor: riskFactor,
+      region: region
+    };
+  }
+
+  function getContractValue(detailId) {
+    return {
+      UserId: currentUserId,
+      PlanId: planId,
+      startDate: $('#startDate').val() + "T00:00:00",
+      endDate: $('#endDate').val() + "T00:00:00",
+      detailId: detailId
+    };
+  }
+
+  function checkUserId() {
+    if (!currentUserId) {
+      alert("Please login to create an insurance contract");
+      return false;
+    }
+    return true;
+  }
+
+  function sendInsuranceVehicleDetail() {
+    if (!checkUserId()) return;
+
+    const data = getAllValues();
+    console.log("Sending data:", data);
+
+    // Validation đầy đủ cho gửi hợp đồng
+    if (data.planId === 0) return alert("Please select a valid insurance plan.");
+    if (data.age < 18) return alert("Driver age must be at least 18.");
+    if (!data.vehicleType) return alert("Please select a vehicle type.");
+    if (!data.vehicleBrand) return alert("Please select a vehicle brand.");
+    if (!data.vehicleModel) return alert("Please enter a vehicle model.");
+    if (data.vehicleYear <= 0 || data.vehicleYear > @DateTime.Now.Year) return alert("Please enter a valid vehicle year.");
+    if (data.cityIds.length === 0) return alert("Please select at least one city.");
+    if (data.numberOfAccidents < 0) return alert("Number of accidents cannot be negative.");
+    if (data.yearsWithoutAccident < 0) return alert("Years without accident cannot be negative.");
+    if (!$('#startDate').val() || !$('#endDate').val()) return alert("Please select start date and duration.");
+    if (data.annualPaymentAmount === 0) return alert("Annual payment amount is required.");
+    if (data.premium === 0) return alert("Premium is required.");
+    if (!data.region) return alert("Please select a region.");
+
+    showLoading();
+    $.ajax({
+      url: "/api/insurance-vehicle",
+      method: "POST",
+      contentType: "application/json",
+      data: JSON.stringify(data),
+      success: function (response) {
+        console.log("Response:", response);
+        detailId = response.detailId;
+        console.log("detailId:", detailId);
+        const dataContract = getContractValue(detailId);
+        saveContract(dataContract);
+      },
+      error: function (xhr) {
+        console.log("Error:", xhr.responseText);
+        hideLoading();
+        alert("Please enter enough information");
       }
-    }
+    });
+  }
 
-    function setupEventListeners() {
-      const debounce = (func, delay) => {
-        let timeoutId;
-        return (...args) => {
-          clearTimeout(timeoutId);
-          timeoutId = setTimeout(() => func.apply(null, args), delay);
-        };
-      };
-      $("#age, #contractDuration, #vehicleYear, #numberOfAccidents, #yearsWithoutAccident").on("input", debounce(calculateInsurance, 500));
-      $("#vehicleType, #vehicleBrand, #region").on("change", calculateInsurance);
-      $('input[name="city"]').on("change", calculateInsurance);
-    }
-
-    function calculateInsurance() {
-      const selectedPlan = JSON.parse(localStorage.getItem("selectedPlan")) || {};
-      const age = parseInt($("#age").val()) || 0;
-      const vehicleType = parseInt($("#vehicleType").val()) || 0; // Giữ nguyên logic cũ
-      const vehicleBrand = parseInt($("#vehicleBrand").val()) || 0; // Giữ nguyên logic cũ
-      const vehicleInfo = [vehicleType, vehicleBrand]; // Giữ nguyên logic cũ
-      const cityIds = $('input[name="city"]:checked').map(function() { return parseInt(this.value); }).get();
-      const numberOfAccidents = parseInt($("#numberOfAccidents").val()) || 0;
-      const yearsWithoutAccident = parseInt($("#yearsWithoutAccident").val()) || 0;
-      const coverageAmount = selectedPlan.coverageAmount || defaultData.coverageAmount;
-      const contractDuration = parseInt($("#contractDuration").val()) || 0;
-
-      // Validation cơ bản để giữ logic cũ
-      if (age < 18 || vehicleType === "" || vehicleBrand === "" || cityIds.length === 0 ||
-          numberOfAccidents < 0 || yearsWithoutAccident < 0 || !coverageAmount || contractDuration <= 0) {
-        return showError("Please fill in all required fields correctly.");
+  function saveContract(data) {
+    $.ajax({
+      url: "/api/insurance-contracts",
+      method: "POST",
+      contentType: "application/json",
+      data: JSON.stringify(data),
+      success: function (response) {
+        console.log("Contract saved:", response);
+        showSuccess();
+        setTimeout(function () {
+          window.location.href = "/Home/PageSuccess";
+        }, 2000);
+      },
+      error: function (xhr) {
+        console.log("Error:", xhr.responseText);
+        hideLoading();
+        alert("Error saving contract. Please try again.");
       }
-
-      const requestData = {
-        age: age,
-        vehicleInfo: vehicleInfo,
-        cityIds: cityIds,
-        numberOfAccidents: numberOfAccidents,
-        yearsWithoutAccident: yearsWithoutAccident,
-        coverageAmount: coverageAmount,
-        contractDuration: contractDuration
-      };
-      console.log("Calculate data:", requestData);
-
-      $.ajax({
-        url: "/api/insurance/calculate/vehicle",
-        method: "POST",
-        contentType: "application/json",
-        data: JSON.stringify(requestData),
-        success: function (response) {
-          console.log("Calculate response:", response);
-          updateResult(response);
-        },
-        error: function (xhr) {
-          console.log("Calculate error:", xhr.responseText);
-          showError(`Error: ${xhr.responseText || "Something went wrong."}`);
-        }
-      });
-    }
-
-    function updateResult(response) {
-      $("#annualPaymentAmount").val(formatVND(response.annualPaymentAmount));
-      $("#premium").val(formatVND(response.premium));
-      $("#deductible").val(formatVND(response.deductible));
-      $("#resultCoverageAmount").val(formatVND(response.coverageAmount));
-      $("#riskFactor").val(response.riskFactor.toFixed(3));
-      $("#errorAlert").addClass("d-none");
-    }
-
-    function showError(message) {
-      $("#errorAlert").text(message).removeClass("d-none");
-      $("#annualPaymentAmount").val("");
-      $("#premium").val("");
-      $("#deductible").val("");
-      $("#resultCoverageAmount").val("");
-      $("#riskFactor").val("");
-    }
-
-    function getAllValues() {
-      const selectedPlan = JSON.parse(localStorage.getItem("selectedPlan")) || {};
-      const age = parseInt($("#age").val()) || 0;
-      const vehicleType = $("#vehicleType").val() === "0" ? "Car" : "Motorcycle";
-      const vehicleBrandText = $("#vehicleBrand option:selected").text();
-      const vehicleModel = $("#vehicleModel").val() || "";
-      const vehicleYear = parseInt($("#vehicleYear").val()) || 0;
-      const numberOfAccidents = parseInt($("#numberOfAccidents").val()) || 0;
-      const yearsWithoutAccident = parseInt($("#yearsWithoutAccident").val()) || 0;
-      const cityIds = $('input[name="city"]:checked').map(function() { return parseInt(this.value); }).get();
-      const contractDuration = parseInt($("#contractDuration").val()) || 0;
-      const annualPaymentAmount = $("#annualPaymentAmount").val() ? parseVNDToNumber($("#annualPaymentAmount").val()) : 0;
-      const premium = $("#premium").val() ? parseVNDToNumber($("#premium").val()) : 0;
-      const deductible = $("#deductible").val() ? parseVNDToNumber($("#deductible").val()) : 0;
-      const riskFactor = $("#riskFactor").val() ? parseFloat($("#riskFactor").val()) : 0;
-      const region = $("#region").val() || null;
-
-      return {
-        planId: planId || 0,
-        age: age,
-        vehicleType: vehicleType,
-        vehicleBrand: vehicleBrandText,
-        vehicleModel: vehicleModel,
-        vehicleYear: vehicleYear,
-        numberOfAccidents: numberOfAccidents,
-        yearsWithoutAccident: yearsWithoutAccident,
-        cityIds: cityIds,
-        duration: contractDuration * 12,
-        annualPaymentAmount: annualPaymentAmount,
-        premium: premium,
-        deductible: deductible,
-        riskFactor: riskFactor,
-        region: region
-      };
-    }
-
-    function getContractValue(detailId) {
-      return {
-        UserId: currentUserId,
-        PlanId: planId,
-        startDate: $('#startDate').val() + "T00:00:00",
-        endDate: $('#endDate').val() + "T00:00:00",
-        detailId: detailId
-      };
-    }
-
-    function checkUserId() {
-      if (!currentUserId) {
-        alert("Please login to create an insurance contract");
-        return false;
-      }
-      return true;
-    }
-
-    function sendInsuranceVehicleDetail() {
-      if (!checkUserId()) return;
-
-      const data = getAllValues();
-      console.log("Sending data:", data);
-
-      // Validation đầy đủ cho gửi hợp đồng
-      if (data.planId === 0) return alert("Please select a valid insurance plan.");
-      if (data.age < 18) return alert("Driver age must be at least 18.");
-      if (!data.vehicleType) return alert("Please select a vehicle type.");
-      if (!data.vehicleBrand) return alert("Please select a vehicle brand.");
-      if (!data.vehicleModel) return alert("Please enter a vehicle model.");
-      if (data.vehicleYear <= 0 || data.vehicleYear > @DateTime.Now.Year) return alert("Please enter a valid vehicle year.");
-      if (data.cityIds.length === 0) return alert("Please select at least one city.");
-      if (data.numberOfAccidents < 0) return alert("Number of accidents cannot be negative.");
-      if (data.yearsWithoutAccident < 0) return alert("Years without accident cannot be negative.");
-      if (!$('#startDate').val() || !$('#endDate').val()) return alert("Please select start date and duration.");
-      if (data.annualPaymentAmount === 0) return alert("Annual payment amount is required.");
-      if (data.premium === 0) return alert("Premium is required.");
-      if (!data.region) return alert("Please select a region.");
-
-      showLoading();
-      $.ajax({
-        url: "/api/insurance-vehicle",
-        method: "POST",
-        contentType: "application/json",
-        data: JSON.stringify(data),
-        success: function (response) {
-          console.log("Response:", response);
-          detailId = response.detailId;
-          console.log("detailId:", detailId);
-          const dataContract = getContractValue(detailId);
-          saveContract(dataContract);
-        },
-        error: function (xhr) {
-          console.log("Error:", xhr.responseText);
-          hideLoading();
-          alert("Please enter enough information");
-        }
-      });
-    }
-
-    function saveContract(data) {
-      $.ajax({
-        url: "/api/insurance-contracts",
-        method: "POST",
-        contentType: "application/json",
-        data: JSON.stringify(data),
-        success: function (response) {
-          console.log("Contract saved:", response);
-          showSuccess();
-          setTimeout(function () {
-            window.location.href = "/Home/PageSuccess";
-          }, 2000);
-        },
-        error: function (xhr) {
-          console.log("Error:", xhr.responseText);
-          hideLoading();
-          alert("Error saving contract. Please try again.");
-        }
-      });
-    }
-  </script>
+    });
+  }
+</script>
 }

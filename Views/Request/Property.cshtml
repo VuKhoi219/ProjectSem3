@@ -13,7 +13,6 @@ Layout = "~/Views/Shared/_Layout.cshtml";
   </div>
 
   <div class="container">
-
   </div>
 
   <!-- Form nhập liệu -->
@@ -67,8 +66,8 @@ Layout = "~/Views/Shared/_Layout.cshtml";
         <label class="form-check-label" for="city2">Ha Noi</label>
       </div>
       <div class="form-check">
-        <input class="form-check-input" type="radio" id="city2" name="city" value="3">
-        <label class="form-check-label" for="city2">Other</label>
+        <input class="form-check-input" type="radio" id="city3" name="city" value="3">
+        <label class="form-check-label" for="city3">Other</label>
       </div>
     </div>
 
@@ -99,7 +98,7 @@ Layout = "~/Views/Shared/_Layout.cshtml";
 
     <!-- Coverage Amount -->
     <div class="mb-3">
-      <label for="coverageAmount" class="form-label">Coverage Amount (VND) (one year)</label>
+      <label for="coverageAmount" class="form-label">Coverage Amount (USD) (one year)</label>
       <input type="text" class="form-control" id="coverageAmount" disabled />
     </div>
 
@@ -140,7 +139,6 @@ Layout = "~/Views/Shared/_Layout.cshtml";
   <div><button class="btn btn-warning" onclick="sendInsurancePropertyDetail()">Contract Requirements</button></div>
 </div>
 
-
 @section Scripts {
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
@@ -157,7 +155,7 @@ Layout = "~/Views/Shared/_Layout.cshtml";
     assetAge: 10,
     materialIds: [0], // Wood
     detail: "Newly built single-family house",
-    coverageAmount: 1000000000,
+    coverageAmount: 1000000000, // Giả sử đây là số tiền gốc, có thể điều chỉnh nếu cần
     contractDuration: 1,
     region: "North"
   };
@@ -168,12 +166,12 @@ Layout = "~/Views/Shared/_Layout.cshtml";
       planId = selectedPlan.id;
       $("#planName").val(selectedPlan.name);
       $("#planId").text(selectedPlan.id);
-      $("#coverageAmount").val(formatVND(selectedPlan.coverageAmount));
+      $("#coverageAmount").val(formatUSD(selectedPlan.coverageAmount));
     } else {
       console.log("No valid insurance plan data found in localStorage.");
       $("#planName").val("No Plan Selected");
       $("#planId").text("N/A");
-      $("#coverageAmount").val(formatVND(defaultData.coverageAmount));
+      $("#coverageAmount").val(formatUSD(defaultData.coverageAmount));
     }
 
     // Tự động tính EndDate khi StartDate hoặc ContractDuration thay đổi
@@ -182,12 +180,15 @@ Layout = "~/Views/Shared/_Layout.cshtml";
     calculateInsurance();
     setupEventListeners();
   });
-  function formatVND(number) {
-    return number.toLocaleString("vi-VN", { style: "currency", currency: "VND" }).replace("₫", "").trim();
+
+  // Hàm định dạng số tiền sang USD
+  function formatUSD(number) {
+    return number.toLocaleString("en-US", { style: "currency", currency: "USD" });
   }
-  function parseVNDToNumber(vndString) {
-    // Loại bỏ tất cả dấu chấm và thay bằng "" để đảm bảo chỉ còn số nguyên
-    return parseFloat(vndString.replace(/\./g, ""));
+
+  // Hàm chuyển chuỗi USD về số
+  function parseUSDToNumber(usdString) {
+    return parseFloat(usdString.replace(/[$,]/g, ""));
   }
 
   function calculateEndDate() {
@@ -260,10 +261,10 @@ Layout = "~/Views/Shared/_Layout.cshtml";
   }
 
   function updateResult(response) {
-    $("#annualPaymentAmount").val(formatVND(response.annualPaymentAmount));
-    $("#premium").val(formatVND(response.premium));
-    $("#deductible").val(formatVND(response.deductible));
-    $("#resultCoverageAmount").val(formatVND(response.coverageAmount));
+    $("#annualPaymentAmount").val(formatUSD(response.annualPaymentAmount));
+    $("#premium").val(formatUSD(response.premium));
+    $("#deductible").val(formatUSD(response.deductible));
+    $("#resultCoverageAmount").val(formatUSD(response.coverageAmount));
     $("#riskFactor").val(response.riskFactor.toFixed(3));
     $("#errorAlert").addClass("d-none");
   }
@@ -286,9 +287,9 @@ Layout = "~/Views/Shared/_Layout.cshtml";
     const materialIds = $('input[name="material"]:checked').map(function() { return parseInt(this.value); }).get();
     const detail = $("#detail").val() || "";
     const contractDuration = parseInt($("#contractDuration").val()) || 0;
-    const annualPaymentAmount = $("#annualPaymentAmount").val() ? parseVNDToNumber($("#annualPaymentAmount").val()) : 0;
-    const premium = $("#premium").val() ? parseVNDToNumber($("#premium").val()) : 0;
-    const deductible = $("#deductible").val() ? parseVNDToNumber($("#deductible").val()) : 0;
+    const annualPaymentAmount = $("#annualPaymentAmount").val() ? parseUSDToNumber($("#annualPaymentAmount").val()) : 0;
+    const premium = $("#premium").val() ? parseUSDToNumber($("#premium").val()) : 0;
+    const deductible = $("#deductible").val() ? parseUSDToNumber($("#deductible").val()) : 0;
     const riskFactor = $("#riskFactor").val() ? parseFloat($("#riskFactor").val()) : 0;
     const region = $("#region").val() || null;
 
@@ -386,7 +387,5 @@ Layout = "~/Views/Shared/_Layout.cshtml";
       }
     });
   }
-
-
 </script>
 }
