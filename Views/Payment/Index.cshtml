@@ -105,13 +105,12 @@ Layout = "~/Views/Shared/_Layout.cshtml";
       url: `/api/payments/user/${id}?pageNumber=${page}&pageSize=${pageSize}`,
       method: 'GET',
       success: function(response) {
+        hideLoading();
         const data = (response.data && response.data.$values) || [];
         if (!Array.isArray(data) || data.length === 0) {
           $('#paymentTable').html('<div class="text-center">No data available</div>');
-          hideLoading();
           return;
         }
-        showSuccess();
 
         let html = '<table class="table table-striped table-hover">';
         html += '<thead class="thead-dark"><tr><th>ID</th><th>Amount</th><th>Status</th><th>Actions</th></tr></thead>';

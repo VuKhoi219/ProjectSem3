@@ -76,7 +76,7 @@ if (!await roleManager.RoleExistsAsync("Admin"))
 
 var adminUser = new IdentityUser
 {
-  UserName = "admin@example.com",
+  UserName = "admin@example19.com",
   Email = "admin@example.com",
   EmailConfirmed = true
 };

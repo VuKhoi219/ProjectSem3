@@ -10,7 +10,7 @@
   <div class="mb-3">
     <label class="form-label">Selected Insurance Plan</label>
     <input type="text" class="form-control" id="planName" disabled />
-    <small class="form-text text-muted">Plan ID: <span id="planId"></span></small>
+    <small class="form-text text-muted"><span id="planId"></span></small>
   </div>
 
   <!-- Form nhập liệu -->
@@ -394,7 +394,6 @@
         data: JSON.stringify(data),
         success: function (response) {
           console.log("Contract saved:", response);
-          hideLoading();
           showSuccess();
           setTimeout(function () {
             window.location.href = "/Home/PageSuccess";
