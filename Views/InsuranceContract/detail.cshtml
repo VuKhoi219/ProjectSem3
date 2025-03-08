@@ -155,6 +155,20 @@ Layout = "~/Views/Shared/_Layout.cshtml";
     margin-bottom: 15px;
     font-weight: 600;
   }
+  .btn-contact {
+    background: linear-gradient(90deg, #ff5733, #e74c3c);
+    color: #fff;
+    padding: 6px 12px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: transform 0.2s ease, background 0.2s ease;
+  }
+  .btn-contact:hover {
+    background: linear-gradient(90deg, #e74c3c, #c0392b);
+    transform: translateY(-2px);
+  }
 </style>
 
 <h1>Insurance Contract Details</h1>
@@ -208,7 +222,10 @@ Layout = "~/Views/Shared/_Layout.cshtml";
   function formatUSD(number) {
     return number.toLocaleString("en-US", { style: "currency", currency: "USD" });
   }
-
+  // Hàm hiển thị thông báo liên hệ
+  function showContactMessage() {
+    alert("Please contact phone number\n+012 345 6789\nfor support");
+  }
   $(document).ready(function() {
     $.ajax({
       url: '/api/insurance-contracts/contract-detail/' + contractId + '/' + planId,
@@ -216,6 +233,8 @@ Layout = "~/Views/Shared/_Layout.cshtml";
       success: function(response) {
         $('#loading').hide();
         const data = response.data;
+        console.log('API response data:', data); // Kiểm tra dữ liệu từ API
+        console.log('Payments from API:', data.payments); // Kiểm tra payments
         const insurancePlan = data.insurancePlan;
 
         $('#plan-name').text(`Insurance Plan: ${insurancePlan.name}`);
@@ -280,6 +299,7 @@ Layout = "~/Views/Shared/_Layout.cshtml";
   });
 
   function displayPaymentSchedule(data, insurancePlan) {
+    console.log(data);
     const paymentList = $('#payment-list');
     const startDate = new Date(data.startDate);
     const endDate = new Date(data.endDate);
@@ -289,21 +309,41 @@ Layout = "~/Views/Shared/_Layout.cshtml";
       insurancePlan.propertyDetail?.annualPaymentAmount;
 
     let payments = [];
-    if (data.payments && data.payments.length > 0) {
-      payments = data.payments;
-    } else {
-      let currentDate = new Date(startDate);
-      while (currentDate < endDate) {
-        payments.push({
-          dueDate: new Date(currentDate),
-          amount: annualPayment,
-          status: 'Pending'
-        });
-        currentDate.setFullYear(currentDate.getFullYear() + 1);
-      }
+    const yearsDiff = endDate.getFullYear() - startDate.getFullYear(); // Số năm hợp đồng
+
+    // Sinh danh sách thanh toán tự động từ startDate
+    let currentDate = new Date(startDate);
+    let paymentCount = 0;
+
+    // Lấy danh sách payments từ database để ánh xạ
+    const dbPayments = data.payments && Array.isArray(data.payments.$values)
+      ? data.payments.$values
+      : [];
+    console.log("--db")
+    console.log(dbPayments)
+    while (currentDate < endDate && paymentCount < yearsDiff) {
+      console.log(`--currentDate: ${currentDate}, Year: ${currentDate.getFullYear()}`);
+
+      // Tìm payment từ database có cùng năm với currentDate, bỏ qua dueDate không hợp lệ
+      const paymentFromDB = paymentCount < dbPayments.length ? dbPayments[paymentCount] : null;
+
+      console.log('--paymentFromDB:', paymentFromDB);
+
+      payments.push({
+        dueDate: new Date(currentDate), // Tự sinh dueDate
+        amount: annualPayment, // Dùng annualPayment như yêu cầu trước
+        status: paymentFromDB ? paymentFromDB.status : 'Pending' // Lấy status từ DB nếu có
+      });
+
+      currentDate.setFullYear(currentDate.getFullYear() + 1);
+      paymentCount++;
     }
 
+    // Sắp xếp payments theo dueDate (tùy chọn, nhưng không cần vì đã theo thứ tự)
+    payments.sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate));
+
     totalPayments = payments.length;
+    console.log('Payments after processing:', payments); // Kiểm tra danh sách payments
     renderPayments(payments, data.id);
 
     $('#prev-page').on('click', function() {
@@ -325,22 +365,31 @@ Layout = "~/Views/Shared/_Layout.cshtml";
     const paymentList = $('#payment-list');
     paymentList.empty();
 
+    if (!Array.isArray(payments)) {
+      console.error('payments is not an array:', payments);
+      paymentList.append('<tr><td colspan="4">No payment data available</td></tr>');
+      return;
+    }
+
     const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
     const endIndex = Math.min(startIndex + ITEMS_PER_PAGE, totalPayments);
     const paginatedPayments = payments.slice(startIndex, endIndex);
 
     paginatedPayments.forEach(payment => {
-      const createButton = payment.status === 'Pending'
-        ? `<button class="btn-create" onclick="handleCreatePayment('${contractId}', ${payment.amount})">Create</button>`
-        : '';
+      let actionButton = '';
+      if (payment.status === 'Pending') {
+        actionButton = `<button class="btn-create" onclick="handleCreatePayment('${contractId}', ${payment.amount})">Create</button>`;
+      } else if (payment.status === 'Failed') {
+        actionButton = `<button class="btn-contact" onclick="showContactMessage()">Contact</button>`;
+      }
 
       const row = `
-                <tr>
-                    <td>${new Date(payment.dueDate).toLocaleDateString('en-US')}</td>
-                    <td>${formatUSD(payment.amount)}</td>
-                    <td>${payment.status}</td>
-                    <td>${createButton}</td>
-                </tr>`;
+      <tr>
+        <td>${new Date(payment.dueDate).toLocaleDateString('en-US')}</td>
+        <td>${formatUSD(payment.amount)}</td>
+        <td>${payment.status}</td>
+        <td>${actionButton}</td>
+      </tr>`;
       paymentList.append(row);
     });
 

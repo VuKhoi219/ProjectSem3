@@ -73,6 +73,15 @@
               <label class="form-check-label" for="formValidationCheckbox">Agree to our terms and conditions</label>
             </div>
           </div>
+          <div class="form-group col-md-6">
+            <label asp-for="Status" class="control-label"></label>
+            <select asp-for="Status" id="status" class="form-control">
+              <option value="Pending">Pending</option>
+              <option value="Completed">Completed</option>
+              <option value="Failed">Failed</option>
+            </select>
+            <span asp-validation-for="Status" class="text-danger"></span>
+          </div>
           <div class="form-group">
             <input type="submit" value="Save" class="btn btn-primary"/>
           </div>
@@ -100,6 +109,7 @@
         contractId: $('#contractId').val(),
         amount: $('#amount').val(),
         imageUrl: $('#imageUrl').val(),
+        status: $('#status').val() // Thêm status vào dữ liệu gửi đi
       };
 
       const paymentId = $('#paymentId').val(); // Lấy paymentId từ input ẩn hoặc URL

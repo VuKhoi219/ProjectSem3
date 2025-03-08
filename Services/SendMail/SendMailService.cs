@@ -22,7 +22,7 @@ public class SendMailService : ISendMailService
         email.From.Add(new MailboxAddress(_mailSettings.DisplayName, _mailSettings.Mail));
         email.To.Add (MailboxAddress.Parse (mailContent.To));
         email.Subject = mailContent.Subject;
-        
+
         var builder = new BodyBuilder();
         builder.HtmlBody = mailContent.Body;
         email.Body = builder.ToMessageBody ();
@@ -51,14 +51,17 @@ public class SendMailService : ISendMailService
         smtp.Disconnect (true);
 
         _logger.LogInformation("send mail to " + mailContent.To);
-        
+
         return check;
     }
-    public async Task SendEmailAsync(string email, string subject, string htmlMessage) {
-        await SendMail(new MailContent() {
-            To = email,
-            Subject = subject,
-            Body = htmlMessage
-        });
+    public async Task<bool> SendEmailAsync(string email, string subject, string htmlMessage) {
+      var mailContent = new MailContent
+      {
+        To = email,
+        Subject = subject,
+        Body = htmlMessage
+      };
+
+      return await SendMail(mailContent); // Trả về kết quả từ SendMail
     }
 }
