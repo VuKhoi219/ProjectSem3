@@ -97,7 +97,7 @@ Layout = "~/Views/Shared/_Layout.cshtml";
 
     showLoading(); // Hiển thị spinner xoay
     $.ajax({
-      url: `/api/payments/user/${id}?pageNumber=${page}&pageSize=${pageSize}`,
+      url: `/api/payments/user/${id}?page=${page}&pageSize=${pageSize}`,
       method: 'GET',
       success: function(response) {
         hideLoading();
@@ -155,35 +155,6 @@ Layout = "~/Views/Shared/_Layout.cshtml";
     window.location.href = "/payment/detail/" + id;
   }
 
-  function editPayment(id) {
-    alert('Edit payment with ID ' + id);
-    // Implement the edit functionality here
-  }
-
-  function deletePayment(id) {
-    if (confirm('Are you sure you want to delete this payment?')) {
-      showLoading(); // Hiển thị spinner xoay
-
-      $.ajax({
-        url: `/api/payments/${id}`,
-        method: 'DELETE',
-        success: function() {
-          showSuccess(); // Chuyển spinner thành dấu tích xanh
-          // Xóa dòng khỏi bảng mà không load lại trang
-          $(`#payment-row-${id}`).remove();
-
-          // Kiểm tra nếu bảng trống thì hiển thị thông báo
-          if ($('#paymentTable tbody tr').length === 0) {
-            $('#paymentTable').html('<div class="text-center">No data available</div>');
-          }
-        },
-        error: function(error) {
-          hideLoading(); // Ẩn spinner nếu lỗi
-          alert('Error deleting payment');
-        }
-      });
-    }
-  }
 
   $(document).ready(function() {
     loadPayments();
