@@ -1,8 +1,11 @@
 using System.Linq.Expressions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Project_Sem3.Data;
 using Project_Sem3.Models;
+using Project_Sem3.Models.MailContent;
+using Project_Sem3.Services.SendMail;
 
 namespace Project_Sem3.Controllers;
 
@@ -11,45 +14,90 @@ namespace Project_Sem3.Controllers;
 public class InsuranceContractsController : ControllerBase
 {
     private readonly MyDbContext _context;
+    private readonly MailSettings _mailSettings;
 
-    public InsuranceContractsController(MyDbContext context)
+    private readonly ISendMailService _emailService; // Sử dụng interface
+    private readonly ILogger<SendMailService> _logger;
+    public InsuranceContractsController(MyDbContext context,IOptions<MailSettings> mailSettings, ILogger<SendMailService> logger , ISendMailService emailService)
     {
+        _mailSettings = mailSettings.Value;
+        _emailService = emailService;
+        _logger = logger;
         _context = context;
     }
 
-    // 1. Get All - Lấy tất cả InsuranceContracts với phân trang, chỉ lấy record chưa xóa mềm
     [HttpGet]
     public async Task<IActionResult> GetAllInsuranceContracts(
         [FromQuery] int page = 1,
         [FromQuery] int pageSize = 10,
         [FromQuery] string? search = null,
         [FromQuery] string? orderColumn = null,
-        [FromQuery] string? orderDir = null)
+        [FromQuery] string? orderDir = null,
+        [FromQuery] bool dueSoon = false)
     {
         try
         {
-            // Starting the query, including related entities (User and Plan)
             var query = _context.InsuranceContracts
-                                 .Include(ic => ic.User)
-                                 .Include(ic => ic.Plan)
-                                 .AsQueryable();
+                                .Include(ic => ic.User)
+                                .Include(ic => ic.Plan)
+                                .Include(ic => ic.Payments)
+                                .Where(ic => ic.DeleteAt == null)
+                                .AsQueryable();
 
-            // Handle search query (for User, Plan, Status, etc.)
             if (!string.IsNullOrEmpty(search))
             {
                 query = query.Where(x =>
-                    (x.UserId != null && EF.Functions.Like(x.User.FullName.ToString(), $"%{search}%")) || // Search User Name
-                    (x.PlanId != null && EF.Functions.Like(x.Plan.Name.ToString(), $"%{search}%")) || // Search Plan Name
-                    (x.Status.ToString() != null && EF.Functions.Like(x.Status.ToString(), $"%{search}%")) // Search Status
+                    (x.UserId != null && EF.Functions.Like(x.User.FullName.ToString(), $"%{search}%")) ||
+                    (x.PlanId != null && EF.Functions.Like(x.Plan.Name.ToString(), $"%{search}%")) ||
+                    (x.Status.ToString() != null && EF.Functions.Like(x.Status.ToString(), $"%{search}%"))
                 );
             }
 
-            // Handle sorting by dynamic column and direction
+            var contractsWithDueDate = query.Select(ic => new
+            {
+                Contract = ic,
+                NextPaymentDueDate = ic.Payments != null && ic.Payments.Any()
+                    ? ic.Payments
+                        .Where(p => p.Status == PaymentStatus.Completed && p.DeleteAt == null)
+                        .OrderByDescending(p => p.PaymentDate)
+                        .Select(p => p.PaymentDate.AddYears(1))
+                        .FirstOrDefault()
+                    : ic.StartDate
+            }).AsQueryable();
+
+            contractsWithDueDate = contractsWithDueDate.Where(x =>
+                x.NextPaymentDueDate <= x.Contract.EndDate &&
+                x.NextPaymentDueDate > DateTime.UtcNow);
+
+            if (dueSoon)
+            {
+                var sevenDaysFromNow = DateTime.UtcNow.AddDays(7);
+                contractsWithDueDate = contractsWithDueDate.Where(x =>
+                    x.NextPaymentDueDate >= DateTime.UtcNow &&
+                    x.NextPaymentDueDate <= sevenDaysFromNow);
+            }
+
             if (!string.IsNullOrEmpty(orderColumn) && !string.IsNullOrEmpty(orderDir))
             {
                 var parameter = Expression.Parameter(typeof(InsuranceContract), "x");
-                var property = Expression.Property(parameter, orderColumn);
-                var lambda = Expression.Lambda<Func<InsuranceContract, object>>(Expression.Convert(property, typeof(object)), parameter);
+                Expression property;
+
+                if (orderColumn.ToLower() == "nextpaymentduedate")
+                {
+                    property = Expression.Property(
+                        Expression.Property(parameter, "Payments"),
+                        "PaymentDate"
+                    );
+                }
+                else
+                {
+                    property = Expression.Property(parameter, orderColumn);
+                }
+
+                var lambda = Expression.Lambda<Func<InsuranceContract, object>>(
+                    Expression.Convert(property, typeof(object)),
+                    parameter
+                );
 
                 if (orderDir.ToLower() == "asc")
                 {
@@ -61,27 +109,28 @@ public class InsuranceContractsController : ControllerBase
                 }
             }
 
-            // Get the total count for pagination
-            var totalCount = await query.CountAsync();
+            var totalCount = await contractsWithDueDate.CountAsync();
+            var pagedContracts = await contractsWithDueDate
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
 
-            // Paginate the results
-            var pagedInsuranceContracts = await query.Skip((page - 1) * pageSize).Take(pageSize).ToListAsync();
-
-            // Return the response in the desired format
             var result = new
             {
-                data = pagedInsuranceContracts.Select(ic => new
+                data = pagedContracts.Select(x => new
                 {
-                    ic.Id,
-                    FullName = ic.User.FullName,
-                    PlanName = ic.Plan.Name,
-                    ic.Status,
-                    ic.StartDate,
-                    ic.EndDate,
-                    planId = ic.PlanId,          // Đảm bảo thêm PlanId
-                    userId = ic.UserId           // Đảm bảo thêm UserId
+                    x.Contract.Id,
+                    FullName = x.Contract.User?.FullName,
+                    PlanName = x.Contract.Plan?.Name,
+                    x.Contract.Status,
+                    x.Contract.StartDate,
+                    x.Contract.EndDate,
+                    NextPaymentDueDate = x.NextPaymentDueDate,
+                    PlanId = x.Contract.PlanId,
+                    UserId = x.Contract.UserId,
+                    UserEmail = x.Contract.User?.Email // Thêm email của người dùng
                 }).ToArray(),
-                recordsTotal = await _context.InsuranceContracts.CountAsync(),
+                recordsTotal = await _context.InsuranceContracts.CountAsync(ic => ic.DeleteAt == null),
                 recordsFiltered = totalCount,
                 page = page,
                 pageSize = pageSize
@@ -91,7 +140,6 @@ public class InsuranceContractsController : ControllerBase
         }
         catch (Exception e)
         {
-            // Log the error (optional)
             Console.WriteLine(e);
             return StatusCode(500, new { Message = "An error occurred", Error = e.Message });
         }
@@ -348,6 +396,12 @@ public class InsuranceContractsController : ControllerBase
                     StartDate = c.StartDate,
                     EndDate = c.EndDate,
                     Status = c.Status,
+                    Payments = c.Payments.Select(p => new
+                    {
+                      dueDate = p.PaymentDate,
+                      amount = p.Amount,
+                      status = p.Status.ToString() // Chuyển enum thành string
+                    }),
                     InsurancePlan = c.PlanId == planId
                         ? _context.InsurancePlans
                             .Where(l => l.Id == planId)
@@ -483,4 +537,5 @@ public class InsuranceContractsController : ControllerBase
             return StatusCode(500, new { Message = "Internal server error", Error = ex.Message });
         }
     }
+
 }

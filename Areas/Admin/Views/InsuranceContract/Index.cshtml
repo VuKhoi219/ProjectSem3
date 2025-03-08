@@ -18,12 +18,12 @@ ViewData["Title"] = "Insurance Contracts List";
 }
 
 @section Scripts {
-  <script>
+<script>
   var dataTable = $('#dataTable').DataTable({
     processing: true,
     serverSide: true,
     ajax: {
-      url: '/api/insurance-contracts',  // API URL for fetching insurance contracts
+      url: '/api/insurance-contracts',
       type: 'GET',
       data: function (d) {
         d.page = (d.start / d.length) + 1;
@@ -31,6 +31,7 @@ ViewData["Title"] = "Insurance Contracts List";
         d.search = d.search.value;
         d.orderColumn = d.columns[d.order[0].column].data;
         d.orderDir = d.order[0].dir;
+        d.dueSoon = $('#due-soon-filter').is(':checked');
         return d;
       },
       dataSrc: 'data',
@@ -39,19 +40,32 @@ ViewData["Title"] = "Insurance Contracts List";
       { data: 'id' },
       { data: 'fullName' },
       { data: 'planName' },
-      { data: 'status', render: function (data) {
+      {
+        data: 'status',
+        render: function (data) {
           return data == 1 ? 'Active' : (data == 0 ? 'Inactive' : 'Expired');
-        }},
+        }
+      },
       { data: 'startDate' },
       { data: 'endDate' },
+      {
+        data: 'nextPaymentDueDate',
+        render: function (data) {
+          return data ? new Date(data).toLocaleDateString('en-US') : 'N/A';
+        }
+      },
       {
         data: null,
         orderable: false,
         searchable: false,
         render: function (data, type, row) {
-          return '<button class="btn btn-sm btn-primary btn-edit" data-id="' + row.id + '">Edit</button> ' +
+          var actions = '<button class="btn btn-sm btn-primary btn-edit" data-id="' + row.id + '">Edit</button> ' +
             '<button class="btn btn-sm btn-danger btn-delete" data-id="' + row.id + '">Delete</button> ' +
             '<button class="btn btn-sm btn-info btn-detail" data-id="' + row.id + '">View</button>';
+          if (row.nextPaymentDueDate && new Date(row.nextPaymentDueDate) > new Date()) {
+            actions += ' <button class="btn btn-sm btn-warning btn-remind" data-id="' + row.id + '">Remind</button>';
+          }
+          return actions;
         }
       }
     ]
@@ -70,39 +84,72 @@ ViewData["Title"] = "Insurance Contracts List";
   dataTable.on('click', '.btn-detail', function () {
     var contractId = $(this).data('id');
     var rowData = dataTable.row($(this).parents('tr')).data();
-
-    // Lấy planId và userId từ rowData
-    var planId = rowData.planId;
-    var userId = rowData.userId;
-
-    // Kiểm tra dữ liệu (tùy chọn)
-    if (!contractId || !planId || !userId) {
-      console.error('Missing required data:', { contractId, planId, userId });
-      alert('Không thể tải chi tiết hợp đồng do thiếu dữ liệu.');
-      return;
-    }
-
-    // Log để kiểm tra
-    console.log('Contract ID:', contractId);
-    console.log('Plan ID:', planId);
-    console.log('User ID:', userId);
-
-    // Lưu vào sessionStorage
     sessionStorage.setItem('contractId', contractId);
-    sessionStorage.setItem('planId', planId);
-    sessionStorage.setItem('userId', userId);
-
-    // Chuyển hướng
+    sessionStorage.setItem('planId', rowData.planId);
+    sessionStorage.setItem('userId', rowData.userId);
     window.location.href = '/Admin/InsuranceContract/Details/' + contractId;
+  });
+
+  dataTable.on('click', '.btn-remind', function () {
+    var contractId = $(this).data('id');
+    var rowData = dataTable.row($(this).parents('tr')).data();
+
+    Swal.fire({
+      title: 'Are you sure?',
+      text: "You are about to send a payment reminder email!",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, send it!',
+      cancelButtonText: 'No, cancel!'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        if (!rowData.userEmail) {
+          Swal.fire('Error!', 'User email is not available.', 'error');
+          return;
+        }
+
+        var mailContent = {
+          to: rowData.userEmail, // Sử dụng email từ API
+          subject: "Payment Reminder",
+          body: "<p>Dear " + rowData.fullName + ", your payment is due on " + new Date(rowData.nextPaymentDueDate).toLocaleDateString('en-US') + ". Please make the payment soon.</p>"
+        };
+
+        $.ajax({
+          url: '/api/send-email/send',
+          method: 'POST',
+          contentType: 'application/json',
+          data: JSON.stringify(mailContent),
+          success: function (response) {
+            Swal.fire('Sent!', 'Reminder email has been sent.', 'success');
+          },
+          error: function (xhr, status, error) {
+            Swal.fire('Error!', 'Failed to send reminder: ' + xhr.responseText, 'error');
+          }
+        });
+      }
+    });
+  });
+
+  $('#due-soon-filter').on('change', function () {
+    dataTable.ajax.reload();
   });
 </script>
 }
 
 <!-- Advanced Search -->
 <div class="card">
-  <h5 class="card-header d-flex justify-content-between">Insurance Contracts List
+  <h5 class="card-header d-flex justify-content-between">
+    Insurance Contracts List
     <a href="@Url.Action("Create", "InsuranceContract")" class="float-right btn btn-primary">Create New Contract</a>
   </h5>
+  <div class="card-body">
+    <div class="form-check mb-3">
+      <input class="form-check-input" type="checkbox" id="due-soon-filter">
+      <label class="form-check-label" for="due-soon-filter">
+        Show contracts with payments due soon (within 7 days)
+      </label>
+    </div>
+  </div>
   <div class="card-datatable table-responsive">
     <table id="dataTable" class="dt-advanced-search table border-top">
       <thead>
@@ -113,6 +160,7 @@ ViewData["Title"] = "Insurance Contracts List";
         <th>Status</th>
         <th>Start Date</th>
         <th>End Date</th>
+        <th>Next Payment Due</th>
         <th>Action</th>
       </tr>
       </thead>
