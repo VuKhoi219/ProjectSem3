@@ -1,11 +1,8 @@
 using System.Linq.Expressions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
 using Project_Sem3.Data;
 using Project_Sem3.Models;
-using Project_Sem3.Models.MailContent;
-using Project_Sem3.Services.SendMail;
 
 namespace Project_Sem3.Controllers;
 
@@ -14,229 +11,186 @@ namespace Project_Sem3.Controllers;
 public class InsuranceContractsController : ControllerBase
 {
     private readonly MyDbContext _context;
-    private readonly MailSettings _mailSettings;
 
-    private readonly ISendMailService _emailService; // Sử dụng interface
-    private readonly ILogger<SendMailService> _logger;
-    public InsuranceContractsController(MyDbContext context,IOptions<MailSettings> mailSettings, ILogger<SendMailService> logger , ISendMailService emailService)
+    public InsuranceContractsController(MyDbContext context)
     {
-        _mailSettings = mailSettings.Value;
-        _emailService = emailService;
-        _logger = logger;
         _context = context;
     }
-
     [HttpGet]
     public async Task<IActionResult> GetAllInsuranceContracts(
-    [FromQuery] int page = 1,
-    [FromQuery] int pageSize = 10,
-    [FromQuery] string? search = null,
-    [FromQuery] string? orderColumn = null,
-    [FromQuery] string? orderDir = null,
-    [FromQuery] string? userName = null,
-    [FromQuery] string? planName = null,
-    [FromQuery] int? status = null,
-    [FromQuery] string? startDate = null,
-    [FromQuery] string? endDate = null,
-    [FromQuery] int? daysToExpire = null // New parameter for filtering contracts that are about to expire
-)
-{
-    try
+        [FromQuery] string? search = null,
+        [FromQuery] string? orderColumn = null,
+        [FromQuery] string? orderDir = null,
+        [FromQuery] string? userName = null,
+        [FromQuery] string? planName = null,
+        [FromQuery] int? status = null,
+        [FromQuery] string? startDate = null,
+        [FromQuery] string? endDate = null,
+        [FromQuery] int? daysToExpire = null)
     {
-        // Starting the query, including related entities (User and Plan)
-        var query = _context.InsuranceContracts
-                             .Include(ic => ic.User)
-                             .Include(ic => ic.Plan)
-                             .AsQueryable(); // Keep it as IQueryable
-
-        // Handle search query (for User, Plan, Status, etc.)
-        if (!string.IsNullOrEmpty(search))
+        try
         {
-            query = query.Where(x =>
-                (x.UserId != null && EF.Functions.Like(x.User.FullName, $"%{search}%")) || // Search User Name
-                (x.PlanId != null && EF.Functions.Like(x.Plan.Name, $"%{search}%")) || // Search Plan Name
-                (x.Status.ToString() != null && EF.Functions.Like(x.Status.ToString(), $"%{search}%")) // Search Status
-            );
-        }
-
-        // Handle additional filters (userName, planName, status, startDate, endDate)
-        if (!string.IsNullOrEmpty(userName))
-        {
-            query = query.Where(x => EF.Functions.Like(x.User.FullName, $"%{userName}%"));
-        }
             var query = _context.InsuranceContracts
-                                .Include(ic => ic.User)
-                                .Include(ic => ic.Plan)
-                                .Include(ic => ic.Payments)
-                                .Where(ic => ic.DeleteAt == null)
-                                .AsQueryable();
+                .Include(ic => ic.User)
+                .Include(ic => ic.Plan)
+                .Include(ic => ic.Payments)
+                .Where(ic => ic.DeleteAt == null)
+                .AsQueryable();
 
             if (!string.IsNullOrEmpty(search))
             {
                 query = query.Where(x =>
-                    (x.UserId != null && EF.Functions.Like(x.User.FullName.ToString(), $"%{search}%")) ||
-                    (x.PlanId != null && EF.Functions.Like(x.Plan.Name.ToString(), $"%{search}%")) ||
-                    (x.Status.ToString() != null && EF.Functions.Like(x.Status.ToString(), $"%{search}%"))
-                );
+                    (x.UserId != null && EF.Functions.Like(x.User.FullName, $"%{search}%")) ||
+                    (x.PlanId != null && EF.Functions.Like(x.Plan.Name, $"%{search}%")) ||
+                    EF.Functions.Like(x.Status.ToString(), $"%{search}%"));
+            }
+
+            if (!string.IsNullOrEmpty(userName))
+            {
+                query = query.Where(x => EF.Functions.Like(x.User.FullName, $"%{userName}%"));
+            }
+
+            if (!string.IsNullOrEmpty(planName))
+            {
+                query = query.Where(x => EF.Functions.Like(x.Plan.Name, $"%{planName}%"));
+            }
+
+            if (status.HasValue)
+            {
+                query = query.Where(x => x.Status == (ContractStatus)status);
+            }
+
+            if (!string.IsNullOrEmpty(startDate) && DateTime.TryParse(startDate, out var start))
+            {
+                query = query.Where(x => x.StartDate >= start);
+            }
+
+            if (!string.IsNullOrEmpty(endDate) && DateTime.TryParse(endDate, out var end))
+            {
+                query = query.Where(x => x.EndDate <= end);
             }
 
             var contractsWithDueDate = query.Select(ic => new
             {
                 Contract = ic,
-                NextPaymentDueDate = ic.Payments != null && ic.Payments.Any()
+                NextPaymentDueDate = ic.Payments != null && ic.Payments.Any(p => p.Status == PaymentStatus.Completed && p.DeleteAt == null)
                     ? ic.Payments
                         .Where(p => p.Status == PaymentStatus.Completed && p.DeleteAt == null)
                         .OrderByDescending(p => p.PaymentDate)
                         .Select(p => p.PaymentDate.AddYears(1))
                         .FirstOrDefault()
-                    : ic.StartDate
+                    : GetValidNextPaymentDueDate(ic.StartDate)
             }).AsQueryable();
 
-            contractsWithDueDate = contractsWithDueDate.Where(x =>
-                x.NextPaymentDueDate <= x.Contract.EndDate &&
-                x.NextPaymentDueDate > DateTime.UtcNow);
-
-            if (dueSoon)
+            if (daysToExpire.HasValue)
             {
-                var sevenDaysFromNow = DateTime.UtcNow.AddDays(7);
+                var today = DateTime.UtcNow;
+                var expirationThreshold = today.AddDays(daysToExpire.Value);
+                Console.WriteLine($"Filtering: today={today}, expirationThreshold={expirationThreshold}");
                 contractsWithDueDate = contractsWithDueDate.Where(x =>
-                    x.NextPaymentDueDate >= DateTime.UtcNow &&
-                    x.NextPaymentDueDate <= sevenDaysFromNow);
+                    x.NextPaymentDueDate >= today &&
+                    x.NextPaymentDueDate <= expirationThreshold);
             }
 
             if (!string.IsNullOrEmpty(orderColumn) && !string.IsNullOrEmpty(orderDir))
             {
-                var parameter = Expression.Parameter(typeof(InsuranceContract), "x");
-                Expression property;
-
-                if (orderColumn.ToLower() == "nextpaymentduedate")
+                switch (orderColumn.ToLower())
                 {
-                    property = Expression.Property(
-                        Expression.Property(parameter, "Payments"),
-                        "PaymentDate"
-                    );
+                    case "id":
+                        contractsWithDueDate = orderDir.ToLower() == "asc"
+                            ? contractsWithDueDate.OrderBy(x => x.Contract.Id)
+                            : contractsWithDueDate.OrderByDescending(x => x.Contract.Id);
+                        break;
+                    case "fullname":
+                        contractsWithDueDate = orderDir.ToLower() == "asc"
+                            ? contractsWithDueDate.OrderBy(x => x.Contract.User.FullName)
+                            : contractsWithDueDate.OrderByDescending(x => x.Contract.User.FullName);
+                        break;
+                    case "planname":
+                        contractsWithDueDate = orderDir.ToLower() == "asc"
+                            ? contractsWithDueDate.OrderBy(x => x.Contract.Plan.Name)
+                            : contractsWithDueDate.OrderByDescending(x => x.Contract.Plan.Name);
+                        break;
+                    case "status":
+                        contractsWithDueDate = orderDir.ToLower() == "asc"
+                            ? contractsWithDueDate.OrderBy(x => x.Contract.Status)
+                            : contractsWithDueDate.OrderByDescending(x => x.Contract.Status);
+                        break;
+                    case "startdate":
+                        contractsWithDueDate = orderDir.ToLower() == "asc"
+                            ? contractsWithDueDate.OrderBy(x => x.Contract.StartDate)
+                            : contractsWithDueDate.OrderByDescending(x => x.Contract.StartDate);
+                        break;
+                    case "enddate":
+                        contractsWithDueDate = orderDir.ToLower() == "asc"
+                            ? contractsWithDueDate.OrderBy(x => x.Contract.EndDate)
+                            : contractsWithDueDate.OrderByDescending(x => x.Contract.EndDate);
+                        break;
+                    case "nextpaymentduedate":
+                        contractsWithDueDate = orderDir.ToLower() == "asc"
+                            ? contractsWithDueDate.OrderBy(x => x.NextPaymentDueDate)
+                            : contractsWithDueDate.OrderByDescending(x => x.NextPaymentDueDate);
+                        break;
+                    default:
+                        contractsWithDueDate = contractsWithDueDate.OrderBy(x => x.Contract.Id);
+                        break;
                 }
-                else
-                {
-                    property = Expression.Property(parameter, orderColumn);
-                }
+            }
 
-                var lambda = Expression.Lambda<Func<InsuranceContract, object>>(
-                    Expression.Convert(property, typeof(object)),
-                    parameter
-                );
-
-        if (!string.IsNullOrEmpty(planName))
-        {
-            query = query.Where(x => EF.Functions.Like(x.Plan.Name, $"%{planName}%"));
-        }
-
-        // Ensure correct comparison for Status if it's an enum or integer
-        if (status.HasValue)
-        {
-            query = query.Where(x => x.Status == (ContractStatus)status);
-        }
-
-        if (!string.IsNullOrEmpty(startDate) && DateTime.TryParse(startDate, out var start))
-        {
-            query = query.Where(x => x.StartDate >= start);
-        }
-
-        if (!string.IsNullOrEmpty(endDate) && DateTime.TryParse(endDate, out var end))
-        {
-            query = query.Where(x => x.EndDate <= end);
-        }
             var totalCount = await contractsWithDueDate.CountAsync();
-            var pagedContracts = await contractsWithDueDate
-                .Skip((page - 1) * pageSize)
-                .Take(pageSize)
-                .ToListAsync();
+            var recordsTotal = await _context.InsuranceContracts.CountAsync(ic => ic.DeleteAt == null);
 
+            var pagedContracts = await contractsWithDueDate
+                .ToListAsync();
+    // Debug dữ liệu trả về
+            foreach (var contract in pagedContracts)
+            {
+              Console.WriteLine($"Contract {contract.Contract.Id}: NextPaymentDueDate={contract.NextPaymentDueDate}");
+            }
             var result = new
             {
                 data = pagedContracts.Select(x => new
                 {
                     x.Contract.Id,
-                    FullName = x.Contract.User?.FullName,
-                    PlanName = x.Contract.Plan?.Name,
+                    FullName = x.Contract.User?.FullName ?? "N/A",
+                    PlanName = x.Contract.Plan?.Name ?? "N/A",
                     x.Contract.Status,
                     x.Contract.StartDate,
                     x.Contract.EndDate,
                     NextPaymentDueDate = x.NextPaymentDueDate,
                     PlanId = x.Contract.PlanId,
                     UserId = x.Contract.UserId,
-                    UserEmail = x.Contract.User?.Email // Thêm email của người dùng
+                    UserEmail = x.Contract.User?.Email
                 }).ToArray(),
-                recordsTotal = await _context.InsuranceContracts.CountAsync(ic => ic.DeleteAt == null),
+                recordsTotal,
                 recordsFiltered = totalCount,
-                page = page,
-                pageSize = pageSize
+
             };
 
-        // Handle filtering contracts that are near expiration (e.g., within the next 'x' days)
-        if (daysToExpire.HasValue)
-        {
-            var today = DateTime.UtcNow;
-            var expirationThreshold = today.AddDays(daysToExpire.Value); // Calculate the expiration threshold
-
-            query = query.Where(x => x.EndDate <= expirationThreshold && x.EndDate >= today);
+            return Ok(result);
         }
-
-        // Handle sorting by dynamic column and direction
-        if (!string.IsNullOrEmpty(orderColumn) && !string.IsNullOrEmpty(orderDir))
+        catch (Exception e)
         {
-            var parameter = Expression.Parameter(typeof(InsuranceContract), "x");
-            var property = Expression.Property(parameter, orderColumn);
-            var lambda = Expression.Lambda<Func<InsuranceContract, object>>(Expression.Convert(property, typeof(object)), parameter);
-
-            if (orderDir.ToLower() == "asc")
-            {
-                query = query.OrderBy(lambda);
-            }
-            else if (orderDir.ToLower() == "desc")
-            {
-                query = query.OrderByDescending(lambda);
-            }
-            Console.WriteLine(e);
             return StatusCode(500, new { Message = "An error occurred", Error = e.Message });
         }
-
-        // Get the total count for pagination
-        var totalCount = await query.CountAsync();
-
-        // Paginate the results
-        var pagedInsuranceContracts = await query.Skip((page - 1) * pageSize).Take(pageSize).ToListAsync();
-
-        // Return the response in the desired format
-        var result = new
-        {
-            data = pagedInsuranceContracts.Select(ic => new
-            {
-                ic.Id,
-                FullName = ic.User.FullName,
-                PlanName = ic.Plan.Name,
-                ic.Status,
-                ic.StartDate,
-                ic.EndDate,
-                planId = ic.PlanId,  // Ensure PlanId is included
-                userId = ic.UserId   // Ensure UserId is included
-            }).ToArray(),
-            recordsTotal = await _context.InsuranceContracts.CountAsync(),
-            recordsFiltered = totalCount,
-            page = page,
-            pageSize = pageSize
-        };
-
-        return Ok(result);
     }
-    catch (Exception e)
+
+    private static DateTime GetValidNextPaymentDueDate(DateTime startDate)
     {
-        // Log the error (optional)
-        Console.WriteLine(e);
-        return StatusCode(500, new { Message = "An error occurred", Error = e.Message });
-    }
-}
+        var currentYear = DateTime.UtcNow.Year;
+        var month = startDate.Month;
+        var day = startDate.Day;
 
+        try
+        {
+            return new DateTime(currentYear, month, day);
+        }
+        catch (ArgumentOutOfRangeException)
+        {
+            var daysInMonth = DateTime.DaysInMonth(currentYear, month);
+            return new DateTime(currentYear, month, Math.Min(day, daysInMonth));
+        }
+    }
     // 2. Get By Id - Lấy InsuranceContract theo Id
     [HttpGet("{id}")]
     public async Task<IActionResult> GetInsuranceContractById(int id)
@@ -629,5 +583,4 @@ public class InsuranceContractsController : ControllerBase
             return StatusCode(500, new { Message = "Internal server error", Error = ex.Message });
         }
     }
-
 }

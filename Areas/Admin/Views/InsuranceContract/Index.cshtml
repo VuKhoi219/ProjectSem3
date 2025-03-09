@@ -1,49 +1,51 @@
 @model IEnumerable<Project_Sem3.Models.InsuranceContract>
 
 @{
-ViewData["Title"] = "Insurance Contracts List";
+    ViewData["Title"] = "Admin Dashboard - Insurance Contracts";
 }
 
 @section VendorStyles {
-<link rel="stylesheet" href="~/vendor/libs/datatables-bs5/datatables.bootstrap5.css">
-<link rel="stylesheet" href="~/vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.css">
-<link rel="stylesheet" href="~/vendor/libs/flatpickr/flatpickr.css" />
+    <link rel="stylesheet" href="~/vendor/libs/datatables-bs5/datatables.bootstrap5.css">
+    <link rel="stylesheet" href="~/vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.css">
+    <link rel="stylesheet" href="~/vendor/libs/flatpickr/flatpickr.css" />
 }
 
 @section VendorScripts {
-<script src="~/vendor/libs/datatables-bs5/datatables-bootstrap5.js"></script>
-<script src="~/vendor/libs/moment/moment.js"></script>
-<script src="~/vendor/libs/flatpickr/flatpickr.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="~/vendor/libs/jquery/jquery.js"></script>
+    <script src="~/vendor/libs/popper/popper.js"></script>
+    <script src="~/vendor/js/bootstrap.js"></script>
+    <script src="~/vendor/libs/perfect-scrollbar/perfect-scrollbar.js"></script>
+    <script src="~/vendor/js/menu.js"></script>
+    <script src="~/vendor/libs/apex-charts/apexcharts.js"></script>
+    <script src="~/vendor/libs/datatables-bs5/datatables-bootstrap5.js"></script>
+    <script src="~/vendor/libs/moment/moment.js"></script>
+    <script src="~/vendor/libs/flatpickr/flatpickr.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 }
 
 @section Scripts {
+    <script src="~/js/main.js"></script>
+    <script src="~/js/dashboards-analytics.js"></script>
 <script>
+  // Biến toàn cục để lưu trữ dữ liệu từ API
+  let allContracts = [];
+
+  // DataTable initialization
   var dataTable = $('#dataTable').DataTable({
     processing: true,
-    serverSide: true,
+    serverSide: false, // Tắt server-side để chuyển sang client-side
+    pageLength: 10, // Số bản ghi mỗi trang (có thể thay đổi)
+    paging: true, // Bật phân trang
+    lengthChange: true, // Cho phép người dùng thay đổi số bản ghi mỗi trang
+    lengthMenu: [5, 10, 25, 50], // Các tùy chọn số bản ghi mỗi trang
     ajax: {
       url: '/api/insurance-contracts',
       type: 'GET',
-      data: function (d) {
-        d.page = (d.start / d.length) + 1;
-        d.pageSize = d.length;
-        d.search = d.search.value;
-        d.orderColumn = d.columns[d.order[0].column].data;
-        d.orderDir = d.order[0].dir;
-
-
-        // Add custom filter data
-        d.userName = $('#filterUserName').val();  // Filter by User Name
-        d.planName = $('#filterPlanName').val();  // Filter by Plan Name
-        d.status = $('#filterStatus').val();      // Filter by Status
-        d.startDate = $('#filterStartDate').val(); // Filter by Start Date
-        d.endDate = $('#filterEndDate').val();    // Filter by End Date
-        d.daysToExpire = $('#daysToExpire').val();
-
-        return d;
-      },
-      dataSrc: 'data',
+      dataSrc: function (json) {
+        allContracts = json.data;
+        console.log('Total records loaded:', allContracts.length); // Debug số bản ghi
+        return allContracts;
+      }
     },
     columns: [
       { data: 'id' },
@@ -60,7 +62,14 @@ ViewData["Title"] = "Insurance Contracts List";
       {
         data: 'nextPaymentDueDate',
         render: function (data) {
-          return data ? new Date(data).toLocaleDateString('en-US') : 'N/A';
+          if (!data) {
+            return 'N/A';
+          }
+          var date = new Date(data);
+          if (date.getFullYear() < 2000) {
+            return 'N/A';
+          }
+          return date.toLocaleDateString('en-US');
         }
       },
       {
@@ -80,20 +89,29 @@ ViewData["Title"] = "Insurance Contracts List";
     ]
   });
 
-  // Refresh the DataTable when filters change
-  $('#filterUserName, #filterPlanName, #filterStatus, #filterStartDate, #filterEndDate, #filterDayToExpired').on('change', function() {
-    dataTable.draw();
-  });
+  // Custom filter cho "Due Soon (within 7 days)"
+  $.fn.dataTable.ext.search.push(
+    function (settings, data, dataIndex) {
+      var isDueSoonFilter = $('#due-soon-filter').is(':checked');
+      if (!isDueSoonFilter) {
+        return true; // Không lọc nếu checkbox không được chọn
+      }
 
-  // Date picker for Start and End Date filters
-  flatpickr('#filterStartDate', {
-    dateFormat: 'Y-m-d'
-  });
+      var nextPaymentDueDate = allContracts[dataIndex].nextPaymentDueDate;
+      if (!nextPaymentDueDate) {
+        return false; // Không hiển thị nếu không có ngày thanh toán
+      }
 
-  flatpickr('#filterEndDate', {
-    dateFormat: 'Y-m-d'
-  });
+      var dueDate = new Date(nextPaymentDueDate);
+      var today = new Date();
+      var diffTime = dueDate - today;
+      var diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); // Tính số ngày chênh lệch
 
+      return diffDays >= 0 && diffDays <= 7; // Chỉ hiển thị nếu còn 0-7 ngày
+    }
+  );
+
+  // Event handlers for DataTable buttons (giữ nguyên)
   dataTable.on('click', '.btn-edit', function () {
     var contractId = $(this).data('id');
     window.location.href = '/Admin/InsuranceContract/Edit/' + contractId;
@@ -113,29 +131,13 @@ ViewData["Title"] = "Insurance Contracts List";
     window.location.href = '/Admin/InsuranceContract/Details/' + contractId;
   });
 
-
-    var planId = rowData.planId;
-    var userId = rowData.userId;
-
-    if (!contractId || !planId || !userId) {
-      console.error('Missing required data:', { contractId, planId, userId });
-      alert('Không thể tải chi tiết hợp đồng do thiếu dữ liệu.');
-      return;
-    }
-
-    console.log('Contract ID:', contractId);
-    console.log('Plan ID:', planId);
-    console.log('User ID:', userId);
-
-    sessionStorage.setItem('contractId', contractId);
-    sessionStorage.setItem('planId', planId);
-    sessionStorage.setItem('userId', userId);
-
-    window.location.href = '/Admin/InsuranceContract/Details/' + contractId;
   dataTable.on('click', '.btn-remind', function () {
     var contractId = $(this).data('id');
     var rowData = dataTable.row($(this).parents('tr')).data();
-
+    if (!rowData.nextPaymentDueDate) {
+      Swal.fire('Error!', 'No payment due date available.', 'error');
+      return;
+    }
     Swal.fire({
       title: 'Are you sure?',
       text: "You are about to send a payment reminder email!",
@@ -149,22 +151,20 @@ ViewData["Title"] = "Insurance Contracts List";
           Swal.fire('Error!', 'User email is not available.', 'error');
           return;
         }
-
         var mailContent = {
-          to: rowData.userEmail, // Sử dụng email từ API
+          to: rowData.userEmail,
           subject: "Payment Reminder",
           body: "<p>Dear " + rowData.fullName + ", your payment is due on " + new Date(rowData.nextPaymentDueDate).toLocaleDateString('en-US') + ". Please make the payment soon.</p>"
         };
-
         $.ajax({
           url: '/api/send-email/send',
           method: 'POST',
           contentType: 'application/json',
           data: JSON.stringify(mailContent),
-          success: function (response) {
+          success: function () {
             Swal.fire('Sent!', 'Reminder email has been sent.', 'success');
           },
-          error: function (xhr, status, error) {
+          error: function (xhr) {
             Swal.fire('Error!', 'Failed to send reminder: ' + xhr.responseText, 'error');
           }
         });
@@ -172,72 +172,87 @@ ViewData["Title"] = "Insurance Contracts List";
     });
   });
 
+  // Refresh DataTable khi checkbox thay đổi
   $('#due-soon-filter').on('change', function () {
-    dataTable.ajax.reload();
-
+    dataTable.draw(); // Vẽ lại bảng với bộ lọc mới
   });
+
+  // Giữ nguyên các bộ lọc khác (nếu muốn lọc client-side)
+  $('#filterUserName').on('keyup', function () {
+    dataTable.column(1).search(this.value).draw();
+  });
+  $('#filterPlanName').on('keyup', function () {
+    dataTable.column(2).search(this.value).draw();
+  });
+  $('#filterStatus').on('change', function () {
+    var status = this.value === '' ? '' : (this.value == 1 ? 'Active' : (this.value == 0 ? 'Inactive' : 'Expired'));
+    dataTable.column(3).search(status).draw();
+  });
+
+  // Initialize Flatpickr for date filters
+  flatpickr('#filterStartDate', { dateFormat: 'Y-m-d' });
+  flatpickr('#filterEndDate', { dateFormat: 'Y-m-d' });
 </script>
 }
 
-<!-- Advanced Search -->
-<div class="card">
-  <h5 class="card-header d-flex justify-content-between">
-    Insurance Contracts List
-    <a href="@Url.Action("Create", "InsuranceContract")" class="float-right btn btn-primary">Create New Contract</a>
-  </h5>
-
-  <!-- Filter Section -->
-  <div class="card-body">
-    <div class="row">
-      <div class="col-md-3">
-        <input type="text" id="filterUserName" class="form-control" placeholder="Search by User Name">
-      </div>
-      <div class="col-md-3">
-        <input type="text" id="filterPlanName" class="form-control" placeholder="Search by Plan Name">
-      </div>
-      <div class="col-md-2">
-        <select id="filterStatus" class="form-control">
-          <option value="">Select Status</option>
-          <option value="1">Active</option>
-          <option value="0">Inactive</option>
-          <option value="2">Expired</option>
-        </select>
-      </div>
-      <div class="col-md-2">
-        <input type="text" id="filterStartDate" class="form-control" placeholder="Start Date" />
-      </div>
-      <div class="col-md-2">
-        <input type="text" id="filterEndDate" class="form-control" placeholder="End Date" />
-      </div>
-      <div class="col-md-3 pt-4">
-        <input type="number" class="form-control" id="filterDayToExpired" placeholder="Enter number of days before expired" />
-      </div>
-    </div>
-  </div>
-
-  <div class="card-body">
-    <div class="form-check mb-3">
-      <input class="form-check-input" type="checkbox" id="due-soon-filter">
-      <label class="form-check-label" for="due-soon-filter">
-        Show contracts with payments due soon (within 7 days)
-      </label>
-    </div>
-  </div>
-  <div class="card-datatable table-responsive">
-    <table id="dataTable" class="dt-advanced-search table border-top">
-      <thead>
-      <tr>
-        <th>Id</th>
-        <th>User Name</th>
-        <th>Plan Name</th>
-        <th>Status</th>
-        <th>Start Date</th>
-        <th>End Date</th>
-        <th>Next Payment Due</th>
-        <th>Action</th>
-      </tr>
-      </thead>
-    </table>
-  </div>
-</div>
+            <!-- Insurance Contracts List -->
+            <div class="col-12 order-3">
+              <div class="card">
+                <h5 class="card-header d-flex justify-content-between">
+                  Insurance Contracts List
+                  <a href="@Url.Action("Create", "InsuranceContract")" class="btn btn-primary">Create New Contract</a>
+                </h5>
+                <div class="card-body">
+                  <div class="row">
+                    <div class="col-md-3">
+                      <input type="text" id="filterUserName" class="form-control" placeholder="Search by User Name">
+                    </div>
+                    <div class="col-md-3">
+                      <input type="text" id="filterPlanName" class="form-control" placeholder="Search by Plan Name">
+                    </div>
+                    <div class="col-md-2">
+                      <select id="filterStatus" class="form-control">
+                        <option value="">Select Status</option>
+                        <option value="1">Active</option>
+                        <option value="0">Inactive</option>
+                        <option value="2">Expired</option>
+                      </select>
+                    </div>
+                    <div class="col-md-2">
+                      <input type="text" id="filterStartDate" class="form-control" placeholder="Start Date" />
+                    </div>
+                    <div class="col-md-2">
+                      <input type="text" id="filterEndDate" class="form-control" placeholder="End Date" />
+                    </div>
+                    <div class="col-md-3 pt-4">
+                      <input type="number" id="daysToExpire" class="form-control" placeholder="Days to Expire" />
+                    </div>
+                    <div class="col-md-3 pt-4">
+                      <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="due-soon-filter">
+                        <label class="form-check-label" for="due-soon-filter">
+                          Due Soon (within 7 days)
+                        </label>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="card-datatable table-responsive">
+                  <table id="dataTable" class="dt-advanced-search table border-top">
+                    <thead>
+                    <tr>
+                      <th>Id</th>
+                      <th>User Name</th>
+                      <th>Plan Name</th>
+                      <th>Status</th>
+                      <th>Start Date</th>
+                      <th>End Date</th>
+                      <th>Next Payment Due</th>
+                      <th>Action</th>
+                    </tr>
+                    </thead>
+                  </table>
+                </div>
+              </div>
+            </div>
 <!-- /Advanced Search -->
