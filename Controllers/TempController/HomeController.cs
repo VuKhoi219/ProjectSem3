@@ -1,5 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
-using Project_Sem3.Controllers.VỉewController;
+using Project_Sem3.Controllers.ViewController;
 using Project_Sem3.Models.ViewModel;
 
 public class HomeController : BaseController
