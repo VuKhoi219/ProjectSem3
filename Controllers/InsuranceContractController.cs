@@ -28,15 +28,42 @@ public class InsuranceContractsController : ControllerBase
 
     [HttpGet]
     public async Task<IActionResult> GetAllInsuranceContracts(
-        [FromQuery] int page = 1,
-        [FromQuery] int pageSize = 10,
-        [FromQuery] string? search = null,
-        [FromQuery] string? orderColumn = null,
-        [FromQuery] string? orderDir = null,
-        [FromQuery] bool dueSoon = false)
+    [FromQuery] int page = 1,
+    [FromQuery] int pageSize = 10,
+    [FromQuery] string? search = null,
+    [FromQuery] string? orderColumn = null,
+    [FromQuery] string? orderDir = null,
+    [FromQuery] string? userName = null,
+    [FromQuery] string? planName = null,
+    [FromQuery] int? status = null,
+    [FromQuery] string? startDate = null,
+    [FromQuery] string? endDate = null,
+    [FromQuery] int? daysToExpire = null // New parameter for filtering contracts that are about to expire
+)
+{
+    try
     {
-        try
+        // Starting the query, including related entities (User and Plan)
+        var query = _context.InsuranceContracts
+                             .Include(ic => ic.User)
+                             .Include(ic => ic.Plan)
+                             .AsQueryable(); // Keep it as IQueryable
+
+        // Handle search query (for User, Plan, Status, etc.)
+        if (!string.IsNullOrEmpty(search))
         {
+            query = query.Where(x =>
+                (x.UserId != null && EF.Functions.Like(x.User.FullName, $"%{search}%")) || // Search User Name
+                (x.PlanId != null && EF.Functions.Like(x.Plan.Name, $"%{search}%")) || // Search Plan Name
+                (x.Status.ToString() != null && EF.Functions.Like(x.Status.ToString(), $"%{search}%")) // Search Status
+            );
+        }
+
+        // Handle additional filters (userName, planName, status, startDate, endDate)
+        if (!string.IsNullOrEmpty(userName))
+        {
+            query = query.Where(x => EF.Functions.Like(x.User.FullName, $"%{userName}%"));
+        }
             var query = _context.InsuranceContracts
                                 .Include(ic => ic.User)
                                 .Include(ic => ic.Plan)
@@ -99,16 +126,26 @@ public class InsuranceContractsController : ControllerBase
                     parameter
                 );
 
-                if (orderDir.ToLower() == "asc")
-                {
-                    query = query.OrderBy(lambda);
-                }
-                else if (orderDir.ToLower() == "desc")
-                {
-                    query = query.OrderByDescending(lambda);
-                }
-            }
+        if (!string.IsNullOrEmpty(planName))
+        {
+            query = query.Where(x => EF.Functions.Like(x.Plan.Name, $"%{planName}%"));
+        }
 
+        // Ensure correct comparison for Status if it's an enum or integer
+        if (status.HasValue)
+        {
+            query = query.Where(x => x.Status == (ContractStatus)status);
+        }
+
+        if (!string.IsNullOrEmpty(startDate) && DateTime.TryParse(startDate, out var start))
+        {
+            query = query.Where(x => x.StartDate >= start);
+        }
+
+        if (!string.IsNullOrEmpty(endDate) && DateTime.TryParse(endDate, out var end))
+        {
+            query = query.Where(x => x.EndDate <= end);
+        }
             var totalCount = await contractsWithDueDate.CountAsync();
             var pagedContracts = await contractsWithDueDate
                 .Skip((page - 1) * pageSize)
@@ -136,14 +173,69 @@ public class InsuranceContractsController : ControllerBase
                 pageSize = pageSize
             };
 
-            return Ok(result);
-        }
-        catch (Exception e)
+        // Handle filtering contracts that are near expiration (e.g., within the next 'x' days)
+        if (daysToExpire.HasValue)
         {
+            var today = DateTime.UtcNow;
+            var expirationThreshold = today.AddDays(daysToExpire.Value); // Calculate the expiration threshold
+
+            query = query.Where(x => x.EndDate <= expirationThreshold && x.EndDate >= today);
+        }
+
+        // Handle sorting by dynamic column and direction
+        if (!string.IsNullOrEmpty(orderColumn) && !string.IsNullOrEmpty(orderDir))
+        {
+            var parameter = Expression.Parameter(typeof(InsuranceContract), "x");
+            var property = Expression.Property(parameter, orderColumn);
+            var lambda = Expression.Lambda<Func<InsuranceContract, object>>(Expression.Convert(property, typeof(object)), parameter);
+
+            if (orderDir.ToLower() == "asc")
+            {
+                query = query.OrderBy(lambda);
+            }
+            else if (orderDir.ToLower() == "desc")
+            {
+                query = query.OrderByDescending(lambda);
+            }
             Console.WriteLine(e);
             return StatusCode(500, new { Message = "An error occurred", Error = e.Message });
         }
+
+        // Get the total count for pagination
+        var totalCount = await query.CountAsync();
+
+        // Paginate the results
+        var pagedInsuranceContracts = await query.Skip((page - 1) * pageSize).Take(pageSize).ToListAsync();
+
+        // Return the response in the desired format
+        var result = new
+        {
+            data = pagedInsuranceContracts.Select(ic => new
+            {
+                ic.Id,
+                FullName = ic.User.FullName,
+                PlanName = ic.Plan.Name,
+                ic.Status,
+                ic.StartDate,
+                ic.EndDate,
+                planId = ic.PlanId,  // Ensure PlanId is included
+                userId = ic.UserId   // Ensure UserId is included
+            }).ToArray(),
+            recordsTotal = await _context.InsuranceContracts.CountAsync(),
+            recordsFiltered = totalCount,
+            page = page,
+            pageSize = pageSize
+        };
+
+        return Ok(result);
     }
+    catch (Exception e)
+    {
+        // Log the error (optional)
+        Console.WriteLine(e);
+        return StatusCode(500, new { Message = "An error occurred", Error = e.Message });
+    }
+}
 
     // 2. Get By Id - Lấy InsuranceContract theo Id
     [HttpGet("{id}")]

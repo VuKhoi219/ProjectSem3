@@ -32,7 +32,7 @@ public class AuthController : Controller
     var result = await _signInManager.PasswordSignInAsync(email, password, false, false);
     if (result.Succeeded)
     {
-      return RedirectToAction("Index2", "Home", new { area = "Admin" });
+      return RedirectToAction("Index2", "Home", new { area = "Admin" }); // check return url.
     }
     ModelState.AddModelError("error", "Invalid login attempt.");
     return View();

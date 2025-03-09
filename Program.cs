@@ -52,14 +52,12 @@ builder.Services.AddSession(options =>
 builder.Services.AddIdentity<IdentityUser, IdentityRole>()
   .AddEntityFrameworkStores<MyDbContext>()
   .AddDefaultTokenProviders();
-
 builder.Services.ConfigureApplicationCookie(options =>
 {
-  options.LoginPath = "/Auth/Login"; // redirect to login if not authenticated
-  options.AccessDeniedPath = "/Auth/AccessDenied"; // access denied for non-admin users
+  options.LoginPath = "/Auth/Login"; // Account/Login <- default
+  options.AccessDeniedPath = "/Auth/AccessDenied"; // Trang 403, đăng nhập rồi nhưng không phải admin hoặc ...
   options.ExpireTimeSpan = TimeSpan.FromMinutes(30);
 });
-
 
 var app = builder.Build();
 
