@@ -309,7 +309,7 @@ Layout = "~/Views/Shared/_Layout.cshtml";
       insurancePlan.propertyDetail?.annualPaymentAmount;
 
     let payments = [];
-    const yearsDiff = endDate.getFullYear() - startDate.getFullYear(); // Số năm hợp đồng
+    const yearsDiff = endDate.getFullYear() - startDate.getFullYear() + 1; // Số năm hợp đồng
 
     // Sinh danh sách thanh toán tự động từ startDate
     let currentDate = new Date(startDate);
