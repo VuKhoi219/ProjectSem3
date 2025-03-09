@@ -1,5 +1,4 @@
-@model Project_Sem3.Models.InsuranceContract
-
+@model Project_Sem3.Models.ViewModel.DashboardViewModel
 
 @section VendorStyles {
 <link rel="stylesheet" href="~/vendor/libs/datatables-bs5/datatables.bootstrap5.css">
@@ -80,7 +79,7 @@
                           <div class="d-flex flex-column">
                             <small>
                               @* Display the year the contract started *@
-                              @Html.DisplayFor(model => model.StartDate.Year)
+                              @Html.DisplayFor(model => model.InsuranceContract.StartDate.Year)
                             </small>
                           </div>
                         </div>
@@ -88,7 +87,7 @@
                           <div class="d-flex flex-column">
                             <small>
                               @* Display the year before the contract started, assuming a comparison year *@
-                              @Html.DisplayFor(model => model.EndDate.Year)
+                              @Html.DisplayFor(model => model.InsuranceContract.EndDate.Year)
                             </small>
                           </div>
                         </div>
@@ -98,139 +97,152 @@
                 </div>
               </div>
             </div>
-@*             <div class="col-12 col-md-8 col-lg-12 col-xxl-4 order-3 order-md-2 profile-report"> *@
-@*               <div class="row"> *@
-@*                 <div class="col-12 mb-6 profile-report"> *@
-@*                   <div class="card h-100"> *@
-@*                     <div class="card-body"> *@
-@*                       <div *@
-@*                         class="d-flex justify-content-between align-items-center flex-sm-row flex-column gap-10 flex-wrap"> *@
-@*                         <div class="d-flex flex-sm-column flex-row align-items-start justify-content-between"> *@
-@*                           <div class="card-title mb-6"> *@
-@*                             <h5 class="text-nowrap mb-1">Profile Report</h5> *@
-@*                             <span class="badge bg-label-warning">YEAR 2022</span> *@
-@*                           </div> *@
-@*                           <div class="mt-sm-auto"> *@
-@*                                 <span class="text-success text-nowrap fw-medium" *@
-@*                                 ><i class="icon-base bx bx-up-arrow-alt"></i> 68.2%</span *@
-@*                                 > *@
-@*                             <h4 class="mb-0">$84,686k</h4> *@
-@*                           </div> *@
-@*                         </div> *@
-@*                         <div id="profileReportChart"></div> *@
-@*                       </div> *@
-@*                     </div> *@
-@*                   </div> *@
-@*                 </div> *@
-@*               </div> *@
-@*             </div> *@
-@*           </div> *@
-@*           <div class="row"> *@
-@*             <!-- Order Statistics --> *@
-@*             <div class="col-md-6 col-lg-4 col-xl-4 order-0 mb-6"> *@
-@*               <div class="card h-100"> *@
-@*                 <div class="card-header d-flex justify-content-between"> *@
-@*                   <div class="card-title mb-0"> *@
-@*                     <h5 class="mb-1 me-2">Order Statistics</h5> *@
-@*                     <p class="card-subtitle">42.82k Total Sales</p> *@
-@*                   </div> *@
-@*                   <div class="dropdown"> *@
-@*                     <button *@
-@*                       class="btn text-body-secondary p-0" *@
-@*                       type="button" *@
-@*                       id="orederStatistics" *@
-@*                       data-bs-toggle="dropdown" *@
-@*                       aria-haspopup="true" *@
-@*                       aria-expanded="false"> *@
-@*                       <i class="icon-base bx bx-dots-vertical-rounded icon-lg"></i> *@
-@*                     </button> *@
-@*                     <div class="dropdown-menu dropdown-menu-end" aria-labelledby="orederStatistics"> *@
-@*                       <a class="dropdown-item" href="javascript:void(0);">Select All</a> *@
-@*                       <a class="dropdown-item" href="javascript:void(0);">Refresh</a> *@
-@*                       <a class="dropdown-item" href="javascript:void(0);">Share</a> *@
-@*                     </div> *@
-@*                   </div> *@
-@*                 </div> *@
-@*                 <div class="card-body"> *@
-@*                   <div class="d-flex justify-content-between align-items-center mb-6"> *@
-@*                     <div class="d-flex flex-column align-items-center gap-1"> *@
-@*                       <h3 class="mb-1">8,258</h3> *@
-@*                       <small>Total Orders</small> *@
-@*                     </div> *@
-@*                     <div id="orderStatisticsChart"></div> *@
-@*                   </div> *@
-@*                   <ul class="p-0 m-0"> *@
-@*                     <li class="d-flex align-items-center mb-5"> *@
-@*                       <div class="avatar flex-shrink-0 me-3"> *@
-@*                             <span class="avatar-initial rounded bg-label-primary" *@
-@*                             ><i class="icon-base bx bx-mobile-alt"></i *@
-@*                               ></span> *@
-@*                       </div> *@
-@*                       <div class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2"> *@
-@*                         <div class="me-2"> *@
-@*                           <h6 class="mb-0">Electronic</h6> *@
-@*                           <small>Mobile, Earbuds, TV</small> *@
-@*                         </div> *@
-@*                         <div class="user-progress"> *@
-@*                           <h6 class="mb-0">82.5k</h6> *@
-@*                         </div> *@
-@*                       </div> *@
-@*                     </li> *@
-@*                     <li class="d-flex align-items-center mb-5"> *@
-@*                       <div class="avatar flex-shrink-0 me-3"> *@
-@*                             <span class="avatar-initial rounded bg-label-success" *@
-@*                             ><i class="icon-base bx bx-closet"></i *@
-@*                               ></span> *@
-@*                       </div> *@
-@*                       <div class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2"> *@
-@*                         <div class="me-2"> *@
-@*                           <h6 class="mb-0">Fashion</h6> *@
-@*                           <small>T-shirt, Jeans, Shoes</small> *@
-@*                         </div> *@
-@*                         <div class="user-progress"> *@
-@*                           <h6 class="mb-0">23.8k</h6> *@
-@*                         </div> *@
-@*                       </div> *@
-@*                     </li> *@
-@*                     <li class="d-flex align-items-center mb-5"> *@
-@*                       <div class="avatar flex-shrink-0 me-3"> *@
-@*                             <span class="avatar-initial rounded bg-label-info" *@
-@*                             ><i class="icon-base bx bx-home-alt"></i *@
-@*                               ></span> *@
-@*                       </div> *@
-@*                       <div class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2"> *@
-@*                         <div class="me-2"> *@
-@*                           <h6 class="mb-0">Decor</h6> *@
-@*                           <small>Fine Art, Dining</small> *@
-@*                         </div> *@
-@*                         <div class="user-progress"> *@
-@*                           <h6 class="mb-0">849k</h6> *@
-@*                         </div> *@
-@*                       </div> *@
-@*                     </li> *@
-@*                     <li class="d-flex align-items-center"> *@
-@*                       <div class="avatar flex-shrink-0 me-3"> *@
-@*                             <span class="avatar-initial rounded bg-label-secondary" *@
-@*                             ><i class="icon-base bx bx-football"></i *@
-@*                               ></span> *@
-@*                       </div> *@
-@*                       <div class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2"> *@
-@*                         <div class="me-2"> *@
-@*                           <h6 class="mb-0">Sports</h6> *@
-@*                           <small>Football, Cricket Kit</small> *@
-@*                         </div> *@
-@*                         <div class="user-progress"> *@
-@*                           <h6 class="mb-0">99</h6> *@
-@*                         </div> *@
-@*                       </div> *@
-@*                     </li> *@
-@*                   </ul> *@
-@*                 </div> *@
-@*               </div> *@
-@*             </div> *@
-@*             <!--/ Order Statistics --> *@
-@*            *@
-@*             <!-- Expense Overview --> *@
+            <div class="col-12 col-md-8 col-lg-12 col-xxl-4 order-3 order-md-2 profile-report">
+              <div class="row">
+                <div class="col-12 mb-6 profile-report">
+                  <div class="card h-100">
+                    <div class="card-body">
+                      <div class="d-flex justify-content-between align-items-center flex-sm-row flex-column gap-10 flex-wrap">
+                        <div class="d-flex flex-sm-column flex-row align-items-start justify-content-between">
+                          <div class="col-12 col-md-8 col-lg-12 col-xxl-4 order-3 order-md-2 profile-report">
+                            <div class="row">
+                              <div class="col-12 mb-6 profile-report">
+                                <div class="card h-100">
+                                  <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-center flex-sm-row flex-column gap-10 flex-wrap">
+                                      <div class="d-flex flex-sm-column flex-row align-items-start justify-content-between">
+                                        <div class="card-title mb-6">
+                                          <h5 class="text-nowrap mb-1">User Report</h5>
+                                          <span class="badge bg-label-warning">YEAR 2024</span>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <div id="profileReportChart"></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- Order Statistics -->
+            <div class="col-md-6 col-lg-4 col-xl-4 order-0 mb-6">
+              <div class="card h-100">
+                <div class="card-header d-flex justify-content-between">
+                  <div class="card-title mb-0">
+                    <h5 class="mb-1 me-2">Insurance Statistics</h5>
+                  </div>
+                  <div class="dropdown">
+                    <button class="btn text-body-secondary p-0" type="button" id="insuranceStatistics" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                      <i class="icon-base bx bx-dots-vertical-rounded icon-lg"></i>
+                    </button>
+                    <div class="dropdown-menu dropdown-menu-end" aria-labelledby="insuranceStatistics">
+                      <a class="dropdown-item" href="javascript:void(0);">Select All</a>
+                      <a class="dropdown-item" href="javascript:void(0);">Refresh</a>
+                      <a class="dropdown-item" href="javascript:void(0);">Share</a>
+                    </div>
+                  </div>
+                </div>
+                <div class="card-body">
+                  <div class="d-flex justify-content-between align-items-center mb-6">
+                    <div class="d-flex flex-column align-items-center gap-1">
+                      <small>Total Policies</small>
+                    </div>
+                    <div id="orderStatisticsChart"></div>
+                  </div>
+                  <ul class="p-0 m-0">
+                    <!-- Health Insurance -->
+                    <li class="d-flex align-items-center mb-5">
+                      <div class="avatar flex-shrink-0 me-3">
+                        <span class="avatar-initial rounded bg-label-primary"><i class="icon-base bx bx-heart"></i></span>
+                      </div>
+                      <div class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2">
+                        <div class="me-2">
+                          <h6 class="mb-0">Health Insurance</h6>
+                          <small>Medical, Wellness</small>
+                        </div>
+                        <div class="user-progress">
+                          <h6 class="mb-0" id="health-insurance">Loading...</h6>
+                        </div>
+                      </div>
+                    </li>
+
+                    <!-- Life Insurance -->
+                    <li class="d-flex align-items-center mb-5">
+                      <div class="avatar flex-shrink-0 me-3">
+                        <span class="avatar-initial rounded bg-label-success"><i class="icon-base bx bx-briefcase"></i></span>
+                      </div>
+                      <div class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2">
+                        <div class="me-2">
+                          <h6 class="mb-0">Life Insurance</h6>
+                          <small>Term, Whole Life</small>
+                        </div>
+                        <div class="user-progress">
+                          <h6 class="mb-0" id="life-insurance">Loading...</h6>
+                        </div>
+                      </div>
+                    </li>
+
+                    <!-- Vehicle Insurance -->
+                    <li class="d-flex align-items-center mb-5">
+                      <div class="avatar flex-shrink-0 me-3">
+                        <span class="avatar-initial rounded bg-label-info"><i class="icon-base bx bx-car"></i></span>
+                      </div>
+                      <div class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2">
+                        <div class="me-2">
+                          <h6 class="mb-0">Vehicle Insurance</h6>
+                          <small>Car, Motorcycle, Truck</small>
+                        </div>
+                        <div class="user-progress">
+                          <h6 class="mb-0" id="vehicle-insurance">Loading...</h6>
+                        </div>
+                      </div>
+                    </li>
+
+                    <!-- House Insurance -->
+                    <li class="d-flex align-items-center">
+                      <div class="avatar flex-shrink-0 me-3">
+                        <span class="avatar-initial rounded bg-label-secondary"><i class="icon-base bx bx-home"></i></span>
+                      </div>
+                      <div class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2">
+                        <div class="me-2">
+                          <h6 class="mb-0">Property Insurance</h6>
+                          <small>Home, Property, Renters</small>
+                        </div>
+                        <div class="user-progress">
+                          <h6 class="mb-0" id="property-insurance">Loading...</h6>
+                        </div>
+                      </div>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+            <!--/ Order Statistics -->
+
+            <script>
+              // Fetch insurance statistics from the API
+              fetch('/api/InsuranceStatistics')
+                .then(response => response.json())
+                .then(data => {
+                  // Update the HTML with the data
+                  document.getElementById('total-sales').textContent = `${data.TotalPolicies} Total Policies`;
+                  document.getElementById('total-policies').textContent = data.TotalPolicies;
+
+                  document.getElementById('health-insurance').textContent = data.HealthInsurance;
+                  document.getElementById('life-insurance').textContent = data.LifeInsurance;
+                  document.getElementById('vehicle-insurance').textContent = data.VehicleInsurance;
+                  document.getElementById('property-insurance').textContent = data.PropertyInsurance;
+                })
+                .catch(error => console.error('Error fetching data:', error));
+            </script>
+
+            @*             <!-- Expense Overview --> *@
 @*             <div class="col-md-6 col-lg-4 order-1 mb-6"> *@
 @*               <div class="card h-100"> *@
 @*                 <div class="card-header nav-align-top"> *@

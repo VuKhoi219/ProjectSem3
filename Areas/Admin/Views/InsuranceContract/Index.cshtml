@@ -31,6 +31,15 @@ ViewData["Title"] = "Insurance Contracts List";
         d.search = d.search.value;
         d.orderColumn = d.columns[d.order[0].column].data;
         d.orderDir = d.order[0].dir;
+
+        // Add custom filter data
+        d.userName = $('#filterUserName').val();  // Filter by User Name
+        d.planName = $('#filterPlanName').val();  // Filter by Plan Name
+        d.status = $('#filterStatus').val();      // Filter by Status
+        d.startDate = $('#filterStartDate').val(); // Filter by Start Date
+        d.endDate = $('#filterEndDate').val();    // Filter by End Date
+        d.daysToExpire = $('#daysToExpire').val();
+
         return d;
       },
       dataSrc: 'data',
@@ -57,6 +66,20 @@ ViewData["Title"] = "Insurance Contracts List";
     ]
   });
 
+  // Refresh the DataTable when filters change
+  $('#filterUserName, #filterPlanName, #filterStatus, #filterStartDate, #filterEndDate, #filterDayToExpired').on('change', function() {
+    dataTable.draw();
+  });
+
+  // Date picker for Start and End Date filters
+  flatpickr('#filterStartDate', {
+    dateFormat: 'Y-m-d'
+  });
+
+  flatpickr('#filterEndDate', {
+    dateFormat: 'Y-m-d'
+  });
+
   dataTable.on('click', '.btn-edit', function () {
     var contractId = $(this).data('id');
     window.location.href = '/Admin/InsuranceContract/Edit/' + contractId;
@@ -71,28 +94,23 @@ ViewData["Title"] = "Insurance Contracts List";
     var contractId = $(this).data('id');
     var rowData = dataTable.row($(this).parents('tr')).data();
 
-    // Lấy planId và userId từ rowData
     var planId = rowData.planId;
     var userId = rowData.userId;
 
-    // Kiểm tra dữ liệu (tùy chọn)
     if (!contractId || !planId || !userId) {
       console.error('Missing required data:', { contractId, planId, userId });
       alert('Không thể tải chi tiết hợp đồng do thiếu dữ liệu.');
       return;
     }
 
-    // Log để kiểm tra
     console.log('Contract ID:', contractId);
     console.log('Plan ID:', planId);
     console.log('User ID:', userId);
 
-    // Lưu vào sessionStorage
     sessionStorage.setItem('contractId', contractId);
     sessionStorage.setItem('planId', planId);
     sessionStorage.setItem('userId', userId);
 
-    // Chuyển hướng
     window.location.href = '/Admin/InsuranceContract/Details/' + contractId;
   });
 </script>
@@ -103,6 +121,36 @@ ViewData["Title"] = "Insurance Contracts List";
   <h5 class="card-header d-flex justify-content-between">Insurance Contracts List
     <a href="@Url.Action("Create", "InsuranceContract")" class="float-right btn btn-primary">Create New Contract</a>
   </h5>
+
+  <!-- Filter Section -->
+  <div class="card-body">
+    <div class="row">
+      <div class="col-md-3">
+        <input type="text" id="filterUserName" class="form-control" placeholder="Search by User Name">
+      </div>
+      <div class="col-md-3">
+        <input type="text" id="filterPlanName" class="form-control" placeholder="Search by Plan Name">
+      </div>
+      <div class="col-md-2">
+        <select id="filterStatus" class="form-control">
+          <option value="">Select Status</option>
+          <option value="1">Active</option>
+          <option value="0">Inactive</option>
+          <option value="2">Expired</option>
+        </select>
+      </div>
+      <div class="col-md-2">
+        <input type="text" id="filterStartDate" class="form-control" placeholder="Start Date" />
+      </div>
+      <div class="col-md-2">
+        <input type="text" id="filterEndDate" class="form-control" placeholder="End Date" />
+      </div>
+      <div class="col-md-3 pt-4">
+        <input type="number" class="form-control" id="filterDayToExpired" placeholder="Enter number of days before expired" />
+      </div>
+    </div>
+  </div>
+
   <div class="card-datatable table-responsive">
     <table id="dataTable" class="dt-advanced-search table border-top">
       <thead>
