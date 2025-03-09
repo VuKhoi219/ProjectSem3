@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Project_Sem3.Models.ViewModel;
 
-namespace Project_Sem3.Controllers.VỉewController;
+namespace Project_Sem3.Controllers.ViewController;
 
 public class BaseController : Controller
 {
