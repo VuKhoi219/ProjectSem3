@@ -6,107 +6,174 @@ Layout = "~/Views/Shared/_Layout.cshtml";
 
 <style>
   body {
-    font-family: Arial, sans-serif;
-    margin: 20px;
-    background-color: #f4f4f4;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    margin: 40px;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    color: #333;
+  }
+  .container {
+    max-width: 800px;
+    margin: 0 auto;
+  }
+  h1 {
+    color: #2c3e50;
+    text-align: center;
+    margin-bottom: 40px;
+    font-weight: 600;
+    letter-spacing: 1px;
   }
   .borrow-card {
     background: white;
-    border-radius: 8px;
-    padding: 20px;
-    margin-bottom: 20px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    max-width: 600px;
+    border-radius: 12px;
+    padding: 25px;
+    margin-bottom: 30px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
     display: none;
+    transition: transform 0.2s;
+  }
+  .borrow-card:hover {
+    transform: translateY(-5px);
   }
   .borrow-card h2 {
-    color: #2c3e50;
-    margin-top: 0;
-  }
-  .detail-section {
-    margin-top: 15px;
+    color: #2980b9;
+    margin: 0 0 20px;
+    font-size: 24px;
+    border-bottom: 2px solid #3498db;
+    padding-bottom: 10px;
   }
   .detail-section p {
-    margin: 5px 0;
+    margin: 12px 0;
+    padding: 8px;
+    background: #f8f9fa;
+    border-radius: 6px;
   }
   .label {
-    font-weight: bold;
-    color: #34495e;
+    font-weight: 600;
+    color: #2c3e50;
+    min-width: 150px;
+    display: inline-block;
   }
   .loading {
-    font-size: 18px;
+    text-align: center;
+    font-size: 20px;
     color: #7f8c8d;
+    padding: 20px;
+    background: rgba(255,255,255,0.8);
+    border-radius: 8px;
   }
   .error {
-    color: red;
+    color: #e74c3c;
+    text-align: center;
+    padding: 15px;
+    background: rgba(231, 76, 60, 0.1);
+    border-radius: 8px;
+    margin-bottom: 20px;
   }
   .loan-payment {
     background: white;
-    border-radius: 8px;
-    padding: 20px;
-    margin-top: 20px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    max-width: 600px;
+    border-radius: 12px;
+    padding: 25px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+    transition: transform 0.2s;
+  }
+  .loan-payment:hover {
+    transform: translateY(-5px);
   }
   .loan-payment h3 {
-    color: #2c3e50;
+    color: #2980b9;
+    margin: 0 0 20px;
+    font-size: 22px;
+    border-bottom: 2px solid #3498db;
+    padding-bottom: 10px;
+  }
+  #createPaymentLink {
+    display: inline-block;
+    padding: 8px 16px;
+    background: #2ecc71;
+    color: white;
+    text-decoration: none;
+    border-radius: 6px;
+    margin-bottom: 15px;
+    transition: background 0.3s;
+  }
+  #createPaymentLink:hover {
+    background: #27ae60;
   }
   .loan-payment table {
     width: 100%;
-    border-collapse: collapse;
-    margin-top: 10px;
-  }
-  .loan-payment th, .loan-payment td {
-    padding: 8px;
-    text-align: left;
-    border-bottom: 1px solid #ddd;
+    border-collapse: separate;
+    border-spacing: 0;
   }
   .loan-payment th {
-    background-color: #f2f2f2;
+    background: #ecf0f1;
+    color: #2c3e50;
+    font-weight: 600;
+    padding: 12px;
+    text-align: left;
+  }
+  .loan-payment td {
+    padding: 12px;
+    border-bottom: 1px solid #eee;
+  }
+  .loan-payment tr:hover {
+    background: #f8f9fa;
   }
   .loan-payment img {
-    max-width: 100px;
-    height: auto;
+    max-width: 80px;
+    border-radius: 4px;
+    transition: transform 0.2s;
+  }
+  .loan-payment img:hover {
+    transform: scale(1.5);
   }
 </style>
 
-<h1>Loan Details</h1>
-<div id="loading" class="loading">Loading data...</div>
-<div id="error" class="error"></div>
+<div class="container">
+  <h1>Loan Details</h1>
+  <div id="loading" class="loading">Loading data...</div>
+  <div id="error" class="error"></div>
 
-<div id="borrow-card" class="borrow-card">
-  <h2 id="title">Loan Information</h2>
-  <p><span class="label">Loan ID:</span> <span id="id"></span></p>
-  <p><span class="label">Loan Amount:</span> <span id="loanAmount"></span></p>
-  <p><span class="label">Repayment Amount:</span> <span id="repaymentAmount"></span></p>
-  <p><span class="label">Monthly Payment Amount:</span> <span id="monthlyPaymentAmount"></span></p>
-  <p><span class="label">Loan Date:</span> <span id="loanDate"></span></p>
-  <p><span class="label">Due Date:</span> <span id="dueDate"></span></p>
-  <p><span class="label">Status:</span> <span id="status"></span></p>
-</div>
+  <div id="borrow-card" class="borrow-card">
+    <h2 id="title">Loan Information</h2>
+    <div class="detail-section">
+      <p><span class="label">Loan ID:</span> <span id="id"></span></p>
+      <p><span class="label">Loan Amount:</span> <span id="loanAmount"></span></p>
+      <p><span class="label">Repayment Amount:</span> <span id="repaymentAmount"></span></p>
+      <p><span class="label">Monthly Payment:</span> <span id="monthlyPaymentAmount"></span></p>
+      <p><span class="label">Loan Date:</span> <span id="loanDate"></span></p>
+      <p><span class="label">Due Date:</span> <span id="dueDate"></span></p>
+      <p><span class="label">Status:</span> <span id="status"></span></p>
+    </div>
+  </div>
 
-<div id="listLoanPayment" class="loan-payment">
-  <h3>Payment History</h3>
-  <a href="#" id="createPaymentLink">Add Transaction</a>
-  <table id="paymentTable">
-    <thead>
-    <tr>
-      <th>Transaction ID</th>
-      <th>Payment Amount</th>
-      <th>Payment Date</th>
-      <th>Image</th>
-      <th>Overdue Days</th>
-      <th>Penalty Interest</th>
-      <th>Status</th>
-    </tr>
-    </thead>
-    <tbody id="paymentList"></tbody>
-  </table>
+  <div id="listLoanPayment" class="loan-payment">
+    <h3>Payment History</h3>
+    <a href="#" id="createPaymentLink">Add Transaction</a>
+    <table id="paymentTable">
+      <thead>
+      <tr>
+        <th>Transaction ID</th>
+        <th>Amount</th>
+        <th>Date</th>
+        <th>Image</th>
+        <th>Overdue Days</th>
+        <th>Penalty</th>
+        <th>Status</th>
+      </tr>
+      </thead>
+      <tbody id="paymentList"></tbody>
+    </table>
+  </div>
 </div>
 
 @section Scripts {
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
+  // Hàm định dạng số tiền sang USD
+  function formatUSD(number) {
+    return number.toLocaleString("en-US", { style: "currency", currency: "USD" });
+  }
+
   $(document).ready(function() {
     const borrowCapital = JSON.parse(localStorage.getItem("BorrowCapital")) || {};
     const borrowCapitalId = borrowCapital.id;
@@ -132,9 +199,9 @@ Layout = "~/Views/Shared/_Layout.cshtml";
         loanDate = response.loanDate.split('T')[0];
 
         $('#id').text(response.id);
-        $('#loanAmount').text(response.loanAmount.toLocaleString('en-US', { style: 'currency', currency: 'VND' }));
-        $('#repaymentAmount').text(response.repaymentAmount.toLocaleString('en-US', { style: 'currency', currency: 'VND' }));
-        $('#monthlyPaymentAmount').text(monthlyPaymentAmount.toLocaleString('en-US', { style: 'currency', currency: 'VND' }));
+        $('#loanAmount').text(formatUSD(response.loanAmount));
+        $('#repaymentAmount').text(formatUSD(response.repaymentAmount));
+        $('#monthlyPaymentAmount').text(formatUSD(monthlyPaymentAmount));
         $('#loanDate').text(loanDateObj.toLocaleDateString('en-US'));
         $('#dueDate').text(dueDate.toLocaleDateString('en-US'));
         const statusMap = { 0: 'Pending', 1: 'Active', 2: 'Overdue', 3: 'Closed' };
@@ -165,23 +232,23 @@ Layout = "~/Views/Shared/_Layout.cshtml";
       success: function(response) {
         const paymentList = $('#paymentList');
         paymentList.empty();
-        console.log(response.$values)
+        console.log(response.$values);
         if (response.$values && response.$values.length > 0) {
           response.$values.forEach(payment => {
             const row = `
-                                <tr>
-                                    <td>${payment.id}</td>
-                                    <td>${payment.paymentAmount.toLocaleString('en-US', { style: 'currency', currency: 'USD' })}</td>
-                                    <td>${new Date(payment.paymentDate).toLocaleDateString('en-US')}</td>
-                                    <td><img src="${payment.paymentImage}" alt="Payment Proof" onerror="this.src='/images/placeholder.jpg'"></td>
-                                    <td>${payment.overdueDays}</td>
-                                    <td>${payment.penaltyInterest.toLocaleString('en-US', { style: 'currency', currency: 'USD' })}</td>
-                                    <td>${payment.status ? 'Paid' : 'Pending Approval'}</td>
-                                </tr>`;
+                            <tr>
+                                <td>${payment.id}</td>
+                                <td>${formatUSD(payment.paymentAmount)}</td>
+                                <td>${new Date(payment.paymentDate).toLocaleDateString('en-US')}</td>
+                                <td><img src="${payment.paymentImage}" alt="Payment Proof" onerror="this.src='/images/placeholder.jpg'"></td>
+                                <td>${payment.overdueDays}</td>
+                                <td>${formatUSD(payment.penaltyInterest)}</td>
+                                <td>${payment.status ? 'Paid' : 'Pending Approval'}</td>
+                            </tr>`;
             paymentList.append(row);
           });
         } else {
-          paymentList.append('<tr><td colspan="6">No payment history available.</td></tr>');
+          paymentList.append('<tr><td colspan="7">No payment history available.</td></tr>');
         }
       },
       error: function(xhr) {

@@ -90,7 +90,11 @@ ViewData["Title"] = "Create Payment";
     transform: translate(-50%, -50%);
     z-index: 1000;
   }
-  keyframes fadeIn {
+  #qrCodeContainer img {
+    max-width: 200px;
+    height: auto;
+  }
+  @@keyframes fadeIn {
     from { opacity: 0; }
     to { opacity: 1; }
   }
@@ -117,11 +121,15 @@ ViewData["Title"] = "Create Payment";
   <form id="paymentForm" enctype="multipart/form-data">
     <div class="form-group">
       <label for="contractId">Contract ID</label>
-      <input type="number" class="form-control" id="contractId" placeholder="Enter Contract ID" required>
+      <input type="number" class="form-control" id="contractId" readonly required>
     </div>
     <div class="form-group">
       <label for="amount">Amount</label>
-      <input type="number" class="form-control" id="amount" placeholder="Enter Amount" required>
+      <input type="number" class="form-control" id="amount" readonly required>
+    </div>
+    <div class="form-group" id="qrCodeContainer" style="display: none;">
+      <label>Payment QR Code</label>
+      <img id="qrCode" alt="QR Code" />
     </div>
     <div class="form-group">
       <label for="paymentImage">Payment Image</label>
@@ -136,17 +144,52 @@ ViewData["Title"] = "Create Payment";
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 <script>
   $(document).ready(function() {
+    // Lấy dữ liệu từ localStorage
+    const paymentData = JSON.parse(localStorage.getItem('paymentData')) || {};
+    const contractId = paymentData.contractId;
+    const amount = paymentData.amount;
+
+    // Điền dữ liệu vào form nếu có
+    if (contractId && amount) {
+      $('#contractId').val(contractId);
+      $('#amount').val(amount);
+
+      // Tạo mã QR dựa trên dữ liệu từ localStorage
+      const qrData = {
+        Amount: parseFloat(amount),
+        Value: `Thanh toán hợp đồng ${contractId} - ${new Date().toLocaleDateString('vi-VN')}`
+      };
+
+      $.ajax({
+        url: '/api/online-payment/generate-qr-url',
+        method: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify(qrData),
+        success: function(qrResponse) {
+          $('#qrCode').attr('src', qrResponse).show();
+          $('#qrCodeContainer').show();
+        },
+        error: function(xhr) {
+          $('#errorAlert').show().text('Lỗi khi tạo mã QR: ' + (xhr.responseJSON?.message || 'Không rõ lỗi'));
+          $('#successAlert').hide();
+        }
+      });
+    } else {
+      $('#errorAlert').show().text('Không tìm thấy thông tin thanh toán. Vui lòng quay lại danh sách để chọn.');
+    }
+
+    // Xử lý submit form
     $('#paymentForm').on('submit', function(e) {
       e.preventDefault();
 
-      // Show loading spinner
       $('#loadingSpinner').show();
+      $('#successAlert').hide();
+      $('#errorAlert').hide();
 
-      // Create FormData for file upload
       const formData = new FormData();
       formData.append('file', $('#paymentImage')[0].files[0]);
 
-      // Step 1: Upload file first
+      // Bước 1: Upload file
       $.ajax({
         url: '/api/upload',
         method: 'POST',
@@ -154,11 +197,10 @@ ViewData["Title"] = "Create Payment";
         processData: false,
         contentType: false,
         success: function(fileResponse) {
-          // After successful upload, get the file URL
           const imageUrl = fileResponse.filePath;
 
-          // Step 2: Create payment with the uploaded URL
-          const paymentData = {
+          // Bước 2: Tạo payment với dữ liệu từ form
+          const paymentDataSubmit = {
             userId: @ViewData["UserId"] ?? null,
             contractId: $('#contractId').val(),
             amount: $('#amount').val(),
@@ -169,26 +211,28 @@ ViewData["Title"] = "Create Payment";
             url: '/api/payments',
             method: 'POST',
             contentType: 'application/json',
-            data: JSON.stringify(paymentData),
+            data: JSON.stringify(paymentDataSubmit),
             success: function(paymentResponse) {
               $('#loadingSpinner').hide();
               $('#successAlert').show();
               $('#errorAlert').hide();
+              // Xóa dữ liệu trong localStorage sau khi tạo thành công
+              localStorage.removeItem('paymentData');
               setTimeout(function() {
                 window.location.href = "/Payment/Index";
               }, 2000);
             },
-            error: function(xhr, status, error) {
+            error: function(xhr) {
               $('#loadingSpinner').hide();
               $('#successAlert').hide();
-              $('#errorAlert').show();
+              $('#errorAlert').show().text('Lỗi khi tạo thanh toán: ' + (xhr.responseJSON?.message || 'Không rõ lỗi'));
             }
           });
         },
-        error: function(xhr, status, error) {
+        error: function(xhr) {
           $('#loadingSpinner').hide();
           $('#successAlert').hide();
-          $('#errorAlert').show();
+          $('#errorAlert').show().text('Lỗi khi tải hình ảnh: ' + (xhr.responseJSON?.message || 'Không rõ lỗi'));
         }
       });
     });

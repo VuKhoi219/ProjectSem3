@@ -4,78 +4,68 @@ ViewData["Title"] = "Payments";
 Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-  <style>
-    body {
-      background-color: #f8f9fa;
-    }
-    .container {
-      margin-top: 30px;
-    }
-    .page-title {
-      color: #007bff;
-      font-size: 2rem;
-      font-weight: bold;
-      margin-bottom: 30px;
-    }
-    .table-wrapper {
-      overflow-x: auto;
-    }
-    .table th, .table td {
-      text-align: center;
-    }
-    .table-striped tbody tr:nth-of-type(odd) {
-      background-color: #f9f9f9;
-    }
-    .btn-custom {
-      background-color: #28a745;
-      color: white;
-    }
-    .btn-custom:hover {
-      background-color: #218838;
-    }
-    .pagination {
-      justify-content: center;
-      margin-top: 20px;
-    }
-    .pagination .page-link {
-      border-radius: 50%;
-    }
-    .alert-custom {
-      margin-top: 20px;
-      text-align: center;
-    }
-    .btn-like {
-      display: inline-block;
-      padding: 8px 20px;
-      background-color: #007bff;
-      color: white;
-      border-radius: 5px;
-      text-align: center;
-      cursor: pointer;
-      transition: background-color 0.3s;
-      margin-bottom: 10px;
-    }
-
-    .btn-like a {
-      color: white;
-      text-decoration: none;
-    }
-
-    .btn-like:hover {
-      background-color: #0056b3;
-    }
-
-  </style>
+<style>
+  body {
+    background-color: #f8f9fa;
+  }
+  .container {
+    margin-top: 30px;
+  }
+  .page-title {
+    color: #007bff;
+    font-size: 2rem;
+    font-weight: bold;
+    margin-bottom: 30px;
+  }
+  .table-wrapper {
+    overflow-x: auto;
+  }
+  .table th, .table td {
+    text-align: center;
+  }
+  .table-striped tbody tr:nth-of-type(odd) {
+    background-color: #f9f9f9;
+  }
+  .btn-custom {
+    background-color: #28a745;
+    color: white;
+  }
+  .btn-custom:hover {
+    background-color: #218838;
+  }
+  .pagination {
+    justify-content: center;
+    margin-top: 20px;
+  }
+  .pagination .page-link {
+    border-radius: 50%;
+  }
+  .alert-custom {
+    margin-top: 20px;
+    text-align: center;
+  }
+  .btn-like {
+    display: inline-block;
+    padding: 8px 20px;
+    background-color: #007bff;
+    color: white;
+    border-radius: 5px;
+    text-align: center;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    margin-bottom: 10px;
+  }
+  .btn-like a {
+    color: white;
+    text-decoration: none;
+  }
+  .btn-like:hover {
+    background-color: #0056b3;
+  }
+</style>
 
 <div class="container">
   <h2 class="page-title text-center">Payments</h2>
-
-  <!-- Table to display payments -->
-  <div class="btn-like">
-    <a href="@Url.Action("Create", "Payment")">Create</a>
-  </div>
-
-
   <div id="paymentTable" class="table-wrapper">
     <!-- Dữ liệu sẽ được load vào đây -->
   </div>
@@ -96,22 +86,26 @@ Layout = "~/Views/Shared/_Layout.cshtml";
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 <script>
+  // Hàm định dạng số tiền sang USD
+  function formatUSD(number) {
+    return number.toLocaleString("en-US", { style: "currency", currency: "USD" });
+  }
+
   function loadPayments(page = 1, pageSize = 10) {
     // Hiển thị loading spinner
     let id = @ViewData["UserId"] ?? null;
 
     showLoading(); // Hiển thị spinner xoay
     $.ajax({
-      url: `/api/payments/user/${id}?pageNumber=${page}&pageSize=${pageSize}`,
+      url: `/api/payments/user/${id}?page=${page}&pageSize=${pageSize}`,
       method: 'GET',
       success: function(response) {
+        hideLoading();
         const data = (response.data && response.data.$values) || [];
         if (!Array.isArray(data) || data.length === 0) {
           $('#paymentTable').html('<div class="text-center">No data available</div>');
-          hideLoading();
           return;
         }
-        showSuccess();
 
         let html = '<table class="table table-striped table-hover">';
         html += '<thead class="thead-dark"><tr><th>ID</th><th>Amount</th><th>Status</th><th>Actions</th></tr></thead>';
@@ -121,13 +115,13 @@ Layout = "~/Views/Shared/_Layout.cshtml";
           const statusMap = { 0: 'Pending', 1: 'Completed', 2: 'Failed' };
           const statusText = statusMap[payment.status] || 'N/A';
           html += `<tr id="payment-row-${payment.id}">
-                                    <td>${payment.id || 'N/A'}</td>
-                                    <td>${(payment.amount || 0).toLocaleString()}</td>
-                                    <td>${statusText}</td>
-                                    <td>
-                                        <button onclick="detailPayment(${payment.id || ''})"><i class='bx bx-paste'></i></button>
-                                    </td>
-                                </tr>`;
+                                <td>${payment.id || 'N/A'}</td>
+                                <td>${formatUSD(payment.amount || 0)}</td>
+                                <td>${statusText}</td>
+                                <td>
+                                    <button onclick="detailPayment(${payment.id || ''})"><i class='bx bx-paste'></i></button>
+                                </td>
+                            </tr>`;
         });
 
         html += '</tbody></table>';
@@ -135,17 +129,17 @@ Layout = "~/Views/Shared/_Layout.cshtml";
         const currentPage = response.currentPage || page;
         const totalPages = response.totalPages || 1;
         const pagination = `
-                        <nav>
-                            <ul class="pagination justify-content-center">
-                                <li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
-                                    <button class="page-link" onclick="loadPayments(${currentPage - 1}, ${pageSize})">Previous</button>
-                                </li>
-                                <li class="page-item ${currentPage === totalPages ? 'disabled' : ''}">
-                                    <button class="page-link" onclick="loadPayments(${currentPage + 1}, ${pageSize})">Next</button>
-                                </li>
-                            </ul>
-                        </nav>
-                    `;
+                    <nav>
+                        <ul class="pagination justify-content-center">
+                            <li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
+                                <button class="page-link" onclick="loadPayments(${currentPage - 1}, ${pageSize})">Previous</button>
+                            </li>
+                            <li class="page-item ${currentPage === totalPages ? 'disabled' : ''}">
+                                <button class="page-link" onclick="loadPayments(${currentPage + 1}, ${pageSize})">Next</button>
+                            </li>
+                        </ul>
+                    </nav>
+                `;
 
         $('#paymentTable').html(html);
         $('#pagination').html(pagination);
@@ -157,39 +151,11 @@ Layout = "~/Views/Shared/_Layout.cshtml";
     });
   }
 
-  function detailPayment(id){
+  function detailPayment(id) {
     window.location.href = "/payment/detail/" + id;
   }
-  function editPayment(id) {
-    alert('Edit payment with ID ' + id);
-    // Implement the edit functionality here
-  }
 
-    function deletePayment(id) {
-    if (confirm('Are you sure you want to delete this payment?')) {
-      showLoading(); // Hiển thị spinner xoay
 
-      // Implement the delete functionality here
-      $.ajax({
-        url: `/api/payments/${id}`,  // Sử dụng transactionId thay vì hard-code giá trị
-        method: 'DELETE',
-        success: function() {
-          showSuccess(); // Chuyển spinner thành dấu tích xanh
-          // Xóa dòng khỏi bảng mà không load lại trang
-          $(`#payment-row-${id}`).remove();
-
-          // Kiểm tra nếu bảng trống thì hiển thị thông báo
-          if ($('#paymentTable tbody tr').length === 0) {
-            $('#paymentTable').html('<div class="text-center">No data available</div>');
-          }
-        },
-        error: function(error) {
-          hideLoading(); // Ẩn spinner nếu lỗi
-          alert('Lỗi khi tải thông tin giao dịch');
-        }
-      });
-    }
-  }
   $(document).ready(function() {
     loadPayments();
   });

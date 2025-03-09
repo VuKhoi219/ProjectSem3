@@ -10,7 +10,7 @@ Layout = "~/Views/Shared/_Layout.cshtml";
   <div class="mb-3">
     <label class="form-label">Selected Insurance Plan</label>
     <input type="text" class="form-control" id="planName" disabled />
-    <small class="form-text text-muted">Plan ID: <span id="planId"></span></small>
+    <small class="form-text text-muted"><span id="planId"></span></small>
   </div>
 
   <!-- Form nhập liệu -->
@@ -125,8 +125,6 @@ Layout = "~/Views/Shared/_Layout.cshtml";
   @Html.Partial("~/Views/Shared/Components/_Readonly.cshtml")
   <div><button class="btn btn-primary" onclick="sendInsuranceLifeDetail()">Contract Requirements</button></div>
 </div>
-
-
 @section Scripts {
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
@@ -134,28 +132,28 @@ Layout = "~/Views/Shared/_Layout.cshtml";
 <script>
   const currentUserId = @ViewData["UserId"] ?? null;
   console.log(currentUserId)
-  let detailId ;
-  let planId ;
+  let detailId;
+  let planId;
   const defaultData = {
     age: 30,
     healthStatus: [0],
     career: [1],
-    coverageAmount: 1000000000,
+    coverageAmount: 1000000000, // Giả sử đây là số tiền gốc, có thể điều chỉnh nếu cần
     contractDuration: 10
   };
 
   $(document).ready(function () {
     const selectedPlan = JSON.parse(localStorage.getItem("selectedPlan"));
     if (selectedPlan) {
-      planId = selectedPlan.id || 0
+      planId = selectedPlan.id || 0;
       $("#planName").val(selectedPlan.name || "Unknown Plan");
       $("#planId").text(selectedPlan.id || "N/A");
-      $("#coverageAmount").val(formatVND(selectedPlan.coverageAmount));
+      $("#coverageAmount").val(formatUSD(selectedPlan.coverageAmount));
     } else {
       console.log("No insurance plan data found in localStorage.");
       $("#planName").val("Default Plan");
       $("#planId").text("N/A");
-      $("#coverageAmount").val(formatVND(defaultData.coverageAmount));
+      $("#coverageAmount").val(formatUSD(defaultData.coverageAmount));
     }
 
     // Tự động tính EndDate khi StartDate hoặc ContractDuration thay đổi
@@ -165,13 +163,17 @@ Layout = "~/Views/Shared/_Layout.cshtml";
     setupEventListeners();
   });
 
-  function formatVND(number) {
-    return number.toLocaleString("vi-VN", { style: "currency", currency: "VND" }).replace("₫", "").trim();
+  // Hàm định dạng số tiền sang USD
+  function formatUSD(number) {
+    return number.toLocaleString("en-US", { style: "currency", currency: "USD" });
   }
-  function parseVNDToNumber(vndString) {
-    // Loại bỏ tất cả dấu chấm và thay bằng "" để đảm bảo chỉ còn số nguyên
-    return parseFloat(vndString.replace(/\./g, ""));
+
+  // Hàm chuyển chuỗi USD về số
+  function parseUSDToNumber(usdString) {
+    // Loại bỏ ký hiệu $ và dấu phẩy
+    return parseFloat(usdString.replace(/[$,]/g, ""));
   }
+
   function calculateEndDate() {
     var startDate = $('#startDate').val();
     var contractDuration = parseInt($('#contractDuration').val()) || 0;
@@ -235,10 +237,10 @@ Layout = "~/Views/Shared/_Layout.cshtml";
   }
 
   function updateResult(response) {
-    $("#annualPaymentAmount").val(formatVND(response.annualPaymentAmount));
-    $("#premium").val(formatVND(response.premium));
-    $("#deductible").val(formatVND(response.deductible));
-    $("#resultCoverageAmount").val(formatVND(response.coverageAmount));
+    $("#annualPaymentAmount").val(formatUSD(response.annualPaymentAmount));
+    $("#premium").val(formatUSD(response.premium));
+    $("#deductible").val(formatUSD(response.deductible));
+    $("#resultCoverageAmount").val(formatUSD(response.coverageAmount));
     $("#riskFactor").val(response.riskFactor.toFixed(3));
     $("#errorAlert").addClass("d-none");
   }
@@ -262,9 +264,9 @@ Layout = "~/Views/Shared/_Layout.cshtml";
     const coverageAmount = selectedPlan.coverageAmount || defaultData.coverageAmount;
     const contractDuration = parseInt($("#contractDuration").val()) || 0;
     const beneficiaries = $("#beneficiaries").val() || null;
-    const annualPaymentAmount = $("#annualPaymentAmount").val() ? parseVNDToNumber($("#annualPaymentAmount").val()) : 0;
-    const premium = $("#premium").val() ? parseVNDToNumber($("#premium").val()) : 0;
-    const deductible = $("#deductible").val() ? parseVNDToNumber($("#deductible").val()) : 0;
+    const annualPaymentAmount = $("#annualPaymentAmount").val() ? parseUSDToNumber($("#annualPaymentAmount").val()) : 0;
+    const premium = $("#premium").val() ? parseUSDToNumber($("#premium").val()) : 0;
+    const deductible = $("#deductible").val() ? parseUSDToNumber($("#deductible").val()) : 0;
     const riskFactor = $("#riskFactor").val() ? parseFloat($("#riskFactor").val()) : 0;
     const region = $("#region").val() || null;
 
@@ -286,14 +288,14 @@ Layout = "~/Views/Shared/_Layout.cshtml";
     };
   }
 
-  function getContractValue(detailId){
-    return{
-      UserId : currentUserId,
-      PlanId : planId,
+  function getContractValue(detailId) {
+    return {
+      UserId: currentUserId,
+      PlanId: planId,
       startDate: $('#startDate').val() + "T00:00:00",
-      endDate: $('#endDate').val() + "T00:00:00" ,    // Gửi EndDate
-      detailId : detailId
-    }
+      endDate: $('#endDate').val() + "T00:00:00",
+      detailId: detailId
+    };
   }
 
   function checkUserId() {
@@ -306,7 +308,7 @@ Layout = "~/Views/Shared/_Layout.cshtml";
 
   function sendInsuranceLifeDetail() {
     if (!checkUserId()) return;
-    showLoading()
+    showLoading();
     const data = getAllValues();
     console.log("Sending data:", data);
     $.ajax({
@@ -317,36 +319,36 @@ Layout = "~/Views/Shared/_Layout.cshtml";
       success: function (response) {
         console.log("Response:", response);
         detailId = response.detailId;
-        console.log("detail id" , detailId)
-       const dataContract =   getContractValue(detailId)
-        console.log(dataContract)
-        saveContract(dataContract)
+        console.log("detail id", detailId);
+        const dataContract = getContractValue(detailId);
+        console.log(dataContract);
+        saveContract(dataContract);
       },
       error: function (xhr) {
         console.log("Error:", xhr.responseText);
         alert("Please enter enough information");
-        hideLoading()
+        hideLoading();
       }
     });
   }
 
-  function saveContract(data){
+  function saveContract(data) {
     $.ajax({
-      url : "/api/insurance-contracts",
-      method : "POST",
-      contentType : "application/json",
-      data : JSON.stringify(data),
-      success: function (response){
-        console.log("contract",response)
+      url: "/api/insurance-contracts",
+      method: "POST",
+      contentType: "application/json",
+      data: JSON.stringify(data),
+      success: function (response) {
+        console.log("contract", response);
         showSuccess();
-        setTimeout(function () {window.location.href = "/Home/PageSuccess";}, 2000);
+        setTimeout(function () { window.location.href = "/Home/PageSuccess"; }, 2000);
       },
       error: function (xhr) {
         console.log("Error:", xhr.responseText);
         alert("Please enter enough information");
-        hideLoading()
+        hideLoading();
       }
-    })
+    });
   }
 
 </script>
